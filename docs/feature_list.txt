@@ -1,0 +1,84 @@
+========== MapleSolaxiaV2 ==========
+Credits:
+Ronan - Freelance Developer
+Vcoc - Freelance Developer
+
+---------------------------
+DISCLAIMER:
+---------------------------
+
+This is NOT intended to be a PURE v83 MapleStory server emulator (acting
+under the clean WZ files, provided by Nexon/Wizet). There has been provided
+a whole array of edited WZ on the Drive to be used for this server. Although
+normal WZs will load properly, there is no guarantee in-game bugs and issues
+may arise because of some incompatibilities with the clean files.
+
+---------------------------
+Feature list:
+---------------------------
+
+PQs:
+* HPQ/KPQ/LPQ/LMPQ/OPQ/EllinPQ/PiratePQ/MagatiaPQ/HorntailPQ/AmoriaPQ 100%.
+* CWKPQ as Expedition-based event 100%.
+* Expeditions: Scarga/Horntail/Showa/Zakum/Pinkbean 100%.
+* GuildPQ 100% + Guild queue with multi-lobby systems available.
+* Brand-new PQ: Boss Rush PQ 100%.
+* Mu Lung Dojo 100%.
+* BalrogPQ semi-functional.
+* Capt. Latanica remade as an event (parties can now fight the boss).
+
+Quests:
+* Doll house quest 100%.
+* Quests can now reward properly items when matching a reward item with the player's job.
+* Loads of quests have been patched.
+* Quest rewards according to jobs works properly.
+* Rewarding system now checks for stacking opportunities on the inventory before checking for new slots.
+
+Player Social Network:
+* Guild and Alliance system fully functional.
+
+Cash & Items:
+* EXP/DROP/Cosmetic Coupons 100%.
+* EXP/DROP coupons now appears as a buff effect when on active time.
+* Great deal of cash items functional.
+* New scroll: antibanish. Used only in cases where bosses send a player back to town.
+
+PQ potentials:
+* Lobby system - Multiple PQ instances on same channel.
+* Expedition system - Multiples parties can attempt on a same instance (lobbies and expeds are mutually-exclusive).
+* Guild queue system - Guilds can register themselves on a queue for the GPQ.
+* EIM Pool system - After the first instance setup, next event instances are loaded beforehand and set on a pooling queue, optimizing future loadouts.
+
+Server potentials:
+* Multi-worlds 100%.
+* Adventurer Mount quests 100%.
+* All Equipment levels up.
+* Player level rates.
+* Gain fame by quests.
+* Every monsterbook card is now droppable by overworld mobs.
+* Monsterbook displays drop data info conformant with the underlying DB (needs custom wz). See more on the MobBookUpdate feature.
+* Mastery book announcer displays droppers of needed books of a player, by reading underlying DB.
+* Every skill/mastery book is now droppable by mobs.
+* Inventory auto-gather and auto-sorting feature.
+* Enhanced AP auto-assigner: exactly matches AP with the needed for the player's current level, surplus assigned to the primary attribute.
+* Added Boss HP Bar for dozens of bosses (needs provided custom wz).
+* If multiple bosses are on the same area, client will prioritize Boss HP bar of the target of the player.
+* Custom jail system (needs provided custom wz).
+* Delete Character 100% (requires ENABLE_PIC activated).
+* Boats, elevator and other travelling mechanics fully working.
+* Vega's spell.
+* Pet item ignore.
+* Autosaver (periodically saves on DB current state of every player in-game).
+
+Admin/GM commands:
+* Server commands layered by GM levels.
+* New commands.
+* Spawn Zakum/Horntail/Pinkbean 100%.
+
+Project:
+* Organized project code.
+* Highly configurable server (see all server flags at ServerConstants).
+* Fixed/added some missing packets for MoveEnvironment, summons and others.
+* Reviewed many Java object aspects that needed concurrency protection.
+
+---------------------------
