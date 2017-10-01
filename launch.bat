@@ -1,5 +1,5 @@
 @echo off
-@title MapleSolaxia
+@title ProjectNano
 set CLASSPATH=.;dist\*
 java -Dwzpath=wz\ net.server.Server
 pause

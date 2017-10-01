@@ -17,7 +17,14 @@ The main objective of this project is to try as best as possible to recreate wha
 ### Download items 
 
 Server files: https://github.com/ronancpl/MapleSolaxiaV2
+
 Client files & general tools: https://drive.google.com/drive/folders/0BzDsHSr-0V4MYVJ0TWIxd05hYUk
+
+---
+### Donation
+
+If you liked what you have seen on the project, donate a little something as a helping hand for my contributions towards Maple development.
+Paypal: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=3K8KVTWRLFBQ4
 
 ---
 ### Preparing the ambient 
@@ -36,13 +43,13 @@ Now install the Java 7 Development Kit:
 * netbeans-8.0.2-javase-windows.exe -> It's a NetBeans project, use other IDE at your own risk.
 
 Overwrite whenever prompted with the JAR files under "jce_policy-7/UnlimitedJCEPolicy" in these Java folders:
-C:\Program Files\Java\jre7\lib
-C:\Program Files\Java\jre7\lib\ext
-C:\Program Files\Java\jre7\lib\security
-C:\Program Files\Java\jdk1.7.0_01\lib
-C:\Program Files\Java\jdk1.7.0_01\jre\lib
-C:\Program Files\Java\jdk1.7.0_01\jre\lib\ext
-C:\Program Files\Java\jdk1.7.0_01\jre\lib\security
+* C:\Program Files\Java\jre7\lib
+* C:\Program Files\Java\jre7\lib\ext
+* C:\Program Files\Java\jre7\lib\security
+* C:\Program Files\Java\jdk1.7.0_01\lib
+* C:\Program Files\Java\jdk1.7.0_01\jre\lib
+* C:\Program Files\Java\jdk1.7.0_01\jre\lib\ext
+* C:\Program Files\Java\jdk1.7.0_01\jre\lib\security
 
 Now that the tools have been installed, test if they are working.
 

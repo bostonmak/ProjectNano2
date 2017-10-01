@@ -1245,8 +1245,11 @@ public class Commands {
 				}
 			}
                         
-                        if(player.getJob().isA(MapleJob.ARAN1)) {
+                        if(player.getJob().isA(MapleJob.ARAN1) || player.getJob().isA(MapleJob.LEGEND)) {
                                 skill = SkillFactory.getSkill(5001005);
+                                player.changeSkillLevel(skill, (byte) -1, -1, -1);
+                        } else {
+                                skill = SkillFactory.getSkill(21001001);
                                 player.changeSkillLevel(skill, (byte) -1, -1, -1);
                         }
                         
@@ -1403,7 +1406,31 @@ public class Commands {
                 MapleCharacter player = c.getPlayer();
                 MapleCharacter victim;
             
-                switch(sub[0]) {    
+                switch(sub[0]) {
+                case "fly":
+                        if (sub.length < 2) {
+				player.yellowMessage("Syntax: !fly <on/off>");
+				break;
+			}
+                        
+                        Integer accid = c.getAccID();
+                        
+                        String sendStr = "";
+                        if(sub[1].equalsIgnoreCase("on")) {
+                                sendStr += "GM Fly feature enabled. With fly active, GM's cannot attack.";
+                                if(!srv.canFly(accid)) sendStr += " Re-login to take effect.";
+                            
+                                srv.changeFly(c.getAccID(), true);
+                        } else {
+                                player.dropMessage(6, "GM Fly feature disabled. GM's can now attack.");
+                                if(srv.canFly(accid)) sendStr += " Re-login to take effect.";
+                                
+                                srv.changeFly(c.getAccID(), false);
+                        }
+                        
+                        player.dropMessage(6, sendStr);
+                break;
+                    
 		case "spawn":
                         if (sub.length < 2) {
 				player.yellowMessage("Syntax: !spawn <mobid>");
@@ -1582,12 +1609,12 @@ public class Commands {
 			Server.getInstance().broadcastGMMessage(MaplePacketCreator.serverNotice(5, message_));
                     break;
                     
-		 case "ignored":
+		case "ignored":
 			for (String ign : MapleLogger.ignored){
 				player.yellowMessage(ign + " is being ignored.");
 			}
                     break;
-                     
+                    
 		case "pos":
 			float xpos = player.getPosition().x;
 			float ypos = player.getPosition().y;
@@ -1657,7 +1684,7 @@ public class Commands {
                 
                 case "givems":
                         if (sub.length < 3){
-				player.yellowMessage("Syntax: !givems <playername> <gainmx>");
+				player.yellowMessage("Syntax: !givems <playername> <gainms>");
 				break;
 			}
                         
@@ -2044,7 +2071,7 @@ public class Commands {
                         try {
                                 if (sub.length == 2) {
                                         int itemId = Integer.parseInt(sub[1]);
-                                        if(!(itemId >= 30000 && itemId < 32000) || MapleItemInformationProvider.getInstance().getName(itemId) == null) {
+                                        if(!(itemId >= 30000 && itemId < 35000) || MapleItemInformationProvider.getInstance().getName(itemId) == null) {
                                                 player.yellowMessage("Hair id '" + sub[1] + "' does not exist.");
                                                 break;
                                         }
@@ -2054,7 +2081,7 @@ public class Commands {
                                         player.equipChanged();
                                 } else {
                                         int itemId = Integer.parseInt(sub[2]);
-                                        if(!(itemId >= 30000 && itemId < 32000) || MapleItemInformationProvider.getInstance().getName(itemId) == null) {
+                                        if(!(itemId >= 30000 && itemId < 35000) || MapleItemInformationProvider.getInstance().getName(itemId) == null) {
                                                 player.yellowMessage("Hair id '" + sub[2] + "' does not exist.");
                                                 break;
                                         }
@@ -2271,6 +2298,7 @@ public class Commands {
                         player.getMap().spawnMonsterOnGroundBelow(monster, player.getPosition());
                         break;
                             
+                    /*
                     case "playernpc":
                         if (sub.length < 3){
                             player.yellowMessage("Syntax: !playernpc <playername> <npcid>");
@@ -2278,6 +2306,7 @@ public class Commands {
                         }
                         player.playerNPC(c.getChannelServer().getPlayerStorage().getCharacterByName(sub[1]), Integer.parseInt(sub[2]));
 			break;
+                    */
                         
                     default:
                         return false;
@@ -2540,6 +2569,14 @@ public class Commands {
 			player.dropMessage(5, "Quest Cache for quest " + sub[1] + " cleared.");
 			break;
                             
+                case "fred":
+                        c.announce(MaplePacketCreator.fredrickMessage(Byte.valueOf(sub[1])));
+                        break;
+                    
+                case "owl":
+                        c.announce(MaplePacketCreator.getOwlMessage(Integer.valueOf(sub[1])));
+                        break;
+                    
                 default:
                         return false;
                 }

@@ -92,13 +92,14 @@ function writeSolaxiaCommandsLv4() {    //SuperGM
         addCommand("pap", "");
         addCommand("pianus", "");
         addCommand("cake", "");
-        addCommand("playernpc", "");
+        //addCommand("playernpc", "");
 }
 
 function writeSolaxiaCommandsLv3() {    //GM
         comm_cursor = comm_lv3;
         desc_cursor = desc_lv3;
 
+        addCommand("fly", "");
         addCommand("spawn", "");
         addCommand("mutemap", "");
         addCommand("checkdmg", "");

@@ -22,7 +22,7 @@ PQs:
 * CWKPQ as Expedition-based event 100%.
 * Expeditions: Scarga/Horntail/Showa/Zakum/Pinkbean 100%.
 * GuildPQ 100% + Guild queue with multi-lobby systems available.
-* Brand-new PQ: Boss Rush PQ 100%.
+* Brand-new PQs: BossRushPQ, CafePQ 100%.
 * Mu Lung Dojo 100%.
 * BalrogPQ semi-functional.
 * Capt. Latanica remade as an event (parties can now fight the boss).
@@ -32,7 +32,7 @@ Quests:
 * Quests can now reward properly items when matching a reward item with the player's job.
 * Loads of quests have been patched.
 * Quest rewards according to jobs works properly.
-* Rewarding system now checks for stacking opportunities on the inventory before checking for new slots.
+* Enchanced rewarding system: checks for stacking opportunities on the inventory before checking for new slots.
 
 Player Social Network:
 * Guild and Alliance system fully functional.
@@ -41,7 +41,7 @@ Cash & Items:
 * EXP/DROP/Cosmetic Coupons 100%.
 * EXP/DROP coupons now appears as a buff effect when on active time.
 * Great deal of cash items functional.
-* New scroll: antibanish. Used only in cases where bosses send a player back to town.
+* New scroll: antibanish. For use only in cases where bosses send a player back to town.
 
 PQ potentials:
 * Lobby system - Multiple PQ instances on same channel.
@@ -60,13 +60,17 @@ Server potentials:
 * Mastery book announcer displays droppers of needed books of a player, by reading underlying DB.
 * Every skill/mastery book is now droppable by mobs.
 * Inventory auto-gather and auto-sorting feature.
+* Enhanced auto-pot system: pet uses as many potions as necessary to reach the desired threshold.
+* Enhanced buff system: smartly checks for the best available buff effects to be active on the player.
 * Enhanced AP auto-assigner: exactly matches AP with the needed for the player's current level, surplus assigned to the primary attribute.
 * Added Boss HP Bar for dozens of bosses (needs provided custom wz).
 * If multiple bosses are on the same area, client will prioritize Boss HP bar of the target of the player.
 * Custom jail system (needs provided custom wz).
 * Delete Character 100% (requires ENABLE_PIC activated).
 * Boats, elevator and other travelling mechanics fully working.
+* Enabled Hired Merchant being able to be used anywhere but FM Entrance and other few places.
 * Vega's spell.
+* Owl of Minerva.
 * Pet item ignore.
 * Autosaver (periodically saves on DB current state of every player in-game).
 

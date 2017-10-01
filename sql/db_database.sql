@@ -1,4 +1,4 @@
-﻿#EXECUTE THIS FIRST, THEN NEXT SQL: 'db_drops.sql'
+#EXECUTE THIS FIRST, THEN NEXT SQL: 'db_drops.sql'
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -12982,6 +12982,15 @@ CREATE TABLE IF NOT EXISTS `inventoryitems` (
   `giftFrom` varchar(26) NOT NULL,
   PRIMARY KEY (`inventoryitemid`),
   KEY `CHARID` (`characterid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `inventorymerchant` (
+  `inventorymerchantid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `inventoryitemid` int(10) unsigned NOT NULL DEFAULT '0',
+  `characterid` int(11) DEFAULT NULL,
+  `bundles` int(10) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`inventorymerchantid`),
+  KEY `INVENTORYITEMID` (`inventoryitemid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `ipbans` (
