@@ -63,7 +63,7 @@
 //        }
 //    }
 //}
-
+// edited by LightRyuzaki for ProjectNano
 var status = -1;
 
 function start() {
@@ -79,62 +79,62 @@ function action(mode, type, selection) {
         if (mode == 1) status++;
         else status--;
         if (status == 0) {
-            cm.sendSimple("Hello #h # ! I am the boss summoner NPC of ProjectNano! Each boss monster that I summon will cost some #b#v4031682##k's! You can get them by trading 1billion mesos in the free market. Would you like me to spawn some #e Special Boss Monsters #n for you? \r\n Please choose #b\r\n#L1#Papulatus clock #b#v4031682##k*1 #l\r\n#L2#Pianus #b#v4031682##k * 1#l\r\n#L3#Black Crow #b#v4031682##k * 1#l\r\n#L4#Anego #b#v4031682##k * 1#l\r\n#L5#BodyGuard A #b#v4031682##k *1#l\r\n#L6#Bodyguard B #b#v4031682##k * 1#l\r\n#L7#The Boss #b#v4031682##k * 1#l#k");
+            cm.sendSimple("Hello #h # ! I am the boss summoner NPC of ProjectNano! Each boss monster that I summon will cost some #b#v4001126##k's! You can get them by trading 1billion mesos in the free market. Would you like me to spawn some #e Special Boss Monsters #n for you? \r\n Please choose #b\r\n#L1#Papulatus clock #b#v4001126##k*1 #l\r\n#L2#Pianus #b#v4001126##k * 1#l\r\n#L3#Black Crow #b#v4001126##k * 1#l\r\n#L4#Anego #b#v4001126##k * 1#l\r\n#L5#BodyGuard A #b#v4001126##k *1#l\r\n#L6#Bodyguard B #b#v4001126##k * 1#l\r\n#L7#The Boss #b#v4001126##k * 1#l#k");
         } else {
             if (selection == 1) {
-        if(cm.haveItem(4031682, 1)) {
-        cm.gainItem(4031682,-1); 
+        if(cm.haveItem(4001126, 1)) {
+        cm.gainItem(4001126,-1); 
                 cm.spawnMonster(8500001);
                 } else{
-        cm.sendOk("Sorry, you don't have enough #b#v4031682##k!'s to summon Papulatus");
+        cm.sendOk("Sorry, you don't have enough #b#v4001126##k!'s to summon Papulatus");
         }
         cm.dispose();
             } else if (selection == 2) {
-        if(cm.haveItem(4031682, 1)) {
-        cm.gainItem(4031682,-1); 
+        if(cm.haveItem(4001126, 1)) {
+        cm.gainItem(4001126,-1); 
                 cm.spawnMonster(8510000);
                 } else{
-        cm.sendOk("Sorry, you don't have enough #b#v4031682##k!'s to summon Pianus");
+        cm.sendOk("Sorry, you don't have enough #b#v4001126##k!'s to summon Pianus");
         }
         cm.dispose();
             } else if (selection == 3) {
-        if(cm.haveItem(4031682, 1)) {
-        cm.gainItem(4031682,-1); 
+        if(cm.haveItem(4001126, 1)) {
+        cm.gainItem(4001126,-1); 
                 cm.spawnMonster(9400014);
                 } else{
-        cm.sendOK("Sorry, you don't have enough #b#v4031682##k!'s to summon Black Crow");
+        cm.sendOK("Sorry, you don't have enough #b#v4001126##k!'s to summon Black Crow");
         }
         cm.dispose();
             } else if (selection == 4) {
-        if(cm.haveItem(4031682, 1)) {
-        cm.gainItem(4031682,-1); 
+        if(cm.haveItem(4001126, 1)) {
+        cm.gainItem(4001126,-1); 
                 cm.spawnMonster(9400121);
                 } else{
-        cm.sendOk("Sorry, you don't have enough #b#v4031682##k!'s to summon Anego");
+        cm.sendOk("Sorry, you don't have enough #b#v4001126##k!'s to summon Anego");
         }
         cm.dispose();
             } else if (selection == 5) {
-        if(cm.haveItem(4031682, 1)) {
-        cm.gainItem(4031682,-1); 
+        if(cm.haveItem(4001126, 1)) {
+        cm.gainItem(4001126,-1); 
                 cm.spawnMonster(9400112);
                 } else{
-        cm.sendOk("Sorry, you don't have enough #b#v4031682##k!'s to summon Bodyguard A");
+        cm.sendOk("Sorry, you don't have enough #b#v4001126##k!'s to summon Bodyguard A");
         }
         cm.dispose();
             } else if (selection == 6) {
-        if(cm.haveItem(4031682, 1)) {
-        cm.gainItem(4031682,-1); 
+        if(cm.haveItem(4001126, 1)) {
+        cm.gainItem(4001126,-1); 
                 cm.spawnMonster(9400113);
                 } else{
-        cm.sendOk("Sorry, you don't have enough #b#v4031682##k!'s to summon Bodyguard B");
+        cm.sendOk("Sorry, you don't have enough #b#v4001126##k!'s to summon Bodyguard B");
         }
         cm.dispose();
             } else if (selection == 7) {
-        if(cm.haveItem(4031682, 1)) {
-        cm.gainItem(4031682,-1); 
+        if(cm.haveItem(4001126, 1)) {
+        cm.gainItem(4001126,-1); 
                 cm.spawnMonster(9400300);
                 } else{
-        cm.sendOk("Sorry, you don't have enough #b#v4031682##k!'s to summon The Boss");
+        cm.sendOk("Sorry, you don't have enough #b#v4001126##k!'s to summon The Boss");
         }
         cm.dispose();
             } else {

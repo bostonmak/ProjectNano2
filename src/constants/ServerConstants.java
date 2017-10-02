@@ -7,8 +7,8 @@ public class ServerConstants {
     //Database Configuration
     public static String DB_URL = "mysql://localhost:3306/maplesolaxia?autoReconnect=true";
     public static String DB_USER = "root";
-    public static String DB_PASS = "root";
-    public static final boolean DB_EXPERIMENTAL_POOL = true;   //[EXPERIMENTAL] Installs a connection pool to hub DB connections. Set false to default.
+    public static String DB_PASS = "";
+    public static final boolean DB_EXPERIMENTAL_POOL = false;   //[EXPERIMENTAL] Installs a connection pool to hub DB connections. Set false to default.
 	
     //World And Version
     public static short VERSION = 83;
@@ -59,12 +59,12 @@ public class ServerConstants {
     public static final int MESO_RATE = 10;
     public static final int DROP_RATE = 8;
     public static final int BOSS_DROP_RATE = 5;
-    public static final double EQUIP_EXP_RATE = 2.0;               //Rate for equipment exp gain, grows linearly. Set 1.0 for default (about 100~200 same-level range mobs killed to pass equip from level 1 to 2).
+    public static final double EQUIP_EXP_RATE = 1.0;               //Rate for equipment exp gain, grows linearly. Set 1.0 for default (about 100~200 same-level range mobs killed to pass equip from level 1 to 2).
     
     public static final int PARTY_EXPERIENCE_MOD = 2;               //Change for event stuff.
     public static final double PQ_BONUS_EXP_MOD = 0.5;
     
-    public static final byte MAX_MONITORED_BUFFSTATS = 5;       //Limits accounting for "dormant" buff effects, that should take place when stronger stat buffs expires.
+    public static final byte MAX_MONITORED_BUFFSTATS = 8;       //Limits accounting for "dormant" buff effects, that should take place when stronger stat buffs expires.
     public static final int MAX_AP = 32767;                     //Max AP allotted on the auto-assigner.
     public static final int MAX_EVENT_LEVELS = 8;               //Event has different levels of rewarding system.
     public static final long BLOCK_NPC_RACE_CONDT = (long)(0.5 * 1000); //Time the player client must wait before reopening a conversation with an NPC.

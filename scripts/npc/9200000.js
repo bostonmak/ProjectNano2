@@ -4,7 +4,7 @@ Sets Your Sp to 0
 
 
 var status = 0;
-var price = 100000;
+var price = 10000000;
 
 
 function start() {
@@ -13,7 +13,7 @@ function start() {
 
 function action(mode, type, selection) {
     if (status == 0) {
-        cm.sendYesNo("Do You Want to Set Your SP points to 0? you'll need it for your 3rd job advancement . it only costs you 100,000 mesos.");
+        cm.sendYesNo("Do You Want to Set Your SP points to 0? you'll need it for your 3rd job advancement . it only costs you 10m");
         status++;
     } else {
         if ((status == 1 && type == 1 && selection == -1 && mode == 0) || mode == -1) {
@@ -26,7 +26,7 @@ function action(mode, type, selection) {
                     cm.sendOk("Sp Resetted . Please re-LogIn For the Effect To Take Place .")
                     cm.dispose();
                 } else {
-                    cm.sendOk("I'm Sorry . Get 100,000 mesos first .");
+                    cm.sendOk("I'm Sorry . Get 10million mesos first .");
                     cm.dispose();
                 }
             }

@@ -15,3 +15,5 @@ tools/MapleIdRetriever/build/
 tools/MobBookIndexer/build/
 tools/MobBookUpdate/build/
 dist/
+configuration.ini
+launch.bat
