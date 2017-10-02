@@ -2281,11 +2281,11 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
             party *= 0.5;
         }
 	
-        if(gain < 0) gain = Integer.MAX_VALUE;   // integer overflow, heh.
-        if(party < 0) party = Integer.MAX_VALUE;   // integer overflow, heh.
+        if(gain < 0) {gain = Integer.MAX_VALUE;}   // integer overflow, heh.
+        if(party < 0) {party = Integer.MAX_VALUE;}   // integer overflow, heh.
         int equip = (int)Math.min((long)((gain / 10) * pendantExp), Integer.MAX_VALUE);
         
-        long total = gain + equip + party;
+        long total = (long)gain + (long)equip + (long)party;
         gainExpInternal(total, equip, party, show, inChat, white);
     }
     
@@ -2298,7 +2298,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     }
     
     private void gainExpInternal(long gain, int equip, int party, boolean show, boolean inChat, boolean white) {
-        long total = Math.max(gain, -exp.get());
+        long total = Math.max(Math.max(gain, -exp.get()), 0);
         
         if (level < getMaxLevel()) {
             long leftover = 0;
@@ -2316,6 +2316,12 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
                 levelUp(true);
                 if (level == getMaxLevel()) {
                     setExp(0);
+                    System.out.print("LEVEL ");
+                    System.out.println(level);
+                    System.out.print("EXP ");
+                    System.out.println(exp);
+                    System.out.print("LEFTOVER ");
+                    System.out.println(leftover);
                     updateSingleStat(MapleStat.EXP, 0);
                     break;
                 }
