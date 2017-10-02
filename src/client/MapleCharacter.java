@@ -4682,8 +4682,8 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
             level = getMaxLevel(); //To prevent levels past 200
         }
         
-        maxhp = Math.min(999999, maxhp);
-        maxmp = Math.min(999999, maxmp);
+        maxhp = Math.min(30000, maxhp);
+        maxmp = Math.min(30000, maxmp);
         if (level == 200) {
             exp.set(0);
         }
