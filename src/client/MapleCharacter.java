@@ -5009,7 +5009,9 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
         if(!isLoggedin() || getCashShop().isOpened()) return;
         
         MapleStatEffect mse = ii.getItemEffect(couponid);
-        mse.applyTo(this);
+        if (mse != null) {
+            mse.applyTo(this);
+        }        
     }
     
     public void dispelBuffCoupons() {
