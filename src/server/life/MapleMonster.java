@@ -355,7 +355,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
             if (exp > 0) {
                 if (partyModifier > 0) {
-                    partyExp = (int) (personalExp * ServerConstants.PARTY_EXPERIENCE_MOD * partyModifier / 1000f);
+                    partyExp = (int) (personalExp / 1000f * ServerConstants.PARTY_EXPERIENCE_MOD * partyModifier);
                 }
                 Integer holySymbol = attacker.getBuffedValue(MapleBuffStat.HOLY_SYMBOL);
                 boolean GMHolySymbol = attacker.getBuffSource(MapleBuffStat.HOLY_SYMBOL) == SuperGM.HOLY_SYMBOL;
