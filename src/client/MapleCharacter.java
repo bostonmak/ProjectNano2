@@ -2316,12 +2316,6 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
                 levelUp(true);
                 if (level == getMaxLevel()) {
                     setExp(0);
-                    System.out.print("LEVEL ");
-                    System.out.println(level);
-                    System.out.print("EXP ");
-                    System.out.println(exp);
-                    System.out.print("LEFTOVER ");
-                    System.out.println(leftover);
                     updateSingleStat(MapleStat.EXP, 0);
                     break;
                 }
@@ -4688,8 +4682,8 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
             level = getMaxLevel(); //To prevent levels past 200
         }
         
-        maxhp = Math.min(30000, maxhp);
-        maxmp = Math.min(30000, maxmp);
+        maxhp = Math.min(999999, maxhp);
+        maxmp = Math.min(999999, maxmp);
         if (level == 200) {
             exp.set(0);
         }
