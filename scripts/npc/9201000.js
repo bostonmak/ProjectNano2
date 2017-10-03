@@ -49,7 +49,7 @@ function start() {
                if (/*cm.getPlayer().getMarriageQuestLevel() == 0 && */cm.getPlayer().getLevel() >= 10) {
                     cm.sendNext("Hey, I'm Moony, and I make engagement rings for marriage.");
                } else /*if (cm.getPlayer().getMarriageQuestLevel() == 1)*/ {
-                   for (var i = 4031367; i < 4031373; i++)
+                   for (var i = 4001126; i < 4001126; i++)
                        numberOfLoves += cm.getPlayer().countItem(i);
                    if (numberOfLoves >= 4) {
                        cm.sendNext("Wow, you're back pretty early. Got the #bProof of Loves#k? Lets see...");
@@ -130,7 +130,7 @@ function start() {
                cm.sendOk("Okay, first bring me back any four colored #bProof of Loves#k. You can get them from talking to #bNana the Love Fairy#k in any town. Also, only one of you, either the Groom or Bride will do this quest.");
                cm.dispose();
            } else /*if (cm.getPlayer().getMarriageQuestLevel() == 1)*/ {
-               for (var j = 4031367; j < 4031373; j++)
+               for (var j = 4001126; j < 4001126; j++)
                    cm.removeAll(j);
                //cm.getPlayer().addMarriageQuestLevel();
                cm.sendNextPrev("You need the following raw materials to make an\r\n#bEngagement Ring#k.\r\n\r\n#e#dMoonstone Ring:#k\r\n#v4011007#Moon Rock 1,#v4021007#Diamond 1, 3,000,000 Meso\r\n#dStar Gem Ring:#k\r\n#v4021009#Star Rock 1,#v4021007#Diamond 1, 2,000,000 Meso\r\n#dGolden Heart Ring:#k\r\n#v4011006#Gold Plate 1,#v4021007#Diamond 1, 1,000,000 Meso\r\n#dSilver Swan Ring:#k\r\n#v4011004#Silver Plate 1,#v4021007#Diamond 1, 500,000 Meso\r\n");
