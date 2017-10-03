@@ -309,6 +309,9 @@ public class Commands {
 		gotomaps.put("hpq", 100000200);
 		gotomaps.put("ht", 240050400);
 		gotomaps.put("fm", 910000000);
+                gotomaps.put("ereve", 130000000);
+                gotomaps.put("ariant", 260000000);
+                gotomaps.put("magatia", 261000000);
 	}
         
         private static void hardsetItemStats(Equip equip, short stat) {
@@ -663,6 +666,69 @@ public class Commands {
 				}
 			}
 			break;
+                    
+                   
+                case "str":
+                    if (sub.length != 2){
+				player.yellowMessage("Syntax: !str <ap>");
+				break;
+			}
+                    else {
+                        int newAp = Integer.parseInt(sub[1]);
+                        if(newAp < 0) newAp = 0;
+                        else if(newAp > player.getRemainingAp()) newAp = player.getRemainingAp();
+
+                        player.gainAp(-newAp);
+                        player.addStat(1, newAp);
+                    }
+                    
+                    break;
+                    
+                case "dex":
+                    if (sub.length != 2){
+				player.yellowMessage("Syntax: !dex <ap>");
+				break;
+			}
+                    else {
+                        int newAp = Integer.parseInt(sub[1]);
+                        if(newAp < 0) newAp = 0;
+                        else if(newAp > player.getRemainingAp()) newAp = player.getRemainingAp();
+
+                        player.gainAp(-newAp);
+                        player.addStat(2, newAp);
+                    }
+                    break;
+                    
+                case "int":
+                    if (sub.length != 2){
+				player.yellowMessage("Syntax: !int <ap>");
+				break;
+			}
+                    else {
+                        int newAp = Integer.parseInt(sub[1]);
+                        if(newAp < 0) newAp = 0;
+                        else if(newAp > player.getRemainingAp()) newAp = player.getRemainingAp();
+
+                        player.gainAp(-newAp);
+                        player.addStat(3, newAp);
+                    }
+                    break;
+                    
+                case "luk":
+                    if (sub.length != 2){
+				player.yellowMessage("Syntax: !luk <ap>");
+				break;
+			}
+                    else {
+                        int newAp = Integer.parseInt(sub[1]);
+                        if(newAp < 0) newAp = 0;
+                        else if(newAp > player.getRemainingAp()) newAp = player.getRemainingAp();
+
+                        player.gainAp(-newAp);
+                        player.addStat(4, newAp);
+                    }
+                    break;
+                
                             
                 default:
                         return false;
@@ -831,7 +897,7 @@ public class Commands {
                                 }
 			}
                     break;
-                    
+                
                 case "empowerme":
 			final int[] array = {2311003, 2301004, 1301007, 4101004, 2001002, 1101007, 1005, 2301003, 5121009, 1111002, 4111001, 4111002, 4211003, 4211005, 1321000, 2321004, 3121002};
 			for (int i : array) {
