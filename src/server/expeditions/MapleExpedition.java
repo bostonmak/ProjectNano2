@@ -72,6 +72,8 @@ public class MapleExpedition {
 			9420542,// - Targa
 			9420543,// - Angry Targa
 			9420544,// - Furious Targa
+			8820000,// - Initial Pink Bean
+			8820001,// - Pink Bean
 	};
 	
 	private MapleCharacter leader;
