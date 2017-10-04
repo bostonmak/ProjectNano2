@@ -309,9 +309,6 @@ public class Commands {
 		gotomaps.put("hpq", 100000200);
 		gotomaps.put("ht", 240050400);
 		gotomaps.put("fm", 910000000);
-                gotomaps.put("ereve", 130000000);
-                gotomaps.put("ariant", 260000000);
-                gotomaps.put("magatia", 261000000);
 	}
         
         private static void hardsetItemStats(Equip equip, short stat) {
@@ -666,69 +663,6 @@ public class Commands {
 				}
 			}
 			break;
-                    
-                   
-                case "str":
-                    if (sub.length != 2){
-				player.yellowMessage("Syntax: !str <ap>");
-				break;
-			}
-                    else {
-                        int newAp = Integer.parseInt(sub[1]);
-                        if(newAp < 0) newAp = 0;
-                        else if(newAp > player.getRemainingAp()) newAp = player.getRemainingAp();
-
-                        player.gainAp(-newAp);
-                        player.addStat(1, newAp);
-                    }
-                    
-                    break;
-                    
-                case "dex":
-                    if (sub.length != 2){
-				player.yellowMessage("Syntax: !dex <ap>");
-				break;
-			}
-                    else {
-                        int newAp = Integer.parseInt(sub[1]);
-                        if(newAp < 0) newAp = 0;
-                        else if(newAp > player.getRemainingAp()) newAp = player.getRemainingAp();
-
-                        player.gainAp(-newAp);
-                        player.addStat(2, newAp);
-                    }
-                    break;
-                    
-                case "int":
-                    if (sub.length != 2){
-				player.yellowMessage("Syntax: !int <ap>");
-				break;
-			}
-                    else {
-                        int newAp = Integer.parseInt(sub[1]);
-                        if(newAp < 0) newAp = 0;
-                        else if(newAp > player.getRemainingAp()) newAp = player.getRemainingAp();
-
-                        player.gainAp(-newAp);
-                        player.addStat(3, newAp);
-                    }
-                    break;
-                    
-                case "luk":
-                    if (sub.length != 2){
-				player.yellowMessage("Syntax: !luk <ap>");
-				break;
-			}
-                    else {
-                        int newAp = Integer.parseInt(sub[1]);
-                        if(newAp < 0) newAp = 0;
-                        else if(newAp > player.getRemainingAp()) newAp = player.getRemainingAp();
-
-                        player.gainAp(-newAp);
-                        player.addStat(4, newAp);
-                    }
-                    break;
-                
                             
                 default:
                         return false;
@@ -897,7 +831,7 @@ public class Commands {
                                 }
 			}
                     break;
-                
+                    
                 case "empowerme":
 			final int[] array = {2311003, 2301004, 1301007, 4101004, 2001002, 1101007, 1005, 2301003, 5121009, 1111002, 4111001, 4111002, 4211003, 4211005, 1321000, 2321004, 3121002};
 			for (int i : array) {
@@ -1382,7 +1316,80 @@ public class Commands {
 			
 			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, sb.toString(), "00 00", (byte) 0));
                     break;
-                    
+                } else if (splitted[0].equals("pmob")) { //should be written as case "pmob":
+            int npcId = Integer.parseInt(splitted[1]);
+            int mobTime = Integer.parseInt(splitted[2]);
+            int xpos = player.getPosition().x;
+            int ypos = player.getPosition().y;
+            int fh = player.getMap().getFootholds().findBelow(player.getPosition()).getId();
+            if (splitted[2] == null) {
+                mobTime = 0;
+            }
+            MapleMonster mob = MapleLifeFactory.getMonster(npcId);
+            if (mob != null && !mob.getName().equals("MISSINGNO")) {
+                mob.setPosition(player.getPosition());
+                mob.setCy(ypos);
+                mob.setRx0(xpos + 50);
+                mob.setRx1(xpos - 50);
+                mob.setFh(fh);
+                try {
+                    Connection con = DatabaseConnection.getConnection();
+                    PreparedStatement ps = con.prepareStatement("INSERT INTO spawns ( idd, f, fh, cy, rx0, rx1, type, x, y, mid, mobtime ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
+                    ps.setInt(1, npcId);
+                    ps.setInt(2, 0);
+                    ps.setInt(3, fh);
+                    ps.setInt(4, ypos);
+                    ps.setInt(5, xpos + 50);
+                    ps.setInt(6, xpos - 50);
+                    ps.setString(7, "m");
+                    ps.setInt(8, xpos);
+                    ps.setInt(9, ypos);
+                    ps.setInt(10, player.getMapId());
+                    ps.setInt(11, mobTime);
+                    ps.executeUpdate();
+                } catch (SQLException e) {
+                    player.dropMessage("Failed to save MOB to the database");
+                }
+                player.getMap().addMonsterSpawn(mob, mobTime);
+            } else {
+                player.dropMessage("You have entered an invalid Mob-Id");
+            }
+        
+        } else if (splitted[0].equals("permanpc")) { //should be written as case "permanpc":
+            int npcId = Integer.parseInt(splitted[1]);
+            MapleNPC npc = MapleLifeFactory.getNPC(npcId);
+            int xpos = player.getPosition().x;
+            int ypos = player.getPosition().y;
+            int fh = player.getMap().getFootholds().findBelow(player.getPosition()).getId();
+            if (npc != null && !npc.getName().equals("MISSINGNO")) {
+                npc.setPosition(player.getPosition());
+                npc.setCy(ypos);
+                npc.setRx0(xpos + 50);
+                npc.setRx1(xpos - 50);
+                npc.setFh(fh);
+                npc.setCustom(true);
+                try {
+                    Connection con = DatabaseConnection.getConnection();
+                    PreparedStatement ps = con.prepareStatement("INSERT INTO spawns ( idd, f, fh, cy, rx0, rx1, type, x, y, mid ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
+                    ps.setInt(1, npcId);
+                    ps.setInt(2, 0);
+                    ps.setInt(3, fh);
+                    ps.setInt(4, ypos);
+                    ps.setInt(5, xpos + 50);
+                    ps.setInt(6, xpos - 50);
+                    ps.setString(7, "n");
+                    ps.setInt(8, xpos);
+                    ps.setInt(9, ypos);
+                    ps.setInt(10, player.getMapId());
+                    ps.executeUpdate();
+                } catch (SQLException e) {
+                    player.dropMessage("Failed to save NPC to the database");
+                }
+                player.getMap().addMapObject(npc);
+                player.getMap().broadcastMessage(MaplePacketCreator.spawnNPC(npc));
+            } else {
+                player.dropMessage("You have entered an invalid Npc-Id");
+            }
                 case "jail":
                         if (sub.length < 2) {
 				player.yellowMessage("Syntax: !jail <playername> [<minutes>]");
