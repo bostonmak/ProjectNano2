@@ -1,0 +1,11 @@
+diff a/src/client/command/Commands.java b/src/client/command/Commands.java	(rejected hunks)
+@@ -309,9 +309,6 @@
+ 		gotomaps.put("hpq", 100000200);
+ 		gotomaps.put("ht", 240050400);
+ 		gotomaps.put("fm", 910000000);
+-                gotomaps.put("ereve", 130000000);
+-                gotomaps.put("ariant", 260000000);
+-                gotomaps.put("magatia", 261000000);
+ 	}
+         
+         private static void hardsetItemStats(Equip equip, short stat) {

@@ -88,7 +88,7 @@ function action(mode, type, selection) {
                     cm.changeJobById(400);
                     cm.gainItem(2070000, 500);
                     cm.gainItem(1472061, 1);
-                    cm.resetStats();
+                    
                 }
                 cm.sendNext("Alright, from here out, you are a part of us! You'll be living the life of a wanderer at ..., but just be patient as soon, you'll be living the high life. Alright, it ain't much, but I'll give you some of my abilities... HAAAHHH!!!");
             } else {
@@ -105,7 +105,7 @@ function action(mode, type, selection) {
                 cm.sendSimple("Alright, when you have made your decision, click on [I'll choose my occupation] at the bottom.#b\r\n#L0#Please explain to me what being the Assassin is all about.\r\n#L1#Please explain to me what being the Bandit is all about.\r\n#L3#I'll choose my occupation!");
             else {
                 cm.sendNext("Good decision. You look strong, but I need to see if you really are strong enough to pass the test, it's not a difficult test, so you'll do just fine. Here, take my letter first... make sure you don't lose it!");
-		if(!cm.isQuestStarted(100009)) cm.startQuest(100009);
+		if(!cm.isQuestStarted(100009) || cm.isQuestCompleted(100009) cm.startQuest(100009);
 	    }
         } else if (status == 1){
             if (!cm.haveItem(4031012)){
@@ -131,6 +131,8 @@ function action(mode, type, selection) {
             }
             job += selection * 10;
             cm.sendYesNo("So you want to make the second job advancement as the " + (job == 410 ? "#bAssassin#k" : "#bBandit#k") + "? You know you won't be able to choose a different job for the 2nd job advancement once you make your desicion here, right?");
+			if (cm.getJobId() != job)
+                cm.changeJobById(job);
         } else if (status == 3){
             if (cm.haveItem(4031012))
                 cm.gainItem(4031012, -1);
@@ -138,9 +140,6 @@ function action(mode, type, selection) {
             
             if(job == 410) cm.sendNext("Alright, from here on out you are the #bAssassin#k. Assassins have quick hands and quicker feets to dominate the enemies. Please keep training. I'll make you even more powerful than you are right now!");
             else cm.sendNext("Alright, you're the #bBandit from here on out. Bandits revel in shadows and darkness, waiting until the right time comes for them to stick a dagger through the enemy's hearth, suddenly and swiftly... please keep training. I'll make you even more powerful than you are right now.");
-            
-            if (cm.getJobId() != job)
-                cm.changeJobById(job);
         } else if (status == 4)
             cm.sendNextPrev("I have just given you a book that gives you the list of skills you can acquire as a " + (job == 410 ? "assassin" : "bandit") + ". Also your etc inventory has expanded by adding another row to it. Your max HP and MP have increased, too. Go check and see for it yourself.");
         else if (status == 5)

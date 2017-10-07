@@ -214,7 +214,7 @@ public class MapleMapFactory {
                             map.addMapObject(myLife);
                         } else if (type.equals("m")) {
                             MapleMonster monster = (MapleMonster) myLife;
-                            map.addMonsterSpawn(monster, mobTime);
+                            map.addMonsterSpawn(monster, mobTime, 0);
                         }
                     }
                 } catch (SQLException e) {

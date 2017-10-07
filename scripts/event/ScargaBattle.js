@@ -4,9 +4,10 @@
 */
 
 var isPq = true;
-var minPlayers = 6, maxPlayers = 30;
+var minPlayers = 1, maxPlayers = 30;
 var minLevel = 100, maxLevel = 255;
 var entryMap = 551030200;
+var fmMap = 910000022;
 var exitMap = 551030100;
 var recruitMap = 551030100;
 var clearMap = 551030100;
@@ -144,7 +145,7 @@ function playerUnregistered(eim, player) {}
 
 function playerExit(eim, player) {
     eim.unregisterPlayer(player);
-    player.changeMap(exitMap, 0);
+    player.changeMap(fmMap, 0);
 }
 
 function end(eim) {

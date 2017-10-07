@@ -4,9 +4,10 @@
 */
 
 var isPq = true;
-var minPlayers = 3, maxPlayers = 4;
-var minLevel = 21, maxLevel = 30;
+var minPlayers = 2, maxPlayers = 6;
+var minLevel = 1, maxLevel = 255;
 var entryMap = 103000800;
+var fmMap = 910000022;
 var exitMap = 103000890;
 var recruitMap = 103000000;
 var clearMap = 103000805;
@@ -70,7 +71,7 @@ function getEligibleParty(party) {      //selects, from the given party, the tea
                 for(var i = 0; i < party.size(); i++) {
                         var ch = partyList[i];
 
-                        if(ch.getMapId() == recruitMap && ch.getLevel() >= minLevel && ch.getLevel() <= maxLevel) {
+                        if((ch.getMapId() == recruitMap || ch.getMapId() == fmMap) && ch.getLevel() >= minLevel && ch.getLevel() <= maxLevel) {
                                 if(ch.isLeader()) hasLeader = true;
                                 eligible.push(ch);
                         }
@@ -113,7 +114,7 @@ function playerUnregistered(eim, player) {}
 
 function playerExit(eim, player) {
         eim.unregisterPlayer(player);
-        player.changeMap(exitMap, 0);
+        player.changeMap(fmMap, 0);
 }
 
 function changedMap(eim, player, mapid) {

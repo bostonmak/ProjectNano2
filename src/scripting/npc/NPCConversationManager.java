@@ -323,6 +323,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
         getPlayer().updateSingleStat(MapleStat.INT, 4);
         getPlayer().updateSingleStat(MapleStat.AVAILABLEAP, totAp);
     } 
+        
         public void openShopNPC(int id) {
             MapleShopFactory.getInstance().getShop(id).sendShop(c);
         }
@@ -341,6 +342,22 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 			}
 		}
 	}
+        //This could not work however i hope it does? yeah idk why this isnt working?
+       
+	public void teachSkill() {
+            for (MapleData skill_ : MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/" + "String.wz")).getData("Skill.img").getChildren()) {
+                try{
+          Skill skill = SkillFactory.getSkill(Integer.parseInt(skill_.getName()));
+                    getPlayer().changeSkillLevel(skill,(byte) 0, (int) 10, (long) -1);
+	} catch (NumberFormatException nfe) {
+                                nfe.printStackTrace();
+				break;
+			} catch (NullPointerException npe) {
+                                npe.printStackTrace();
+				continue;
+			}
+	}
+        }
 
 	public void doGachapon() {
 		int[] maps = {100000000, 101000000, 102000000, 103000000, 105040300, 800000000, 809000101, 809000201, 600000000, 120000000};

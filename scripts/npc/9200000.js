@@ -21,7 +21,7 @@ function action(mode, type, selection) {
         } else {
             if (status == 1) {
                 if (cm.getMeso() >= price) {
-                    cm.player.setRemainingSp(0)
+                    cm.player.resetSP(0)
                     cm.gainMeso(-price);
                     cm.sendOk("Sp Resetted . Please re-LogIn For the Effect To Take Place .")
                     cm.dispose();

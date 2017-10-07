@@ -7,9 +7,10 @@ importPackage(Packages.server.life);
 importPackage(Packages.client.inventory);
 
 var isPq = true;
-var minPlayers = 6, maxPlayers = 30;
+var minPlayers = 3, maxPlayers = 30;
 var minLevel = 120, maxLevel = 255;
 var entryMap = 270050100;
+var fmMap = 910000022;
 var exitMap = 270050300;
 var recruitMap = 270050000;
 var clearMap = 270050300;
@@ -165,7 +166,7 @@ function playerUnregistered(eim, player) {}
 
 function playerExit(eim, player) {
     eim.unregisterPlayer(player);
-    player.changeMap(exitMap, 0);
+    player.changeMap(fmMap, 0);
 }
 
 function end(eim) {
@@ -217,7 +218,7 @@ function monsterKilled(mob, eim) {
         eim.setIntProperty("defeatedBoss", 1);
         eim.showClearEffect(mob.getMap().getId());
         mob.getMap().killAllMonsters();
-        eim.clearPQ();
+        //eim.clearPQ();
         
         var ch = eim.getIntProperty("channel");
         mob.getMap().broadcastPinkBeanVictory(ch);

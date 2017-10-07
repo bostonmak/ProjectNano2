@@ -387,14 +387,16 @@ public class MaplePacketCreator {
                 addExpirationTime(mplew, item.getExpiration());
                 if (isPet) {
                         MaplePet pet = item.getPet();
-                        mplew.writeAsciiString(StringUtil.getRightPaddedStr(pet.getName(), '\0', 13));
-                        mplew.write(pet.getLevel());
-                        mplew.writeShort(pet.getCloseness());
-                        mplew.write(pet.getFullness());
-                        addExpirationTime(mplew, item.getExpiration());
-                        mplew.writeInt(0);
-                        mplew.write(new byte[]{(byte) 0x50, (byte) 0x46}); //wonder what this is
-                        mplew.writeInt(0);
+                        if (pet != null) {
+                            mplew.writeAsciiString(StringUtil.getRightPaddedStr(pet.getName(), '\0', 13));
+                            mplew.write(pet.getLevel());
+                            mplew.writeShort(pet.getCloseness());
+                            mplew.write(pet.getFullness());
+                            addExpirationTime(mplew, item.getExpiration());
+                            mplew.writeInt(0);
+                            mplew.write(new byte[]{(byte) 0x50, (byte) 0x46}); //wonder what this is
+                            mplew.writeInt(0);
+                        }
                         return;
                 }
                 if (equip == null) {

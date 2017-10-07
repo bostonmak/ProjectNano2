@@ -467,7 +467,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
                 return ring;
             }
         }
-        if (getMarriageRing().getRingId() == id) {
+        if (getMarriageRing() != null && getMarriageRing().getRingId() == id) {
             return getMarriageRing();
         }
 
@@ -3746,7 +3746,8 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     }
 
     public int getMaxLevel() {
-        return isCygnus() ? 120 : 200;
+        //return isCygnus() ? 120 : 200;
+        return 200;
     }
 
     public int getMaxMp() {
@@ -4614,20 +4615,10 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
         Skill improvingMaxMP = null;
         int improvingMaxHPLevel = 0;
         int improvingMaxMPLevel = 0;
-
-        if (isBeginnerJob() && getLevel() < 11) {
-            remainingAp = 0;
-            if (getLevel() < 6) {
-                str += 5;
-            } else {
-                str += 4;
-                dex += 1;
-            }
-        } else {
-            remainingAp += 5;
-            if (isCygnus() && level < 70) {
-                remainingAp++;
-            }
+        
+        remainingAp += 5;
+        if (isCygnus() && level < 70) {
+            remainingAp++;
         }
         if (job == MapleJob.BEGINNER || job == MapleJob.NOBLESSE || job == MapleJob.LEGEND) {
             maxhp += Randomizer.rand(12, 16);
@@ -5129,13 +5120,17 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
                     Equip equip = (Equip) item.getLeft();
                     if (equip.getRingId() > -1) {
                         MapleRing ring = MapleRing.loadFromDb(equip.getRingId());
-                        if (item.getRight().equals(MapleInventoryType.EQUIPPED)) {
-                            ring.equip();
+                        if (ring != null) {
+                            if (item.getRight().equals(MapleInventoryType.EQUIPPED)) {
+                                ring.equip();
+                            }
+                            if (ring.getItemId() > 1112012) {
+                                ret.addFriendshipRing(ring);
+                            } else {
+                                ret.addCrushRing(ring);
+                            }
                         }
-                        if (ring.getItemId() > 1112012) {
-                            ret.addFriendshipRing(ring);
-                        } else {
-                            ret.addCrushRing(ring);
+                        else {
                         }
                     }
                 }

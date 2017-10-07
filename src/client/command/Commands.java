@@ -474,6 +474,23 @@ public class Commands {
 			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, output, "00 00", (byte) 0));
 			break;
                     
+                case "recharge":
+                        MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
+                        for (Item torecharge : c.getPlayer().getInventory(MapleInventoryType.USE).list()) {
+                                if (ItemConstants.isThrowingStar(torecharge.getItemId())){
+                                        torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
+                                        c.getPlayer().forceUpdateItem(torecharge);
+                                } else if (ItemConstants.isArrow(torecharge.getItemId())){
+                                        torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
+                                        c.getPlayer().forceUpdateItem(torecharge);
+                                } else if (ItemConstants.isBullet(torecharge.getItemId())){
+                                        torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
+                                        c.getPlayer().forceUpdateItem(torecharge);
+                                }
+                        }
+                        player.dropMessage(5, "USE Recharged.");
+                                break;
+                    
 		case "dispose":
 			NPCScriptManager.getInstance().dispose(c);
 			c.announce(MaplePacketCreator.enableActions());
@@ -677,6 +694,7 @@ public class Commands {
                         int newAp = Integer.parseInt(sub[1]);
                         if(newAp < 0) newAp = 0;
                         else if(newAp > player.getRemainingAp()) newAp = player.getRemainingAp();
+                        else if(newAp + player.getStr() > ServerConstants.MAX_AP) newAp = Math.min(newAp - player.getStr(), 0);
 
                         player.gainAp(-newAp);
                         player.addStat(1, newAp);
@@ -693,6 +711,7 @@ public class Commands {
                         int newAp = Integer.parseInt(sub[1]);
                         if(newAp < 0) newAp = 0;
                         else if(newAp > player.getRemainingAp()) newAp = player.getRemainingAp();
+                        else if(newAp + player.getDex() > ServerConstants.MAX_AP) newAp = Math.min(newAp - player.getDex(), 0);
 
                         player.gainAp(-newAp);
                         player.addStat(2, newAp);
@@ -708,6 +727,7 @@ public class Commands {
                         int newAp = Integer.parseInt(sub[1]);
                         if(newAp < 0) newAp = 0;
                         else if(newAp > player.getRemainingAp()) newAp = player.getRemainingAp();
+                        else if(newAp + player.getInt() > ServerConstants.MAX_AP) newAp = Math.min(newAp - player.getInt(), 0);
 
                         player.gainAp(-newAp);
                         player.addStat(3, newAp);
@@ -723,12 +743,30 @@ public class Commands {
                         int newAp = Integer.parseInt(sub[1]);
                         if(newAp < 0) newAp = 0;
                         else if(newAp > player.getRemainingAp()) newAp = player.getRemainingAp();
+                        else if(newAp + player.getLuk() > ServerConstants.MAX_AP) newAp = Math.min(newAp - player.getLuk(), 0);
 
                         player.gainAp(-newAp);
                         player.addStat(4, newAp);
                     }
                     break;
-                
+                   
+                case "goto":
+                    if (sub.length < 2){
+                            player.yellowMessage("Syntax: !goto <map name>");
+                            break;
+                    }
+
+                    if (gotomaps.containsKey(sub[1])) {
+                            MapleMap target = c.getChannelServer().getMapFactory().getMap(gotomaps.get(sub[1]));
+                            MaplePortal targetPortal = target.getPortal(0);
+                            if (player.getEventInstance() != null) {
+                                    player.getEventInstance().removePlayer(player);
+                            }
+                            player.changeMap(target, targetPortal);
+                    } else {
+                            player.dropMessage(5, "That map does not exist.");
+                    }
+                    break;
                             
                 default:
                         return false;
@@ -753,25 +791,7 @@ public class Commands {
                         player.setMp(player.getMaxMp());
                         player.updateSingleStat(MapleStat.MP, player.getMaxMp());
                                 break;
-                        
-                case "goto":
-                        if (sub.length < 2){
-				player.yellowMessage("Syntax: !goto <map name>");
-				break;
-			}
-                    
-			if (gotomaps.containsKey(sub[1])) {
-				MapleMap target = c.getChannelServer().getMapFactory().getMap(gotomaps.get(sub[1]));
-				MaplePortal targetPortal = target.getPortal(0);
-				if (player.getEventInstance() != null) {
-					player.getEventInstance().removePlayer(player);
-				}
-				player.changeMap(target, targetPortal);
-			} else {
-				player.dropMessage(5, "That map does not exist.");
-			}
-                                break;
-								
+                        			
                 case "recharge":
                         MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
                         for (Item torecharge : c.getPlayer().getInventory(MapleInventoryType.USE).list()) {
@@ -1382,114 +1402,116 @@ public class Commands {
 			
 			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, sb.toString(), "00 00", (byte) 0));
                     break;
-                } else if (splitted[0].equals("pmob")) { //should be written as case "pmob":
-            int npcId = Integer.parseInt(splitted[1]);
-            int mobTime = Integer.parseInt(splitted[2]);
-            int xpos = player.getPosition().x;
-            int ypos = player.getPosition().y;
-            int fh = player.getMap().getFootholds().findBelow(player.getPosition()).getId();
-            if (splitted[2] == null) {
-                mobTime = 0;
-            }
-            MapleMonster mob = MapleLifeFactory.getMonster(npcId);
-            if (mob != null && !mob.getName().equals("MISSINGNO")) {
-                mob.setPosition(player.getPosition());
-                mob.setCy(ypos);
-                mob.setRx0(xpos + 50);
-                mob.setRx1(xpos - 50);
-                mob.setFh(fh);
-                try {
-                    Connection con = DatabaseConnection.getConnection();
-                    PreparedStatement ps = con.prepareStatement("INSERT INTO spawns ( idd, f, fh, cy, rx0, rx1, type, x, y, mid, mobtime ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
-                    ps.setInt(1, npcId);
-                    ps.setInt(2, 0);
-                    ps.setInt(3, fh);
-                    ps.setInt(4, ypos);
-                    ps.setInt(5, xpos + 50);
-                    ps.setInt(6, xpos - 50);
-                    ps.setString(7, "m");
-                    ps.setInt(8, xpos);
-                    ps.setInt(9, ypos);
-                    ps.setInt(10, player.getMapId());
-                    ps.setInt(11, mobTime);
-                    ps.executeUpdate();
-                } catch (SQLException e) {
-                    player.dropMessage("Failed to save MOB to the database");
+                case "pmob":
+                {
+                    int npcId = Integer.parseInt(sub[1]);
+                    int mobTime = Integer.parseInt(sub[2]);
+                    int xpos = player.getPosition().x;
+                    int ypos = player.getPosition().y;
+                    int fh = player.getMap().getFootholds().findBelow(player.getPosition()).getId();
+                    if (sub[2] == null) {
+                        mobTime = 0;
+                    }
+                    MapleMonster mob = MapleLifeFactory.getMonster(npcId);
+                    if (mob != null && !mob.getName().equals("MISSINGNO")) {
+                        mob.setPosition(player.getPosition());
+                        mob.setCy(ypos);
+                        mob.setRx0(xpos + 50);
+                        mob.setRx1(xpos - 50);
+                        mob.setFh(fh);
+                        try {
+                            Connection con = DatabaseConnection.getConnection();
+                            PreparedStatement ps = con.prepareStatement("INSERT INTO spawns ( idd, f, fh, cy, rx0, rx1, type, x, y, mid, mobtime ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
+                            ps.setInt(1, npcId);
+                            ps.setInt(2, 0);
+                            ps.setInt(3, fh);
+                            ps.setInt(4, ypos);
+                            ps.setInt(5, xpos + 50);
+                            ps.setInt(6, xpos - 50);
+                            ps.setString(7, "m");
+                            ps.setInt(8, xpos);
+                            ps.setInt(9, ypos);
+                            ps.setInt(10, player.getMapId());
+                            ps.setInt(11, mobTime);
+                            ps.executeUpdate();
+                        } catch (SQLException e) {
+                            player.dropMessage("Failed to save MOB to the database");
+                        }
+                        player.getMap().addMonsterSpawn(mob, mobTime, 0);
+                    } else {
+                        player.dropMessage("You have entered an invalid Mob-Id");
+                    }
+                    break;
                 }
-                player.getMap().addMonsterSpawn(mob, mobTime);
-            } else {
-                player.dropMessage("You have entered an invalid Mob-Id");
-            }
-        
-        } else if (splitted[0].equals("permanpc")) { //should be written as case "permanpc":
-            int npcId = Integer.parseInt(splitted[1]);
-            MapleNPC npc = MapleLifeFactory.getNPC(npcId);
-            int xpos = player.getPosition().x;
-            int ypos = player.getPosition().y;
-            int fh = player.getMap().getFootholds().findBelow(player.getPosition()).getId();
-            if (npc != null && !npc.getName().equals("MISSINGNO")) {
-                npc.setPosition(player.getPosition());
-                npc.setCy(ypos);
-                npc.setRx0(xpos + 50);
-                npc.setRx1(xpos - 50);
-                npc.setFh(fh);
-                npc.setCustom(true);
-                try {
-                    Connection con = DatabaseConnection.getConnection();
-                    PreparedStatement ps = con.prepareStatement("INSERT INTO spawns ( idd, f, fh, cy, rx0, rx1, type, x, y, mid ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
-                    ps.setInt(1, npcId);
-                    ps.setInt(2, 0);
-                    ps.setInt(3, fh);
-                    ps.setInt(4, ypos);
-                    ps.setInt(5, xpos + 50);
-                    ps.setInt(6, xpos - 50);
-                    ps.setString(7, "n");
-                    ps.setInt(8, xpos);
-                    ps.setInt(9, ypos);
-                    ps.setInt(10, player.getMapId());
-                    ps.executeUpdate();
-                } catch (SQLException e) {
-                    player.dropMessage("Failed to save NPC to the database");
-                }
-                player.getMap().addMapObject(npc);
-                player.getMap().broadcastMessage(MaplePacketCreator.spawnNPC(npc));
-            } else {
-                player.dropMessage("You have entered an invalid Npc-Id");
-            }
-                case "jail":
-                        if (sub.length < 2) {
-				player.yellowMessage("Syntax: !jail <playername> [<minutes>]");
-				break;
-			}
-                        
-                        int minutesJailed = 5;
-                        if(sub.length >= 3) {
-                                minutesJailed = Integer.valueOf(sub[2]);
-                                if(minutesJailed <= 0) {
+                case "permanpc":
+                    int npcId = Integer.parseInt(sub[1]);
+                    MapleNPC npc = MapleLifeFactory.getNPC(npcId);
+                    int xpos = player.getPosition().x;
+                    int ypos = player.getPosition().y;
+                    int fh = player.getMap().getFootholds().findBelow(player.getPosition()).getId();
+                    if (npc != null && !npc.getName().equals("MISSINGNO")) {
+                        npc.setPosition(player.getPosition());
+                        npc.setCy(ypos);
+                        npc.setRx0(xpos + 50);
+                        npc.setRx1(xpos - 50);
+                        npc.setFh(fh);
+                        //npc.setCustom(true);
+                        try {
+                            Connection con = DatabaseConnection.getConnection();
+                            PreparedStatement ps = con.prepareStatement("INSERT INTO spawns ( idd, f, fh, cy, rx0, rx1, type, x, y, mid ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
+                            ps.setInt(1, npcId);
+                            ps.setInt(2, 0);
+                            ps.setInt(3, fh);
+                            ps.setInt(4, ypos);
+                            ps.setInt(5, xpos + 50);
+                            ps.setInt(6, xpos - 50);
+                            ps.setString(7, "n");
+                            ps.setInt(8, xpos);
+                            ps.setInt(9, ypos);
+                            ps.setInt(10, player.getMapId());
+                            ps.executeUpdate();
+                        } catch (SQLException e) {
+                            player.dropMessage("Failed to save NPC to the database");
+                        }
+                        player.getMap().addMapObject(npc);
+                        player.getMap().broadcastMessage(MaplePacketCreator.spawnNPC(npc));
+                    } else {
+                        player.dropMessage("You have entered an invalid Npc-Id");
+                    }
+                        case "jail":
+                                if (sub.length < 2) {
                                         player.yellowMessage("Syntax: !jail <playername> [<minutes>]");
                                         break;
                                 }
-                        }
-                    
-                        victim = cserv.getPlayerStorage().getCharacterByName(sub[1]);
-                        if (victim != null) {
-                                victim.addJailExpirationTime(minutesJailed * 60 * 1000);
-                            
-                                int mapid = 300000012;
-                                
-                                if(victim.getMapId() != mapid) {    // those gone to jail won't be changing map anyway
-                                        MapleMap target = cserv.getMapFactory().getMap(mapid);
-                                        MaplePortal targetPortal = target.getPortal(0);
-                                        victim.changeMap(target, targetPortal);
-                                        player.message(victim.getName() + " was jailed for " + minutesJailed + " minutes.");
+
+                                int minutesJailed = 5;
+                                if(sub.length >= 3) {
+                                        minutesJailed = Integer.valueOf(sub[2]);
+                                        if(minutesJailed <= 0) {
+                                                player.yellowMessage("Syntax: !jail <playername> [<minutes>]");
+                                                break;
+                                        }
                                 }
-                                else {
-                                        player.message(victim.getName() + "'s time in jail has been extended for " + minutesJailed + " minutes.");
+
+                                victim = cserv.getPlayerStorage().getCharacterByName(sub[1]);
+                                if (victim != null) {
+                                        victim.addJailExpirationTime(minutesJailed * 60 * 1000);
+
+                                        int mapid = 300000012;
+
+                                        if(victim.getMapId() != mapid) {    // those gone to jail won't be changing map anyway
+                                                MapleMap target = cserv.getMapFactory().getMap(mapid);
+                                                MaplePortal targetPortal = target.getPortal(0);
+                                                victim.changeMap(target, targetPortal);
+                                                player.message(victim.getName() + " was jailed for " + minutesJailed + " minutes.");
+                                        }
+                                        else {
+                                                player.message(victim.getName() + "'s time in jail has been extended for " + minutesJailed + " minutes.");
+                                        }
+
+                                } else {
+                                        player.message("Player '" + sub[1] + "' could not be found on this channel.");
                                 }
-                                
-                        } else {
-                                player.message("Player '" + sub[1] + "' could not be found on this channel.");
-                        }
                     break; 
                     
                 case "unjail":

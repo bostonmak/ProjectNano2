@@ -86,7 +86,7 @@ function action(mode, type, selection) {
                 if (cm.getJobId() == 0){
                     cm.changeJobById(100);
                     cm.gainItem(1302077, 1);
-                    cm.resetStats();
+                    
                 }
                 cm.sendNext("From here on out, you are going to the (Incomplete)");
             } else {

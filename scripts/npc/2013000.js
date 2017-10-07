@@ -26,7 +26,7 @@ function action(mode, type, selection) {
                 else
                         status--;
 
-                if(cm.getMapId() == 200080101) {
+                if(cm.getMapId() == 200080101 || cm.getMapId() == 910000022) {
                         if (status == 0) {
                                 em = cm.getEventManager("OrbisPQ");
                                 if(em == null) {
@@ -83,7 +83,7 @@ function action(mode, type, selection) {
                         if(status == 0) {
                                 cm.sendYesNo("Are you going to drop out from this rescue mission?");
                         } else if(status == 1) {
-                                cm.warp(920011200);
+                                cm.warp(910000022);
                                 cm.dispose();
                         }
                 }

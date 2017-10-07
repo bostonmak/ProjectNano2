@@ -911,7 +911,7 @@ public class MapleItemInformationProvider {
                             break;
                     }
                     if (!ItemConstants.isCleanSlate(scrollId)) {
-                        if (ServerConstants.USE_PERFECT_SCROLLING == true && !assertGM && !usingWhiteScroll) {
+                        if (ServerConstants.USE_PERFECT_SCROLLING == false && !assertGM && !usingWhiteScroll) {
                             nEquip.setUpgradeSlots((byte) (nEquip.getUpgradeSlots() - 1));
                         }
                         nEquip.setLevel((byte) (nEquip.getLevel() + 1));

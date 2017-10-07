@@ -55,10 +55,10 @@ public class ServerConstants {
     public static final boolean USE_BUFF_MOST_SIGNIFICANT = true;   //When applying buffs, the player will stick with the highest stat boost among the listed, rather than overwriting stats.
     
     //Server Rates And Experience
-    public static final int EXP_RATE = 10;
+    public static final int EXP_RATE = 100;
     public static final int MESO_RATE = 10;
-    public static final int DROP_RATE = 8;
-    public static final int BOSS_DROP_RATE = 5;
+    public static final int DROP_RATE = 5;
+    public static final int BOSS_DROP_RATE = 3;
     public static final double EQUIP_EXP_RATE = 1.0;               //Rate for equipment exp gain, grows linearly. Set 1.0 for default (about 100~200 same-level range mobs killed to pass equip from level 1 to 2).
     
     public static final int PARTY_EXPERIENCE_MOD = 2;               //Change for event stuff.
@@ -73,11 +73,11 @@ public class ServerConstants {
     //Dangling Items Configuration
     public static final int ITEM_EXPIRE_TIME  = 3 * 60 * 1000;  //Time before items start disappearing. Recommended to be set up to 3 minutes.
     public static final int ITEM_MONITOR_TIME = 5 * 60 * 1000;  //Interval between item monitoring tasks on maps, which checks for dangling item objects on the map item history.
-    public static final int ITEM_LIMIT_ON_MAP = 200;            //Max number of items allowed on a map.
+    public static final int ITEM_LIMIT_ON_MAP = 9999;            //Max number of items allowed on a map.
     
     //Some Gameplay Enhancing Configurations
     //Scroll Configuration
-    public static final boolean USE_PERFECT_GM_SCROLL = true;   //Scrolls from GMs never uses up slots nor fails.
+    public static final boolean USE_PERFECT_GM_SCROLL = false;   //Scrolls from GMs never uses up slots nor fails.
     public static final boolean USE_PERFECT_SCROLLING = false;   //Scrolls doesn't use slots upon failure.
     public static final boolean USE_ENHANCED_CHSCROLL = false;   //Equips even more powerful with chaos upgrade.
     public static final boolean USE_ENHANCED_CRAFTING = true;   //Applys chaos scroll on every equip crafted.
@@ -89,7 +89,7 @@ public class ServerConstants {
     
     //Character Configuration
     public static final boolean USE_ADD_SLOTS_BY_LEVEL = true;  //Slots are added each 20 levels.
-    public static final boolean USE_ADD_RATES_BY_LEVEL = true;  //Rates are added each 20 levels.
+    public static final boolean USE_ADD_RATES_BY_LEVEL = false;  //Rates are added each 20 levels.
     public static final boolean USE_STACK_COUPON_RATES = false;  //Multiple coupons effects builds up together.
     public static final boolean USE_PERFECT_PITCH = true;	//For lvl 30 or above, each lvlup grants player 1 perfect pitch.
     public static final int FAME_GAIN_BY_QUEST = 5;             //Fame gain each N quest completes, set 0 to disable.
