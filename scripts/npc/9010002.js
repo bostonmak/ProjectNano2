@@ -115,6 +115,9 @@ function action(mode, type, selection) {
             } else if (cm.getJobId()==1510) {
                 status = 181;
                 cm.sendYesNo("#eCongratulations on reaching such a high level. Do you want to Job Advance now?");
+            } else if (cm.getJobId()==2110) {
+                status = 184;
+                cm.sendYesNo("#eCongratulations on reaching such a high level. Do you want to Job Advance now?");
             } else if (cm.getLevel() < 120) {
                 cm.sendNext("#eSorry, but you have to be at least level 120 to make the #rForth Job Advancement#k.");
                 status = 98;
@@ -149,10 +152,13 @@ function action(mode, type, selection) {
                 status = 132;
                 cm.sendYesNo("#eCongratulations on reaching such a high level. Do you want to Job Advance now?");
             } else if (cm.getJobId()==511) {
-                status = 133;
+                status = 135;
                 cm.sendYesNo("#eCongratulations on reaching such a high level. Do you want to Job Advance now?");
             } else if (cm.getJobId()==521) {
-                status = 134;
+                status = 138;
+                cm.sendYesNo("#eCongratulations on reaching such a high level. Do you want to Job Advance now?");
+            } else if (cm.getJobId()==2111) {
+                status = 141;
                 cm.sendYesNo("#eCongratulations on reaching such a high level. Do you want to Job Advance now?");
             } else if (cm.getLevel() < 200) {
                 cm.sendNext("#eSorry, but you have already attained the highest level of your job's mastery. \r\n\r\nHowever, you can #rrebirth#k when you are level 200.");
@@ -216,6 +222,7 @@ function action(mode, type, selection) {
             if (selection == 13) {
                 cm.sendOk("Come back to me when you are ready.");
                 cm.dispose();
+                return;
             }
             if (selection == 14) {
                 jobName = "Level 2 Dawn Warrior";
@@ -224,6 +231,7 @@ function action(mode, type, selection) {
             if (selection == 15) {
                 cm.sendOk("Come back to me when you are ready.");
                 cm.dispose();
+                return;
             }
             if (selection == 16) {
                 jobName = "Level 2 Night Walker";
@@ -232,6 +240,7 @@ function action(mode, type, selection) {
             if (selection == 17) {
                 cm.sendOk("#eCome back to me when you are ready.");
                 cm.dispose();
+                return;
             }
             if (selection == 18) {
                 jobName = "Level 2 Wind Archer";
@@ -240,18 +249,20 @@ function action(mode, type, selection) {
             if (selection == 19) {
                 cm.sendOk("#eCome back to me when you are ready.");
                 cm.dispose();
+                return;
             }
             if (selection == 20) {
                 jobName = "Level 2 Thunder Breaker";
                 job = 1510;
             }
-			if (selection == 21) {
+			if (selection == 22) {
 			    jobName = "Level 2 Aran";
 				job = 2110;
 			}
-            if (selection == 22) {
+            if (selection == 23) {
                 cm.sendOk("#eCome back to me when you are ready.");
                 cm.dispose();
+                return;
             }
             cm.sendYesNo("#eDo you want to become a #r" + jobName + "#k?");
         } else if (status == 3) {
@@ -471,12 +482,16 @@ function action(mode, type, selection) {
             cm.changeJobById(132);
             cm.sendOk("#eThere you go. Hope you enjoy it.");
             cm.dispose();
-        } else if (status == 134) {
+        } else if (status == 136) {
             cm.changeJobById(512);
             cm.sendOk("#eThere you go. Hope you enjoy it.");
             cm.dispose();
-        } else if (status == 135) {
+        } else if (status == 139) {
             cm.changeJobById(522);
+            cm.sendOk("#eThere you go. Hope you enjoy it.");
+            cm.dispose();
+        } else if (status == 142) {
+            cm.changeJobById(2112);
             cm.sendOk("#eThere you go. Hope you enjoy it.");
             cm.dispose();
         } else if (status == 154) {
@@ -531,7 +546,10 @@ function action(mode, type, selection) {
                 cm.changeJobById(job);
                 cm.sendOk("#eThere you go. Hope you enjoy it. See you around in the future maybe.");
                 cm.dispose();
-            }
+        } else {
+            cm.sendOk("#edas coo");
+            cm.dispose();
         }
+        } 
     }
 
