@@ -584,15 +584,15 @@ public class MapleInventoryManipulator {
             
             boolean weddingRing = source.getItemId() == 1112803 || source.getItemId() == 1112806 || source.getItemId() == 1112807 || source.getItemId() == 1112809;
             if (weddingRing) {
-                c.getPlayer().getMap().disappearingItemDrop(c.getPlayer(), c.getPlayer(), target, dropPos);
+                c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), target, dropPos, true, true);
             } else if (c.getPlayer().getMap().getEverlast()) {
                 if (ii.isDropRestricted(target.getItemId()) || ii.isCash(target.getItemId()) || isDroppedItemRestricted(target)) {
-                    c.getPlayer().getMap().disappearingItemDrop(c.getPlayer(), c.getPlayer(), target, dropPos);
+                    c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), target, dropPos, true, true);
                 } else {
                     c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), target, dropPos, true, true);
                 }
             } else if (ii.isDropRestricted(target.getItemId()) || ii.isCash(target.getItemId()) || isDroppedItemRestricted(target)) {
-                c.getPlayer().getMap().disappearingItemDrop(c.getPlayer(), c.getPlayer(), target, dropPos);
+                c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), target, dropPos, true, true);
             } else {
                 c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), target, dropPos, true, true);
             }
@@ -613,12 +613,12 @@ public class MapleInventoryManipulator {
             
             if (c.getPlayer().getMap().getEverlast()) {
                 if (ii.isDropRestricted(itemId) || ii.isCash(itemId) || isDroppedItemRestricted(source)) {
-                    c.getPlayer().getMap().disappearingItemDrop(c.getPlayer(), c.getPlayer(), source, dropPos);
+                    c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), source, dropPos, true, true);
                 } else {
                     c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), source, dropPos, true, true);
                 }
             } else if (ii.isDropRestricted(itemId) || ii.isCash(itemId) || isDroppedItemRestricted(source)) {
-                c.getPlayer().getMap().disappearingItemDrop(c.getPlayer(), c.getPlayer(), source, dropPos);           
+                c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), source, dropPos, true, true);           
             } else {
                 c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), source, dropPos, true, true);
             }
