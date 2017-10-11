@@ -911,7 +911,7 @@ public class MapleItemInformationProvider {
                             break;
                     }
                     if (!ItemConstants.isCleanSlate(scrollId)) {
-                        if (ServerConstants.USE_PERFECT_SCROLLING == false && !assertGM && !usingWhiteScroll) {
+                        if (ServerConstants.USE_PERFECT_SCROLLING == false && !assertGM) {
                             nEquip.setUpgradeSlots((byte) (nEquip.getUpgradeSlots() - 1));
                         }
                         nEquip.setLevel((byte) (nEquip.getLevel() + 1));
@@ -970,11 +970,14 @@ public class MapleItemInformationProvider {
                     nEquip.setMp((short) stat.getValue().intValue());
                 } else if (stat.getKey().equals("tuc")) {
                     nEquip.setUpgradeSlots((byte) stat.getValue().intValue());
-                } else if (isDropRestricted(equipId)) {
-                    byte flag = nEquip.getFlag();
-                    flag |= ItemConstants.UNTRADEABLE;
-                    nEquip.setFlag(flag);
-                } else if (stats.get("fs") > 0) {
+              
+                } //else if (isDropRestricted(equipId)) {
+                   // byte flag = nEquip.getFlag();
+                    //flag |= ItemConstants.UNTRADEABLE;
+                    //nEquip.setFlag(flag);
+                    
+                //}
+                    else if (stats.get("fs") > 0) {
                     byte flag = nEquip.getFlag();
                     flag |= ItemConstants.SPIKES;
                     nEquip.setFlag(flag);
@@ -1088,7 +1091,7 @@ public class MapleItemInformationProvider {
             bRestricted = MapleDataTool.getIntConvert("info/quest", data, 0) == 1;
         }
         dropRestrictionCache.put(itemId, bRestricted);
-        return bRestricted;
+        return false;
     }
 
     public boolean isPickupRestricted(int itemId) {
@@ -1098,7 +1101,7 @@ public class MapleItemInformationProvider {
         MapleData data = getItemData(itemId);
         boolean bRestricted = MapleDataTool.getIntConvert("info/only", data, 0) == 1;
         pickupRestrictionCache.put(itemId, bRestricted);
-        return bRestricted;
+        return false; //brestricted
     }
 
     public Map<String, Integer> getSkillStats(int itemId, double playerJob) {
