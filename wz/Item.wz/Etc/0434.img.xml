@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<imgdir name="0434.img">
+    <imgdir name="04340000">
+        <imgdir name="info">
+            <canvas name="icon" width="29" height="32" basedata="iVBORw0KGgoAAAANSUhEUgAAAB0AAAAgCAYAAADud3N8AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAJzSURBVEhLtZaLkeIwEERJgRRIgRQuhUuBFEiBFEiBFJyCUnAKTsE3rzUjxl84dumqLtuy1U8z0lJ7+EWNM39NDXK9XkfUdZ3s478qhYZK3ws6DL2evwFWMICAIKCAvgFWUCiDuX4D3IJCAd0C45+AFRraA/d2vVwu+oZ7/AlYYVnDMPhdFUAB7EDhx+MhMNcY+x+wxy41B0c4LqUswbYoFkdmjV6Xx22LsFAGdg7N4Hcq9ajXapWYgeH7/d4cYExujV/K496XKgHYTYG4WHW8J7fGL+UxrsFOaXhDtcoKo31rUFpOdkVM5TGuPoPsfvJcNWmrVxl79w7UY5CfygW07h2/s2Nn37sDGDB+HNg/xt6qcvJnIKhZrTWX89hdDmN/8wUOR7lc+Wl8QqtLOzxb+1kzAAJyDw36GMf7ya4nQZuAPg6C1rZGxV6hee8A1Qxr31QGLjZWDEh1tBKoXzFALLg9tz18AUSVEZWFrMLeKgxAtvbTKo8Wh7QI28NXQKQJrZ2tpWcFCwLA1aDYOxAC+g4Qjb2tjpOpdgps/3oA8lauQlWp256LLYCs5JdSIK0pt7Ot+KjwcARzzePZyoiTbeJZyTtStUhH3kIEyZUS6NB8z/fMJWMie8+Y0nf0BAcooL6A/DwHYs0J8f1PwQtPgaE2p/ljcIKz7wD5bssNyDb4Vvi7XQksQKouA5tiUcl6/wH0aNaHOtHJjC20UVlbiI153qqAncxn8x/zX3NMaFZQKIDrlWWTSf5EAQzY1X1z35OfVayY92bmMP9iJm8TmivkYxzwuXMVczMfk0UmxSyAoag2zIS5I2juPA+TFU46HP4B1lLig9z7MMUAAAAASUVORK5CYII=">
+                <vector name="origin" x="-2" y="32"/>
+            </canvas>
+            <canvas name="iconRaw" width="29" height="31" basedata="iVBORw0KGgoAAAANSUhEUgAAAB0AAAAfCAYAAAAbW8YEAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAI7SURBVEhLtZYLkeMwEERDYSkshXAKhVBYCqFgCqYgCqZgCr55rRllHH/iy6erumzLcj/NSJva0wc1PfhrapDr9Tqhvu9lH/+oFBoqwyDoOA56/gZYwQACgoAC+gZYQaEM5voNcAsKBXQLjN8BKzS0Bx7serlcNId7/ApYYVnjOPpdFUAB7EDhrusE5hpj/wP22KUewRGOSylLsC2KxZFZo9flcdsiLJSBvUMz+EilHvVcrRIzMHy73ZoDjMmt8Ut53HGpEoD9HIiLVcd7cmv8Uh7jGu2UhjdUq6ww2rcGpeVkV8RcHuMaMsjuZ89Vs7Z6lbF3R6Aeg/xULqB17/idnXqb7w5gwPhxYP8YO1Tl7M9AULNaay7nqb+cpuHPFzj+yOXKT+MdWl3a4dnaz5oBEJB7bNBumm6/dv0VtAlodxK0tjUq9grNeweoZlj75jJwsbFiQKqjlUD9igFiwe257eETIKqMqCxkFQ5WYQCytZ9WebQ4pEXYHj4DIn3Q2tlaelawIABcDYq9AyGgR4BoGmx1nEy1U2D71wOQt3IVqkrd9lxsAWQlP5UCaU35O9uKfxQejmCueTxbGXGyTTwreUeqFunIW4gguVICHZrvmc+3ZMxk7xlT+o7u4AAF1BeQnx+BWN+EmP8ueOE5MNS+aX4ZnODsO0DmbbkB2QbfCn+3K4EFSNVlYFMsKlnvX4AiTdSJTmZsoY3K2kJszPMOKz5oVlAogOuVZb+texUr5n2d9nnlKh69o9PpH1iT0WGwlYqBAAAAAElFTkSuQmCC">
+                <vector name="origin" x="-2" y="32"/>
+            </canvas>
+            <int name="price" value="1"/>
+            <int name="notSale" value="1"/>
+        </imgdir>
+        <imgdir name="spec">
+            <int name="prob" value="50"/>
+        </imgdir>
+    </imgdir>
+</imgdir>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<imgdir name="0435.img">
+    <imgdir name="04350000">
+        <imgdir name="info">
+            <canvas name="icon" width="33" height="27" basedata="iVBORw0KGgoAAAANSUhEUgAAACEAAAAbCAYAAADyBeakAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAI/SURBVEhLxZVrleswDIRLYSmUQikshVIohVAIhVAIhVAIhVAohV59siZRvO3msT/unDPHsS1pJrLTXv4TXsHdUMKhpA28AGOZbsMTntOUzexO/gCvyVimv8ODayRDwhFTXmMYeifzsvwZngBGS5jGIWYF7MM3XYI1fL1pGs/da8KDAeJD3776rnEOfefrOSYDU7frVQKruFMmns+nd6Fvi4FMjNXdwYBoyQsN1DliwgMBid6FMDF3pH2U+dC5EeI8tmtnc7yA17Dn3tZrA7tMzF0wsc5EoRsIjmYAEyJCq1jG5j7P/9SFWlxkj/uRDZS1QuatTNh42ARd8GJWSG9Cq7OJRdSMzOLlWQZk4shReCAo51uEZhNRvOZsYHUs1sGGDpS800chEQxITM+iX0Q4G1j26AL34lQX3orF29brvoeJ2OeZGO4AJjBwyoQXCSKS5z+OqDKgL0L34XG/ec1DBjiGLLoWXN7ez9vXiriICRmAxGBksh+v3Sa43S4aBcRFPIrHiKiLs2/P2UCOkwm0iuQaIV8+y/Jpls/MjYiYiYJiNsC+RKHnk2OcpvG4iQwM5Q78MGBj5sqEjRjwOr8YANp01sh/SNM4evFsBvLf4Hcp5sSwRrwQ9XdjZSobqMG64t4h7xv/hFwoyq8Evj6s5314GipwTcwC38G8ltfFW5D83YYkTCJF7sZHsEls3zDvZ5JLHWpuGpEBiauIRLoNZkPiKRNbHfhExUpQ1JGcOg6RAjXzWWfmPEgt8Q0ul38g5JjQ9p6FpAAAAABJRU5ErkJggg==">
+                <vector name="origin" x="0" y="27"/>
+            </canvas>
+            <canvas name="iconRaw" width="33" height="23" basedata="iVBORw0KGgoAAAANSUhEUgAAACEAAAAXCAYAAACFxybfAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAH4SURBVEhLxZWBcYMwDEUzS1foLF2hK7ACK7ACK7ACK7BCVkj1viQQTtpC0rv+u3/GtqT/kU1y+SfcgoeRCaeSfsENMPr0dyjhuizVzOHkb6CajD79GQpuUQwlzphSjWkaRea+/D2UAGZLWOYpZg724YMuwRZa77pOuUdNKBggPo39bRw6cRoHrdeYCky9v72lwC7uKRPX61VdGHs3UImxtjsYSFryRgN1zphQICBRXQgTa0f6T59Pg4wQp9ihX83xAqphz6OttwYOmVi7YGKDiUIZCM5mABNJhHaxjN3HOn+pC614kj3uRzXga07mfZqw8bQJuqBiVijfhFZXE5uoGVnF/TkNpIkzR6FA4OfrQquJKN5yNbA7FutgRwc87+mjSBEMpFg+J3UR4Wpg26ML3IunuvBQLN62XdceJmKfZ2K4A5jAwFMmVCSISJ3fHVFjIL+IvA+fH++qecoAx1BF94Lb2+u8tebiSUykAUgMRhb78Tpsgtst0SiQ3MSjeIyISpx9e64GalyaQMsl9wh5/yz90/TPTEaSmImCyWqA/RSFyifHuCzzeRMVGKoduDNgY+XOhI0YUJ0fDIDcFFvUP6RlnlW8moH8N+guxZwY1ohPRP3D2JmqBlqwnnGPUPeNL6EWivI7ARCrd8K5/+d4JFDX6voBXC5fapx0bC0xHMcAAAAASUVORK5CYII=">
+                <vector name="origin" x="0" y="27"/>
+            </canvas>
+            <int name="cash" value="0"/>
+            <int name="slotMax" value="1"/>
+            <int name="price" value="1"/>
+            <int name="only" value="1"/>
+            <int name="picture" value="0"/>
+        </imgdir>
+    </imgdir>
+    <imgdir name="04350001">
+        <imgdir name="info">
+            <canvas name="icon" width="33" height="27" basedata="iVBORw0KGgoAAAANSUhEUgAAACEAAAAbCAYAAADyBeakAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAI/SURBVEhLxZVrleswDIRLYSmUQikshVIohVAIhVAIhVAIhVAohV59siZRvO3msT/unDPHsS1pJrLTXv4TXsHdUMKhpA28AGOZbsMTntOUzexO/gCvyVimv8ODayRDwhFTXmMYeifzsvwZngBGS5jGIWYF7MM3XYI1fL1pGs/da8KDAeJD3776rnEOfefrOSYDU7frVQKruFMmns+nd6Fvi4FMjNXdwYBoyQsN1DliwgMBid6FMDF3pH2U+dC5EeI8tmtnc7yA17Dn3tZrA7tMzF0wsc5EoRsIjmYAEyJCq1jG5j7P/9SFWlxkj/uRDZS1QuatTNh42ARd8GJWSG9Cq7OJRdSMzOLlWQZk4shReCAo51uEZhNRvOZsYHUs1sGGDpS800chEQxITM+iX0Q4G1j26AL34lQX3orF29brvoeJ2OeZGO4AJjBwyoQXCSKS5z+OqDKgL0L34XG/ec1DBjiGLLoWXN7ez9vXiriICRmAxGBksh+v3Sa43S4aBcRFPIrHiKiLs2/P2UCOkwm0iuQaIV8+y/Jpls/MjYiYiYJiNsC+RKHnk2OcpvG4iQwM5Q78MGBj5sqEjRjwOr8YANp01sh/SNM4evFsBvLf4Hcp5sSwRrwQ9XdjZSobqMG64t4h7xv/hFwoyq8Evj6s5314GipwTcwC38G8ltfFW5D83YYkTCJF7sZHsEls3zDvZ5JLHWpuGpEBiauIRLoNZkPiKRNbHfhExUpQ1JGcOg6RAjXzWWfmPEgt8Q0ul38g5JjQ9p6FpAAAAABJRU5ErkJggg==">
+                <vector name="origin" x="0" y="27"/>
+            </canvas>
+            <canvas name="iconRaw" width="33" height="23" basedata="iVBORw0KGgoAAAANSUhEUgAAACEAAAAXCAYAAACFxybfAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAH4SURBVEhLxZWBcYMwDEUzS1foLF2hK7ACK7ACK7ACK7BCVkj1viQQTtpC0rv+u3/GtqT/kU1y+SfcgoeRCaeSfsENMPr0dyjhuizVzOHkb6CajD79GQpuUQwlzphSjWkaRea+/D2UAGZLWOYpZg724YMuwRZa77pOuUdNKBggPo39bRw6cRoHrdeYCky9v72lwC7uKRPX61VdGHs3UImxtjsYSFryRgN1zphQICBRXQgTa0f6T59Pg4wQp9ihX83xAqphz6OttwYOmVi7YGKDiUIZCM5mABNJhHaxjN3HOn+pC614kj3uRzXga07mfZqw8bQJuqBiVijfhFZXE5uoGVnF/TkNpIkzR6FA4OfrQquJKN5yNbA7FutgRwc87+mjSBEMpFg+J3UR4Wpg26ML3IunuvBQLN62XdceJmKfZ2K4A5jAwFMmVCSISJ3fHVFjIL+IvA+fH++qecoAx1BF94Lb2+u8tebiSUykAUgMRhb78Tpsgtst0SiQ3MSjeIyISpx9e64GalyaQMsl9wh5/yz90/TPTEaSmImCyWqA/RSFyifHuCzzeRMVGKoduDNgY+XOhI0YUJ0fDIDcFFvUP6RlnlW8moH8N+guxZwY1ohPRP3D2JmqBlqwnnGPUPeNL6EWivI7ARCrd8K5/+d4JFDX6voBXC5fapx0bC0xHMcAAAAASUVORK5CYII=">
+                <vector name="origin" x="0" y="27"/>
+            </canvas>
+            <int name="cash" value="0"/>
+            <int name="slotMax" value="1"/>
+            <int name="price" value="1"/>
+            <int name="only" value="1"/>
+            <int name="picture" value="1"/>
+        </imgdir>
+    </imgdir>
+    <imgdir name="04350002">
+        <imgdir name="info">
+            <canvas name="icon" width="33" height="27" basedata="iVBORw0KGgoAAAANSUhEUgAAACEAAAAbCAYAAADyBeakAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAI/SURBVEhLxZVrleswDIRLYSmUQikshVIohVAIhVAIhVAIhVAohV59siZRvO3msT/unDPHsS1pJrLTXv4TXsHdUMKhpA28AGOZbsMTntOUzexO/gCvyVimv8ODayRDwhFTXmMYeifzsvwZngBGS5jGIWYF7MM3XYI1fL1pGs/da8KDAeJD3776rnEOfefrOSYDU7frVQKruFMmns+nd6Fvi4FMjNXdwYBoyQsN1DliwgMBid6FMDF3pH2U+dC5EeI8tmtnc7yA17Dn3tZrA7tMzF0wsc5EoRsIjmYAEyJCq1jG5j7P/9SFWlxkj/uRDZS1QuatTNh42ARd8GJWSG9Cq7OJRdSMzOLlWQZk4shReCAo51uEZhNRvOZsYHUs1sGGDpS800chEQxITM+iX0Q4G1j26AL34lQX3orF29brvoeJ2OeZGO4AJjBwyoQXCSKS5z+OqDKgL0L34XG/ec1DBjiGLLoWXN7ez9vXiriICRmAxGBksh+v3Sa43S4aBcRFPIrHiKiLs2/P2UCOkwm0iuQaIV8+y/Jpls/MjYiYiYJiNsC+RKHnk2OcpvG4iQwM5Q78MGBj5sqEjRjwOr8YANp01sh/SNM4evFsBvLf4Hcp5sSwRrwQ9XdjZSobqMG64t4h7xv/hFwoyq8Evj6s5314GipwTcwC38G8ltfFW5D83YYkTCJF7sZHsEls3zDvZ5JLHWpuGpEBiauIRLoNZkPiKRNbHfhExUpQ1JGcOg6RAjXzWWfmPEgt8Q0ul38g5JjQ9p6FpAAAAABJRU5ErkJggg==">
+                <vector name="origin" x="0" y="27"/>
+            </canvas>
+            <canvas name="iconRaw" width="33" height="23" basedata="iVBORw0KGgoAAAANSUhEUgAAACEAAAAXCAYAAACFxybfAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAH4SURBVEhLxZWBcYMwDEUzS1foLF2hK7ACK7ACK7ACK7BCVkj1viQQTtpC0rv+u3/GtqT/kU1y+SfcgoeRCaeSfsENMPr0dyjhuizVzOHkb6CajD79GQpuUQwlzphSjWkaRea+/D2UAGZLWOYpZg724YMuwRZa77pOuUdNKBggPo39bRw6cRoHrdeYCky9v72lwC7uKRPX61VdGHs3UImxtjsYSFryRgN1zphQICBRXQgTa0f6T59Pg4wQp9ihX83xAqphz6OttwYOmVi7YGKDiUIZCM5mABNJhHaxjN3HOn+pC614kj3uRzXga07mfZqw8bQJuqBiVijfhFZXE5uoGVnF/TkNpIkzR6FA4OfrQquJKN5yNbA7FutgRwc87+mjSBEMpFg+J3UR4Wpg26ML3IunuvBQLN62XdceJmKfZ2K4A5jAwFMmVCSISJ3fHVFjIL+IvA+fH++qecoAx1BF94Lb2+u8tebiSUykAUgMRhb78Tpsgtst0SiQ3MSjeIyISpx9e64GalyaQMsl9wh5/yz90/TPTEaSmImCyWqA/RSFyifHuCzzeRMVGKoduDNgY+XOhI0YUJ0fDIDcFFvUP6RlnlW8moH8N+guxZwY1ohPRP3D2JmqBlqwnnGPUPeNL6EWivI7ARCrd8K5/+d4JFDX6voBXC5fapx0bC0xHMcAAAAASUVORK5CYII=">
+                <vector name="origin" x="0" y="27"/>
+            </canvas>
+            <int name="cash" value="0"/>
+            <int name="slotMax" value="1"/>
+            <int name="price" value="1"/>
+            <int name="only" value="1"/>
+            <int name="picture" value="2"/>
+        </imgdir>
+    </imgdir>
+</imgdir>
