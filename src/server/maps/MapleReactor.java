@@ -29,12 +29,13 @@ import java.util.List;
 
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import tools.locks.MonitoredReentrantLock;
 
 import scripting.reactor.ReactorScriptManager;
 import server.TimerManager;
 import tools.MaplePacketCreator;
 import tools.Pair;
+import tools.locks.MonitoredLockType;
 
 /**
  *
@@ -53,13 +54,13 @@ public class MapleReactor extends AbstractMapleMapObject {
     private boolean shouldCollect;
     private boolean attackHit;
     private ScheduledFuture<?> timeoutTask = null;
-    private Lock reactorLock = new ReentrantLock(true);
+    private Lock reactorLock = new MonitoredReentrantLock(MonitoredLockType.REACTOR, true);
 
     public MapleReactor(MapleReactorStats stats, int rid) {
         this.evstate = (byte)0;
         this.stats = stats;
         this.rid = rid;
-        alive = true;
+        this.alive = true;
     }
     
     public void setShouldCollect(boolean collect) {
@@ -161,18 +162,19 @@ public class MapleReactor extends AbstractMapleMapObject {
         return MaplePacketCreator.spawnReactor(this);
     }
 
-    public void resetReactorActions() {
+    public void resetReactorActions(int newState) {
+        setState((byte) newState);
         cancelReactorTimeout();
         setShouldCollect(true);
         refreshReactorTimeout();
+        
+        if(map != null) map.searchItemReactors(this);
     }
     
     public void forceHitReactor(final byte newState) {
         this.lockReactor();
         try {
-            setState((byte) newState);
-            this.resetReactorActions();
-            
+            this.resetReactorActions(newState);
             map.broadcastMessage(MaplePacketCreator.triggerReactor(this, (short) 0));
         } finally {
             this.unlockReactor();
@@ -183,9 +185,7 @@ public class MapleReactor extends AbstractMapleMapObject {
         if(!this.reactorLock.tryLock()) return;
         
         try {
-            setState((byte) newState);
-            this.resetReactorActions();
-            
+            this.resetReactorActions(newState);
             map.broadcastMessage(MaplePacketCreator.triggerReactor(this, (short) 0));
         } finally {
             this.unlockReactor();
@@ -270,6 +270,9 @@ public class MapleReactor extends AbstractMapleMapObject {
 
                                 setShouldCollect(true);     // refresh collectability on item drop-based reactors
                                 refreshReactorTimeout();
+                                if(stats.getType(state) == 100) {
+                                    map.searchItemReactors(this);
+                                }
                             }
                             break;
                         }
@@ -281,6 +284,9 @@ public class MapleReactor extends AbstractMapleMapObject {
 
                     setShouldCollect(true);
                     refreshReactorTimeout();
+                    if(stats.getType(state) == 100) {
+                        map.searchItemReactors(this);
+                    }
                 }
             } finally {
                 this.unlockReactor();

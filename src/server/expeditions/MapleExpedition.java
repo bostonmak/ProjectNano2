@@ -72,8 +72,6 @@ public class MapleExpedition {
 			9420542,// - Targa
 			9420543,// - Angry Targa
 			9420544,// - Furious Targa
-			8820000,// - Initial Pink Bean
-			8820001,// - Pink Bean
 	};
 	
 	private MapleCharacter leader;
@@ -98,7 +96,8 @@ public class MapleExpedition {
 	private void beginRegistration() {
 		registering = true;
                 leader.announce(MaplePacketCreator.getClock(type.getRegistrationTime() * 60));
-		startMap.broadcastMessage(MaplePacketCreator.serverNotice(6, "[Expedition] " + leader.getName() + " has been declared the expedition captain. Please register for the expedition."));
+		startMap.broadcastMessage(leader, MaplePacketCreator.serverNotice(6, "[Expedition] " + leader.getName() + " has been declared the expedition captain. Please register for the expedition."), false);
+                leader.announce(MaplePacketCreator.serverNotice(6, "[Expedition] You have become the expedition captain. Gather enough people for your team then talk to the NPC to start."));
 		scheduleRegistrationEnd();
 	}
 
@@ -135,7 +134,7 @@ public class MapleExpedition {
 		broadcastExped(MaplePacketCreator.removeClock());
 		broadcastExped(MaplePacketCreator.serverNotice(6, "[Expedition] The expedition has started! Good luck, brave heroes!"));
 		startTime = System.currentTimeMillis();
-		Server.getInstance().broadcastGMMessage(MaplePacketCreator.serverNotice(6, "[Expedition] " + type.toString() + " Expedition started with leader: " + leader.getName()));
+		Server.getInstance().broadcastGMMessage(leader.getWorld(), MaplePacketCreator.serverNotice(6, "[Expedition] " + type.toString() + " Expedition started with leader: " + leader.getName()));
 	}
 
 	public String addMember(MapleCharacter player) {

@@ -1633,7 +1633,7 @@
       <int name="x" value="2569"/>
       <int name="y" value="2"/>
       <int name="tm" value="914000100"/>
-      <string name="tn" value="west00"/>
+      <string name="tn" value="out00"/>
     </imgdir>
     <imgdir name="2">
       <string name="pn" value="west00"/>

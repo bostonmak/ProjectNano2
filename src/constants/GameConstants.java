@@ -10,13 +10,12 @@ import server.maps.FieldLimit;
  * @author Ronan
  */
 public class GameConstants {
-    //public static final int[] OWL_DATA = {2000014, 2000015, 2000016};
     public static final int[] OWL_DATA = new int[]{1082002, 2070005, 2070006, 1022047, 1102041, 2044705, 2340000, 2040017, 1092030, 2040804};
     
     // Ronan's rates upgrade system
-    private static final int[] DROP_RATE_GAIN = {1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 3, 1, 1, 4};
-    private static final int[] MESO_RATE_GAIN = {1, 1, 1, 2, 2, 2, 2, 3, 4, 5, 6, 7, 9, 10};
-    private static final int[]  EXP_RATE_GAIN = {2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14};    //fibonacci :3
+    private static final int[] DROP_RATE_GAIN = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14};
+    private static final int[] MESO_RATE_GAIN = {1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78, 91, 105};
+    private static final int[]  EXP_RATE_GAIN = {1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610};    //fibonacci :3
     
     public static int getPlayerBonusDropRate(int slot) {
         return(DROP_RATE_GAIN[slot]);
@@ -27,7 +26,7 @@ public class GameConstants {
     }
     
     public static int getPlayerBonusExpRate(int slot) {
-      return(EXP_RATE_GAIN[slot]);
+        return(EXP_RATE_GAIN[slot]);
     }
     
     // MapleStory default keyset
@@ -63,7 +62,29 @@ public class GameConstants {
         330000, 340000, 350000, 360000, 370000, 380000, 390000, 400000, 410000, 420000, 430000, 440000, 450000, 460000, 470000, 480000, 490000, 500000, 510000, 520000,
         530000, 550000, 570000, 590000, 610000, 630000, 650000, 670000, 690000, 710000, 730000, 750000, 770000, 790000, 810000, 830000, 850000, 870000, 890000, 910000};
     
-
+    public static int getJobMaxLevel(MapleJob job) {
+        if(job.getId() % 1000 == 0) {   // beginner
+            return 10;
+            
+        } else if(job.getId() % 100 == 0) {   // 1st job
+            return 30;
+            
+        } else {
+            int jobBranch = job.getId() % 10;
+            
+            switch(jobBranch) {
+                case 0:
+                    return 70;   // 2nd job
+                    
+                case 1:
+                    return 120;   // 3rd job
+                    
+                default:
+                    return (job.getId() / 1000 == 1) ? 120 : 200;   // 4th job: cygnus is 120, rest is 200
+            }
+        }
+    }
+    
     public static int getHiddenSkill(final int skill) {
         switch (skill) {
             case Aran.HIDDEN_FULL_DOUBLE:
@@ -82,7 +103,6 @@ public class GameConstants {
         }
         return 0;
     }
-    
     
     public static boolean isAranSkills(final int skill) {
     	return Aran.FULL_SWING == skill || Aran.OVER_SWING == skill || Aran.COMBO_TEMPEST == skill || Aran.COMBO_FENRIR == skill || Aran.COMBO_DRAIN == skill 
@@ -132,7 +152,7 @@ public class GameConstants {
     }
     
     public static boolean isPqSkill(final int skill) {
-    	return skill >= 20001013 && skill <= 20000018 || skill  % 10000000 == 1020 || skill == 10000013 || skill  % 10000000 >= 1009 && skill % 10000000 <= 1011;  
+    	return (skill >= 20000014 && skill <= 20000018) || skill == 10000013 || skill == 20001013 || (skill % 10000000 >= 1009 && skill % 10000000 <= 1011) || skill % 10000000 == 1020;
     }
     
     public static boolean bannedBindSkills(final int skill) {
@@ -165,14 +185,14 @@ public class GameConstants {
     }
     
     public static boolean isDojo(int mapid) {
-        return mapid >= 925020100 && mapid <= 925023814;
+        return mapid >= 925020000 && mapid < 925040000;
     }
     
     public static boolean isPyramid(int mapid) {
     	return mapid >= 926010010 & mapid <= 930010000;
     }
     
-    public static boolean isPQSkillMap(int mapid) {
+    public static boolean isPqSkillMap(int mapid) {
     	return isDojo(mapid) || isPyramid(mapid);
     }
     

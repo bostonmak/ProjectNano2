@@ -1,8 +1,22 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+    This file is part of the HeavenMS (MapleSolaxiaV2) MapleStory Server
+    Copyleft (L) 2017 RonanLana
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation version 3 as published by
+    the Free Software Foundation. You may not use, modify or distribute
+    this program under any other version of the GNU Affero General Public
+    License.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 package maplecouponinstaller;
 
 import java.io.*;
@@ -15,13 +29,13 @@ import java.sql.SQLException;
  *
  * @author RonanLana
  * 
- * This application gathers information about the Cash Shop EXP & DROP coupons, such
- * as applied rates, active times of day and days of week and dumps them in a SQL
- * table, in which will be used by the server.
+ * This application gathers information about the Cash Shop's EXP & DROP coupons,
+ * such as applied rates, active times of day and days of week and dumps them in
+ * a SQL table, in which will be used by the server.
  * 
  */
 public class MapleCouponInstaller {
-    static String host = "jdbc:mysql://localhost:3306/maplesolaxia";
+    static String host = "jdbc:mysql://localhost:3306/heavenms";
     static String driver = "com.mysql.jdbc.Driver";
     static String username = "root";
     static String password = "";
@@ -291,9 +305,6 @@ public class MapleCouponInstaller {
         }
     }
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
         installCouponsTable();
     }

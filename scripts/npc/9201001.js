@@ -1,71 +1,120 @@
+/*
+Credits go to Travis of DeanMS ( xKillsAlotx on RaGEZONE)
+Item Exchanger for scrolls
 
-var item;
-var common = Array(1003945, 1000050, 1004029, 1001083,1003730, 1002241, 1002450, 1002417, 1002421, 1002422, 1002423, 10024232,1002846, 1002863, 1003221, 1003222, 1003268, 1003269, 1003271, 1003276, 1003271, 1003588, 1003729, 1003737, 1003777, 1003548, 1003549, 1003398, 1003399, 1003400, 1003401, 01042251, 01042252, 01042265, 01042312, 01042313, 01042315, 01042330, 01042333, 01042334, 01042335, 01042336, 01042337, 01042338, 01042345, 01048000, 01049000);
-var normal = Array(01050177, 01050179, 01050187, 01050209, 01050209, 01050210, 01050215, 01050227, 01050232, 01050235, 01050284, 01050298, 01050300, 01050301, 01050302, 01050303, 01050304, 01050310, 01050318, 01050319, 01050351, 01050356, 01051206, 01051211, 01051218, 01051228, 01051231, 01051233, 01051235, 01051252, 01051254, 01051255); 
-var rare = Array(01702236, 01702235, 01702277, 01702279, 01702280, 01702281, 01702282, 01702283, 01702284, 01702285, 01702287, 01702288, 01702289,  01702293,  01702296, 01702299, 01702302, 01702303, 01702310, 01702324, 01702330, 01702334, 01702337, 01702342, 1102452, 1102423, 1102424, 1102425, 1102426, 1102427, 1102428, 1102429, 1102430, 1102431, 1102432, 110243, 1102434, 1102435, 1102438, 1102450, 1102452, 1102486, 1102488, 1102494, 1102495, 1102512, 1102574, 1102583, 1102591, 1102592, 1102755, 1102756);
+Modified by SharpAceX (Alan) for MapleSolaxia
+*/
 
-function getRandom(min, max) {
-	if (min > max) {
-		return(-1);
-	}
+importPackage(Packages.tools);
 
-	if (min == max) {
-		return(min);
-	}
-
-	return(min + parseInt(Math.random() * (max - min + 1)));
-}
-
-var icommon = common[getRandom(0, common.length - 1)];
-var inormal = normal[getRandom(0, normal.length - 1)];
-var irare = rare[getRandom(0, rare.length - 1)];
-
-var chance = getRandom(0, 5);
+var status = 0;
+var leaf = 4001126;
+var chairs = new Array(3010000, 3010001, 3010002, 3010003, 3010004, 3010005, 3010006, 3010007, 3010008, 3010009, 3010010, 3010011, 3010012, 3010013, 3010015, 3010016, 3010017, 3010018, 3010019, 3010022, 3010023, 3010024, 3010025, 3010026, 3010028, 3010040, 3010041, 3010043, 3010045, 3010046, 3010047,3010057,3010058,3010060,3010061,3010062,3010063, 3010064,3010065,3010066,3010067,3010069,3010071,3010072,3010073,3010080,3010081,3010082,3010083, 3010084,3010085,3010097,3010098,3010099,3010101,3010106,3010116,3011000,3012005,3012010,3012011);
+var scrolls = new Array(2040603,2044503,2041024,2041025,2044703,2044603,2043303,2040807,2040806,2040006,2040007,2043103,2043203,2043003,2040506,2044403,2040903,2040709,2040710,2040711,2044303,2043803,2040403,2044103,2044203,2044003,2043703);
+var weapons = new Array(1302020, 1302030, 1302033, 1302058, 1302064, 1302080, 1312032, 1322054, 1332025, 1332055, 1332056, 1372034, 1382009, 1382012, 1382039, 1402039, 1412011, 1412027, 1422014, 1422029, 1432012, 1432040, 1432046, 1442024, 1442030, 1442051, 1452016, 1452022, 1452045, 1462014, 1462019, 1462040, 1472030, 1472032, 1472055, 1482020, 1482021, 1482022, 1492020, 1492021, 1492022, 1092030, 1092045, 1092046, 1092047);
 
 function start() {
-	status = -1;
-	action(1, 0, 0);
+    status = -1;
+    action(1, 0, 0);
 }
 
 function action(mode, type, selection) {
-	if (mode == -1) {
-		cm.dispose();
-	} else {
-		if (mode == 0) {
-			cm.sendOk("#rOkay, come back when you're ready to test your #eRNG!");
-			cm.dispose();
-			return;
-		} else if (mode == 1) {
-			status++;
-		}
-
-		if (status == 0) {
-			cm.sendNext(" #i3991013##i3991023##i3991006##i3991000##i3991002##i3991007##i3991000##i3991015##i3991014##i3991013# \r\nHello #h #,\r\n\r\nWant to try your luck at the #r#eNX Gachapon?#n#k You can earn assorted up to date NX items as well as mastery books, boss summoning bags, and boss coins! Remember that it will cost you #r#e10,000,000 mesos#n#k a spin! #b#eGood Luck!");
-		} else if (status == 1) {
-			if (cm.getMeso() >= 10000000) {
-				//cm.gainMeso([-1]);
-				cm.sendNext(" #eFeatured NX Items in September#e \r\n\r\n #i1003755##i1004197#  #i1003252# #i1702368#\r\n ------------------------------------------------------------------------------ \r\n#i1102802##i1102820##i1102839##i1102789##i1102754#\r\n ------------------------------------------------------------------------------ \r\n #i1702529##i1702530##i1702534##i1702533##i1702540##i1702523# \r\n ------------------------------------------------------------------------------ \r\n \t\t\t\t\t\#e#rGood Luck Adventurer!");
-				
-			} else {
-                cm.sendOk("Sorry you dont have 10,000,000 mesos :(");
-                cm.dispose();				
+    if (mode == -1)
+        cm.dispose();
+    else {
+        if (mode == 0 && status == 0)
+            cm.dispose();
+        if (mode == 1)
+            status++;
+        else
+            status--;
+        if (status == 0) {
+            cm.sendSimple("Hello#b #h ##k, you currently have #b#c4001126# maple leaves.#k \r\nWhat would you like to do?\r\n#k#L1# Trade 1 leaf for 5,000 NX#l\r\n\#L2# Trade 1 leaf for 1 random chair #l\r\n\#L3# Trade 1 leaf for 3 random Maple Weapons #l\r\n\#L4# Trade 1 leaf for 3 Swiss Cheese and Onyx Apples#l\r\n#L5#Trade 1 leaf for a 10 day Hired Merchant#l");
+        } else if (status == 1) {
+            if (selection == 1) {
+                if(cm.haveItem(leaf, 1)) {
+					cm.getPlayer().getCashShop().gainCash(1, 5000);
+					cm.getPlayer().announce(MaplePacketCreator.earnTitleMessage("You have earned 5,000 NX"));
+                    cm.gainItem(leaf, -1);
+                    cm.sendOk("Here is your 5,000 NX!");
+					cm.logLeaf("5k NX");
+                } else {
+                    cm.sendOk("Sorry, you don't have a maple leaf!");
 				}
-		} else if (status == 2) {
-        //    		 cm.setDailyReward('DailyGift');
-					 
-
-			if (chance > 0 && chance <= 2) {
-			cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(icommon, 1) + "##k #v" + icommon + "#"); 
-			cm.gainMeso([-10000000]);
-			} else if (chance >= 3 && chance <= 4) {
-			cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(inormal, 1) + "##k #v" + inormal + "#");
-			cm.gainMeso([-10000000]);
+                cm.dispose();
+            } else if (selection == 2) {
+                if(cm.haveItem(leaf, 1)) {
+					var chair1 = chairs[Math.floor(Math.random()*chairs.length)];
+					if(cm.canHold(chair1)){
+						cm.gainItem(chair1);
+						cm.gainItem(leaf, -1);
+						cm.sendOk("Here is your random chair!");
+						cm.logLeaf("Chair ID: " + chair1);
+					} else {
+						cm.sendOk("Please make sure you have enough space to hold this chair!");
+					}
+                 } else {
+                    cm.sendOk("Sorry, you don't have a maple leaf!");
+				}
+                cm.dispose();
+			} else if (selection == 3) {
+                if(cm.haveItem(leaf, 1)) {
+					var weapon1 = weapons[Math.floor(Math.random()*weapons.length)];
+					var weapon2 = weapons[Math.floor(Math.random()*weapons.length)];
+					var weapon3 = weapons[Math.floor(Math.random()*weapons.length)];
+					if(!cm.getPlayer().getInventory(Packages.client.inventory.MapleInventoryType.EQUIP).isFull(3)) {
+						cm.gainItem(weapon1, 1, true, true);
+						cm.gainItem(weapon2, 1, true, true);
+						cm.gainItem(weapon3, 1, true, true);
+						cm.gainItem(leaf, -1);
+						cm.sendOk("Here are your 3 random weapons!");
+						cm.logLeaf("Maple Weapons IDs: " + weapon1 + "," + weapon2 + "," + weapon3);
+					} else {
+						cm.sendOk("Please make sure you have enough space to hold these weapons!");
+					}
+                 } else {
+                    cm.sendOk("Sorry, you don't have a maple leaf!");
+				}
+                cm.dispose();
+			} else if (selection == 4) {
+                if(cm.haveItem(leaf, 1)) {
+					var cheese = 2022273;
+					var apple = 2022179;
+					if(!cm.getPlayer().getInventory(Packages.client.inventory.MapleInventoryType.EQUIP).isFull(2)){
+						cm.gainItem(apple, 3);
+						cm.gainItem(cheese, 3);
+						cm.gainItem(leaf, -1);
+						cm.sendOk("Here are your 3 cheeses and apples!");
+						cm.logLeaf("3 cheeses and apples");
+					} else {
+						cm.sendOk("Please make sure you have enough space to hold these items!");
+					}
+                 } else {
+                    cm.sendOk("Sorry, you don't have a maple leaf!");
+				}
+                cm.dispose();
+            } else if(selection == 5) {
+				if(cm.haveItem(leaf, 1)) {
+					if(!cm.haveItem(5030000, 1)) {
+						if(!cm.getPlayer().getInventory(Packages.client.inventory.MapleInventoryType.CASH).isFull(1)){
+							cm.gainItem(5030000, 1, false, true, 1000 * 60 * 60 * 24 * 10);
+							cm.gainItem(leaf, -1);
+							cm.sendOk("Here is your Hired Merchant!");
+							cm.logLeaf("10 day hired merchant");
+						} else {
+							cm.sendOk("Please make sure you have enough space to hold these items!");
+						}
+					} else {
+						cm.sendOk("I can't give you a merchant if you already have one!");
+					}
+				} else {
+					cm.sendOk("Sorry, you don't have a maple leaf!");
+				}
+				cm.dispose();
 			} else {
-			cm.sendOk("#b#eCongratulations!#n#k You have obtained a #d#t" + cm.gainItem(irare, 1) + "##k #v" + irare + "#");
-			cm.gainMeso([-10000000]);
+                cm.sendOk("Come back later!");
+				cm.dispose();
 			}
-
-			cm.dispose();
-		}
-	}
+        }
+    }
 }

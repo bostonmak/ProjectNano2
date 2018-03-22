@@ -6,10 +6,9 @@
 importPackage(Packages.server.life);
 
 var isPq = true;
-var minPlayers = 1, maxPlayers = 30;
+var minPlayers = 6, maxPlayers = 30;
 var minLevel = 50, maxLevel = 255;
 var entryMap = 280030000;
-var fmMap = 910000022;
 var exitMap = 211042400;
 var recruitMap = 211042400;
 var clearMap = 211042400;
@@ -96,7 +95,7 @@ function scheduledTimeout(eim) {
 function changedMap(eim, player, mapid) {
     if (mapid < minMapId || mapid > maxMapId) {
 	if (eim.isEventTeamLackingNow(true, minPlayers, player)) {
-            eim.dropMessage(5, "[Expedition] Either the leader has quitted the event or there is no longer the minimum number of members required to continue this event.");
+            eim.dropMessage(5, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.");
             eim.unregisterPlayer(player);
             end(eim);
         }
@@ -114,7 +113,7 @@ function playerDead(eim, player) {}
 function playerRevive(eim, player) {
     if (eim.isEventTeamLackingNow(true, minPlayers, player)) {
         eim.unregisterPlayer(player);
-        eim.dropMessage(5, "[Expedition] Either the leader has quitted the event or there is no longer the minimum number of members required to continue this event.");
+        eim.dropMessage(5, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.");
         end(eim);
     }
     else {
@@ -125,7 +124,7 @@ function playerRevive(eim, player) {
 
 function playerDisconnected(eim, player) {
     if (eim.isEventTeamLackingNow(true, minPlayers, player)) {
-        eim.dropMessage(5, "[Expedition] Either the leader has quitted the event or there is no longer the minimum number of members required to continue this event.");
+        eim.dropMessage(5, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.");
         eim.unregisterPlayer(player);
         end(eim);
     }
@@ -151,7 +150,7 @@ function playerUnregistered(eim, player) {
 
 function playerExit(eim, player) {
     eim.unregisterPlayer(player);
-    player.changeMap(fmMap, 0);
+    player.changeMap(exitMap, 0);
 }
 
 function end(eim) {

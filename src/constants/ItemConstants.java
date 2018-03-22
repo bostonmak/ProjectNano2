@@ -22,6 +22,8 @@
 package constants;
 
 import client.inventory.MapleInventoryType;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -29,6 +31,8 @@ import client.inventory.MapleInventoryType;
  * @author Ronan
  */
 public final class ItemConstants {
+    protected static Map<Integer, MapleInventoryType> inventoryTypeCache = new HashMap<>();
+    
     public final static int LOCK = 0x01;
     public final static int SPIKES = 0x02;
     public final static int COLD = 0x04;
@@ -89,6 +93,22 @@ public final class ItemConstants {
         return itemId / 1000 == 5000;
     }
     
+    public static boolean isExpirablePet(int itemId) {
+        return ServerConstants.USE_ERASE_PET_ON_EXPIRATION || itemId == 5000054;
+    }
+    
+    public static boolean isNewYearCardEtc(int itemId) { 
+        return itemId / 10000 == 430;
+    } 
+     
+    public static boolean isNewYearCardUse(int itemId) { 
+        return itemId / 10000 == 216;
+    }
+    
+    public static boolean isAccessory(int itemId) {
+        return itemId >= 1110000 && itemId < 1140000;
+    }
+    
     public static boolean isTownScroll(int itemId) {
         return itemId >= 2030000 && itemId < 2030021;
     }
@@ -129,10 +149,34 @@ public final class ItemConstants {
     }
 
     public static MapleInventoryType getInventoryType(final int itemId) {
+        if (inventoryTypeCache.containsKey(itemId)) {
+            return inventoryTypeCache.get(itemId);
+        }
+        
+        MapleInventoryType ret = MapleInventoryType.UNDEFINED;
+        
 	final byte type = (byte) (itemId / 1000000);
-	if (type < 1 || type > 5) {
-	    return MapleInventoryType.UNDEFINED;
+	if (type >= 1 && type <= 5) {
+	    ret = MapleInventoryType.getByType(type);
 	}
-	return MapleInventoryType.getByType(type);
+        
+        inventoryTypeCache.put(itemId, ret);
+        return ret;
+    }
+    
+    public static boolean isMakerReagent(int itemId) {
+        return itemId / 10000 == 425;
+    }
+    
+    public static boolean isOverall(int itemId) {
+        return itemId / 10000 == 105;
+    }
+
+    public static boolean isWeapon(int itemId) {
+        return itemId >= 1302000 && itemId < 1492024;
+    }
+    
+    public static boolean isEquipment(int itemId) {
+        return itemId < 2000000;
     }
 }

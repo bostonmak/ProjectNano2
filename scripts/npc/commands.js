@@ -83,7 +83,7 @@ function writeSolaxiaCommandsLv4() {    //SuperGM
         addCommand("exprate", "");
         addCommand("mesorate", "");
         addCommand("droprate", "");
-        addCommand("bossdroprate", "");
+        addCommand("questrate", "");
         addCommand("itemvac", "");
         addCommand("forcevac", "");
         addCommand("zakum", "");
@@ -166,6 +166,7 @@ function writeSolaxiaCommandsLv2() {    //JrGM
         addCommand("warp", "");
         addCommand("warpto", "");
         addCommand("warphere", "");
+        addCommand("reach", "");
         addCommand("gmshop", "");
         addCommand("heal", "");
         addCommand("item", "");
@@ -197,8 +198,9 @@ function writeSolaxiaCommandsLv0() {    //Common
         desc_cursor = desc_lv0;
 
         addCommand("commands", "");
+        addCommand("droplimit", "");
         addCommand("time", "");
-        addCommand("staff", "");
+        addCommand("credits", "");
         addCommand("uptime", "");
         addCommand("gacha", "");
         addCommand("whatdropsfrom", "");

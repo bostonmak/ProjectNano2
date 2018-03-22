@@ -41,9 +41,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+
+import tools.*;
+import tools.locks.MonitoredReentrantLock;
 
 import javax.script.ScriptEngine;
 
@@ -70,15 +71,9 @@ import scripting.quest.QuestActionManager;
 import scripting.quest.QuestScriptManager;
 import server.life.MapleMonster;
 import server.MapleTrade;
-import server.TimerManager;
 import server.maps.*;
 import server.quest.MapleQuest;
-import tools.LogHelper;
-import tools.DatabaseConnection;
-import tools.FilePrinter;
-import tools.HexTool;
-import tools.MapleAESOFB;
-import tools.MaplePacketCreator;
+import tools.locks.MonitoredLockType;
 
 public class MapleClient {
 
@@ -88,7 +83,7 @@ public class MapleClient {
 	public static final String CLIENT_KEY = "CLIENT";
 	private MapleAESOFB send;
 	private MapleAESOFB receive;
-	private IoSession session;
+	private final IoSession session;
 	private MapleCharacter player;
 	private int channel = 1;
 	private int accId = 1;
@@ -101,7 +96,6 @@ public class MapleClient {
 	private int gmlevel;
 	private Set<String> macs = new HashSet<>();
 	private Map<String, ScriptEngine> engines = new HashMap<>();
-	private ScheduledFuture<?> idleTask = null;
 	private byte characterSlots = 3;
 	private byte loginattempt = 0;
 	private String pin = null;
@@ -111,7 +105,7 @@ public class MapleClient {
 	private int picattempt = 0;
 	private byte gender = -1;
 	private boolean disconnecting = false;
-	private final Lock mutex = new ReentrantLock(true);
+	private final Lock lock = new MonitoredReentrantLock(MonitoredLockType.CLIENT, true);
 	private int votePoints;
 	private int voteTime = -1;
 	private long lastNpcClick;
@@ -123,15 +117,15 @@ public class MapleClient {
 		this.session = session;
 	}
 
-	public synchronized MapleAESOFB getReceiveCrypto() {
+	public MapleAESOFB getReceiveCrypto() {
 		return receive;
 	}
 
-	public synchronized MapleAESOFB getSendCrypto() {
+	public MapleAESOFB getSendCrypto() {
 		return send;
 	}
 
-	public synchronized IoSession getSession() {
+	public IoSession getSession() {
 		return session;
 	}
         
@@ -459,7 +453,7 @@ public class MapleClient {
 	public boolean checkPin(String other) {
 		pinattempt++;
 		if (pinattempt > 5) {
-			getSession().close(true);
+			session.close(false);
 		}
 		if (pin.equals(other)) {
 			pinattempt = 0;
@@ -493,7 +487,7 @@ public class MapleClient {
             
 		picattempt++;
 		if (picattempt > 5) {
-			getSession().close(true);
+			session.close(false);
 		}
 		if (pic.equals(other)) {
 			picattempt = 0;
@@ -505,21 +499,19 @@ public class MapleClient {
 	public int login(String login, String pwd) {
 		loginattempt++;
 		if (loginattempt > 4) {
-			getSession().close(true);
+			session.close(false);
 		}
 		int loginok = 5;
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-                        con = DatabaseConnection.getConnection();
+			con = DatabaseConnection.getConnection();
 			ps = con.prepareStatement("SELECT id, password, salt, gender, banned, gm, pin, pic, characterslots, tos FROM accounts WHERE name = ?");
 			ps.setString(1, login);
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				if (rs.getByte("banned") == 1) {
-					return 3;
-				}
+				boolean banned = (rs.getByte("banned") == 1);
 				accId = rs.getInt("id");
 				gmlevel = rs.getInt("gm");
 				pin = rs.getString("pin");
@@ -528,19 +520,22 @@ public class MapleClient {
 				characterSlots = rs.getByte("characterslots");
 				String passhash = rs.getString("password");
 				String salt = rs.getString("salt");
-				//we do not unban
 				byte tos = rs.getByte("tos");
+
 				ps.close();
 				rs.close();
+
+				if (banned) {
+					return 3;
+				}
+
 				if (getLoginState() > LOGIN_NOTLOGGEDIN) { // already loggedin
 					loggedIn = false;
 					loginok = 7;
+				} else if (passhash.charAt(0) == '$' && passhash.charAt(1) == '2' && BCrypt.checkpw(pwd, passhash)) {
+					loginok = (tos == 0) ? 23 : 0;
 				} else if (pwd.equals(passhash) || checkHash(passhash, "SHA-1", pwd) || checkHash(passhash, "SHA-512", pwd + salt)) {
-					if (tos == 0) {
-						loginok = 23;
-					} else {
-						loginok = 0;
-					}
+					loginok = (tos == 0) ? -23 : -10; // migrate to bcrypt
 				} else {
 					loggedIn = false;
 					loginok = 4;
@@ -560,11 +555,11 @@ public class MapleClient {
 				if (rs != null && !rs.isClosed()) {
 					rs.close();
 				}
-                                if (con != null && !con.isClosed()) {
+				if (con != null && !con.isClosed()) {
 					con.close();
 				}
 			} catch (SQLException e) {
-                            e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 		if (loginok == 0) {
@@ -787,6 +782,7 @@ public class MapleClient {
 
 	private void removePlayer() {
 		try {
+                        player.setAwayFromWorld(true);
 			player.cancelAllBuffs(true);
 			player.cancelAllDebuffs();
                         
@@ -834,7 +830,7 @@ public class MapleClient {
                             
                                 removePlayer();
                                 player.saveCooldowns();
-                                player.saveToDB();
+                                player.saveToDB(true);
                             
 				player = null;
 				return;
@@ -918,7 +914,7 @@ public class MapleClient {
 					worlda.removePlayer(player);
                                         
                                         player.saveCooldowns();
-                                        player.saveToDB();
+                                        player.saveToDB(true);
 					if (player != null) {//no idea, occur :(
 						player.empty(false);
 					}
@@ -934,21 +930,19 @@ public class MapleClient {
 		if (!serverTransition && isLoggedIn()) {
 			updateLoginState(MapleClient.LOGIN_NOTLOGGEDIN);
 			session.removeAttribute(MapleClient.CLIENT_KEY); // prevents double dcing during login
-			session.close();
+			session.close(false);
 		}
 		engines.clear();
 	}
 
-	private void clear() {
+	private void clear() {  //usable when defining client = null shortly after
+                Server.getInstance().unregisterLoginState(this);
+            
 		this.accountName = null;
 		this.macs = null;
 		this.hwid = null;
 		this.birthday = null;
 		//this.engines = null;
-		if (this.idleTask != null) {
-			this.idleTask.cancel(true);
-			this.idleTask = null;
-		}
 		this.player = null;
 		this.receive = null;
 		this.send = null;
@@ -971,8 +965,37 @@ public class MapleClient {
 		return Server.getInstance().getChannel(world, channel);
 	}
 
+        private boolean hasCharacter(int cid) throws SQLException {
+                Connection con = null;
+                PreparedStatement ps = null;
+                ResultSet rs = null;
+                
+                try {
+                        con = DatabaseConnection.getConnection();
+                        ps = con.prepareStatement("SELECT id FROM characters WHERE accountid = ?");
+                        ps.setInt(1, getAccID());
+                        
+                        rs = ps.executeQuery();
+                        while (rs.next()) {
+                                if (rs.getInt("id") == cid) {
+                                        return true;
+                                }
+                        }
+                } finally {
+                        if(rs != null && !rs.isClosed()) rs.close();
+                        if(ps != null && !ps.isClosed()) ps.close();
+                        if(con != null && !con.isClosed()) con.close();
+                }
+                
+                return false;
+        }
+        
 	public boolean deleteCharacter(int cid) {
                 try {
+                        if(!hasCharacter(cid)) {
+                                return false;
+                        }
+                    
                         return MapleCharacter.deleteCharFromDB(MapleCharacter.loadCharFromDB(cid, this, false));
                 } catch(SQLException ex) {
                         ex.printStackTrace();
@@ -1004,25 +1027,17 @@ public class MapleClient {
 		lastPong = System.currentTimeMillis();
 	}
 
-	public void sendPing() {
-		final long then = System.currentTimeMillis();
-		announce(MaplePacketCreator.getPing());
-		TimerManager.getInstance().schedule(new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					if (lastPong < then) {
-						if (getSession() != null && getSession().isConnected()) {
-							getSession().close(true);
-						}
-					}
-				} catch (NullPointerException e) {
-                                    e.printStackTrace();
-				}
-			}
-		}, 15000);
-	}
+        public void testPing(long timeThen) {
+                try {
+                        if (lastPong < timeThen) {
+                                if (session != null && session.isConnected()) {
+                                        session.close(false);
+                                }
+                        }
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
+        }
 	
 	public String getHWID() {
 		return hwid;
@@ -1050,14 +1065,6 @@ public class MapleClient {
 
 	public void removeScriptEngine(String name) {
                 engines.remove(name);
-	}
-
-	public ScheduledFuture<?> getIdleTask() {
-		return idleTask;
-	}
-
-	public void setIdleTask(ScheduledFuture<?> idleTask) {
-		this.idleTask = idleTask;
 	}
 
 	public NPCConversationManager getCM() {
@@ -1149,8 +1156,12 @@ public class MapleClient {
 		}
 	}
 
-	public final Lock getLock() {
-		return mutex;
+	public void lockClient() {
+                lock.lock();
+	}
+        
+        public void unlockClient() {
+                lock.unlock();
 	}
 
 	private static class CharNameAndId {
@@ -1276,8 +1287,8 @@ public class MapleClient {
 		session.write(packet);
 	}
 
-        public void announceHint(String msg) {
-                announce(MaplePacketCreator.sendHint(msg, 500, 10));
+        public void announceHint(String msg, int length) {
+                announce(MaplePacketCreator.sendHint(msg, length, 10));
                 announce(MaplePacketCreator.enableActions());
         }
 
@@ -1290,7 +1301,12 @@ public class MapleClient {
 		if (!player.isAlive() || FieldLimit.CANNOTMIGRATE.check(player.getMap().getFieldLimit())) {
 			announce(MaplePacketCreator.enableActions());
 			return;
-		}
+		} else if(MapleMiniDungeonInfo.isDungeonMap(player.getMapId())) {
+                        announce(MaplePacketCreator.serverNotice(5, "Changing channels or entering Cash Shop or MTS are disabled when inside a Mini-Dungeon."));
+                        announce(MaplePacketCreator.enableActions());
+			return;
+                }
+                
 		String[] socket = Server.getInstance().getIP(getWorld(), channel).split(":");
 		if (player.getTrade() != null) {
 			MapleTrade.cancelTrade(getPlayer());
@@ -1304,10 +1320,14 @@ public class MapleClient {
 				merchant.removeVisitor(getPlayer());
 			}
 		}
+                player.unregisterChairBuff();
 		server.getPlayerBuffStorage().addBuffsToStorage(player.getId(), player.getAllBuffs());
+                player.setAwayFromWorld(true);
 		player.cancelAllBuffs(true);
                 player.cancelBuffExpireTask();
+                player.cancelDiseaseExpireTask();
                 player.cancelSkillCooldownTask();
+                player.cancelQuestExpirationTask();
 		//Cancelling magicdoor? Nope
 		//Cancelling mounts? Noty
 		if (player.getBuffedValue(MapleBuffStat.PUPPET) != null) {

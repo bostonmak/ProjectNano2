@@ -8020,8 +8020,8 @@
       <int name="meso" value="220000"/>
       <imgdir name="recipe">
         <imgdir name="0">
-          <null name="item"/>
           <int name="count" value="12"/>
+          <int name="item" value="4007004"/>
         </imgdir>
         <imgdir name="1">
           <int name="item" value="4260007"/>

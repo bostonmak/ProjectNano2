@@ -32,6 +32,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.locks.Lock;
+import tools.locks.MonitoredReentrantLock;
+import tools.locks.MonitoredReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -60,9 +63,12 @@ import server.expeditions.MapleExpeditionType;
 import server.maps.MapleHiredMerchant;
 import server.maps.MapleMap;
 import server.maps.MapleMapFactory;
+import server.maps.MapleMiniDungeon;
 import tools.MaplePacketCreator;
 import client.MapleCharacter;
 import constants.ServerConstants;
+import server.maps.MapleMiniDungeonInfo;
+import tools.locks.MonitoredLockType;
 
 public final class Channel {
 
@@ -75,9 +81,6 @@ public final class Channel {
     private EventScriptManager eventSM;
     private Map<Integer, MapleHiredMerchant> hiredMerchants = new HashMap<>();
     private final Map<Integer, Integer> storedVars = new HashMap<>();
-    private ReentrantReadWriteLock merchant_lock = new ReentrantReadWriteLock(true);
-    private ReadLock merchRlock = merchant_lock.readLock();
-    private WriteLock merchWlock = merchant_lock.writeLock();
     private List<MapleExpedition> expeditions = new ArrayList<>();
     private List<MapleExpeditionType> expedType = new ArrayList<>();
     private MapleEvent event;
@@ -87,6 +90,13 @@ public final class Channel {
     private long[] dojoFinishTime;
     private ScheduledFuture<?>[] dojoTask;
     private Map<Integer, Integer> dojoParty = new HashMap<>();
+    private Map<Integer, MapleMiniDungeon> dungeons = new HashMap<>();
+    
+    private ReentrantReadWriteLock merchantLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.MERCHANT, true);
+    private ReadLock merchRlock = merchantLock.readLock();
+    private WriteLock merchWlock = merchantLock.writeLock();
+    
+    private Lock lock = new MonitoredReentrantLock(MonitoredLockType.CHANNEL, true);
     
     public Channel(final int world, final int channel) {
         this.world = world;
@@ -100,7 +110,7 @@ public final class Channel {
             IoBuffer.setUseDirectBuffer(false);
             IoBuffer.setAllocator(new SimpleBufferAllocator());
             acceptor = new NioSocketAcceptor();
-            TimerManager.getInstance().register(new respawnMaps(), 10000);
+            TimerManager.getInstance().register(new respawnMaps(), ServerConstants.RESPAWN_INTERVAL);
             acceptor.setHandler(new MapleServerHandler(world, channel));
             acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 30);
             acceptor.getFilterChain().addLast("codec", (IoFilter) new ProtocolCodecFilter(new MapleCodecFactory()));
@@ -484,5 +494,38 @@ public final class Channel {
     
     public long getDojoFinishTime(int dojoMapId) {
         return dojoFinishTime[getDojoSlot(dojoMapId)];
+    }
+    
+    public boolean addMiniDungeon(int dungeonid) {
+        lock.lock();
+        try {
+            if(dungeons.containsKey(dungeonid)) return false;
+            
+            MapleMiniDungeonInfo mmdi = MapleMiniDungeonInfo.getDungeon(dungeonid);
+            MapleMiniDungeon mmd = new MapleMiniDungeon(mmdi.getBase(), 30);    // all minidungeons timeout on 30 mins
+            
+            dungeons.put(dungeonid, mmd);
+            return true;
+        } finally {
+            lock.unlock();
+        }
+    }
+    
+    public MapleMiniDungeon getMiniDungeon(int dungeonid) {
+        lock.lock();
+        try {
+            return dungeons.get(dungeonid);
+        } finally {
+            lock.unlock();
+        }
+    }
+    
+    public void removeMiniDungeon(int dungeonid) {
+        lock.lock();
+        try {
+            dungeons.remove(dungeonid);
+        } finally {
+            lock.unlock();
+        }
     }
 }

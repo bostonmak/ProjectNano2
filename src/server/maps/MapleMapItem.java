@@ -24,46 +24,54 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.Item;
 import java.awt.Point;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.Lock;
+import tools.locks.MonitoredReentrantLock;
 import tools.MaplePacketCreator;
+import tools.locks.MonitoredLockType;
 
 public class MapleMapItem extends AbstractMapleMapObject {
-
+    protected MapleClient ownerClient;
     protected Item item;
     protected MapleMapObject dropper;
-    protected int character_ownerid, meso, questid = -1;
+    protected int character_ownerid, party_ownerid, meso, questid = -1;
     protected byte type;
     protected boolean pickedUp = false, playerDrop;
     protected long dropTime;
-    private ReentrantLock itemLock = new ReentrantLock();
+    private Lock itemLock = new MonitoredReentrantLock(MonitoredLockType.MAP_ITEM);
 
-    public MapleMapItem(Item item, Point position, MapleMapObject dropper, MapleCharacter owner, byte type, boolean playerDrop) {
+    public MapleMapItem(Item item, Point position, MapleMapObject dropper, MapleCharacter owner, MapleClient ownerClient, byte type, boolean playerDrop) {
 	setPosition(position);
 	this.item = item;
 	this.dropper = dropper;
-	this.character_ownerid = owner.getId();
+        this.character_ownerid = owner.getId();
+        this.party_ownerid = owner.getPartyId();
+        this.ownerClient = owner.getClient();
 	this.meso = 0;
 	this.type = type;
 	this.playerDrop = playerDrop;
     }
 
-    public MapleMapItem(Item item, Point position, MapleMapObject dropper, MapleCharacter owner, byte type, boolean playerDrop, int questid) {
+    public MapleMapItem(Item item, Point position, MapleMapObject dropper, MapleCharacter owner, MapleClient ownerClient, byte type, boolean playerDrop, int questid) {
 	setPosition(position);
 	this.item = item;
 	this.dropper = dropper;
-	this.character_ownerid = owner.getParty() == null ? owner.getId() : owner.getPartyId();
-	this.meso = 0;
+        this.character_ownerid = owner.getId();
+        this.party_ownerid = owner.getPartyId();
+	this.ownerClient = owner.getClient();
+        this.meso = 0;
 	this.type = type;
 	this.playerDrop = playerDrop;
 	this.questid = questid;
     }
 
-    public MapleMapItem(int meso, Point position, MapleMapObject dropper, MapleCharacter owner, byte type, boolean playerDrop) {
+    public MapleMapItem(int meso, Point position, MapleMapObject dropper, MapleCharacter owner, MapleClient ownerClient, byte type, boolean playerDrop) {
 	setPosition(position);
 	this.item = null;
 	this.dropper = dropper;
-	this.character_ownerid = owner.getParty() == null ? owner.getId() : owner.getPartyId();
-	this.meso = meso;
+	this.character_ownerid = owner.getId();
+        this.party_ownerid = owner.getPartyId();
+        this.ownerClient = owner.getClient();
+        this.meso = meso;
 	this.type = type;
 	this.playerDrop = playerDrop;
     }
@@ -85,8 +93,34 @@ public class MapleMapItem extends AbstractMapleMapObject {
 	return dropper;
     }
 
-    public final int getOwner() {
+    public final int getOwnerId() {
 	return character_ownerid;
+    }
+    
+    public final boolean canBePickedBy(MapleCharacter chr) {
+        if (character_ownerid <= 0) return true;
+        
+        if (party_ownerid == -1) {
+            if (chr.getId() == character_ownerid) {
+                return true;
+            } else if (chr.isPartyMember(character_ownerid)) {
+                party_ownerid = chr.getPartyId();
+                return true;
+            }
+        } else {
+            if (chr.getPartyId() == party_ownerid) {
+                return true;
+            } else if (chr.getId() == character_ownerid) {
+                party_ownerid = chr.getPartyId();
+                return true;
+            }
+        }
+        
+        return System.currentTimeMillis() - dropTime >= 15 * 1000;
+    }
+    
+    public final MapleClient getOwnerClient() {
+	return (ownerClient.isLoggedIn() && !ownerClient.getPlayer().isAwayFromWorld()) ? ownerClient : null;
     }
 
     public final int getMeso() {

@@ -21,13 +21,14 @@
 */
 package scripting.reactor;
 
+import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
+import constants.ItemConstants;
 import java.awt.Point;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Level;
@@ -53,6 +54,7 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
     private MapleReactor reactor;
     private MapleClient client;
     private Invocable iv;
+    private ScheduledFuture<?> sprayTask = null;
 
     public ReactorActionManager(MapleClient c, MapleReactor reactor, Invocable iv) {
         super(c);
@@ -69,6 +71,22 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
         reactor.getMap().destroyNPC(npcId);
     }
 
+    public void sprayItems() {
+        sprayItems(false, 0, 0, 0, 0);
+    }
+
+    public void sprayItems(boolean meso, int mesoChance, int minMeso, int maxMeso) {
+        sprayItems(meso, mesoChance, minMeso, maxMeso, 0);
+    }
+    
+    public void sprayItems(boolean meso, int mesoChance, int minMeso, int maxMeso, int minItems) {
+        sprayItems((int)reactor.getPosition().getX(), (int)reactor.getPosition().getY(), meso, mesoChance, minMeso, maxMeso, minItems);
+    }
+
+    public void sprayItems(int posX, int posY, boolean meso, int mesoChance, int minMeso, int maxMeso, int minItems) {
+        dropItems(true, posX, posY, meso, mesoChance, minMeso, maxMeso, minItems);
+    }
+    
     public void dropItems() {
         dropItems(false, 0, 0, 0, 0);
     }
@@ -82,52 +100,120 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
     }
 
     public void dropItems(int posX, int posY, boolean meso, int mesoChance, int minMeso, int maxMeso, int minItems) {
-        List<ReactorDropEntry> chances = getDropChances();
-        List<ReactorDropEntry> items = new LinkedList<>();
-        int numItems = 0;
-        if (meso && Math.random() < (1 / (double) mesoChance)) {
-            items.add(new ReactorDropEntry(0, mesoChance, -1));
-        }
-        Iterator<ReactorDropEntry> iter = chances.iterator();
-        while (iter.hasNext()) {
-            ReactorDropEntry d = iter.next();
-            if (Math.random() < (c.getPlayer().getDropRate() / (double) d.chance)) {
-                numItems++;
-                items.add(d);
-            }
-        }
-        while (items.size() < minItems) {
-            items.add(new ReactorDropEntry(0, mesoChance, -1));
-            numItems++;
-        }
-        java.util.Collections.shuffle(items);
+        dropItems(false, posX, posY, meso, mesoChance, minMeso, maxMeso, minItems);
+    }
+    
+    public void dropItems(boolean delayed, int posX, int posY, boolean meso, int mesoChance, final int minMeso, final int maxMeso, int minItems) {
+        if(c.getPlayer() == null) return;
         
+        List<ReactorDropEntry> items = generateDropList(getDropChances(), c.getPlayer().getDropRate(), meso, mesoChance, minItems);
+        
+        if(items.size() % 2 == 0) posX -= 12;
         final Point dropPos = new Point(posX, posY);
-        dropPos.x -= (12 * numItems);
         
-        for (ReactorDropEntry d : items) {
-            if (d.itemId == 0) {
-                int range = maxMeso - minMeso;
-                int displayDrop = (int) (Math.random() * range) + minMeso;
-                int mesoDrop = (displayDrop * client.getWorldServer().getMesoRate());
-                reactor.getMap().spawnMesoDrop(mesoDrop, reactor.getMap().calcDropPos(dropPos, reactor.getPosition()), reactor, client.getPlayer(), false, (byte) 2);
-            } else {
-                Item drop;
-                MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-                if (ii.getInventoryType(d.itemId) != MapleInventoryType.EQUIP) {
-                    drop = new Item(d.itemId, (short) 0, (short) 1);
-                } else {
-                    drop = ii.randomizeStats((Equip) ii.getEquipById(d.itemId));
-                }
+        if(!delayed) {
+            MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
+            
+            byte p = 1;
+            for (ReactorDropEntry d : items) {
+                dropPos.x = (int) (posX + ((p % 2 == 0) ? (25 * ((p + 1) / 2)) : -(25 * (p / 2))));
+                p++;
                 
-                reactor.getMap().dropFromReactor(getPlayer(), reactor, drop, dropPos, (short)d.questid);
+                if (d.itemId == 0) {
+                    int range = maxMeso - minMeso;
+                    int displayDrop = (int) (Math.random() * range) + minMeso;
+                    int mesoDrop = (displayDrop * client.getWorldServer().getMesoRate());
+                    reactor.getMap().spawnMesoDrop(mesoDrop, reactor.getMap().calcDropPos(dropPos, reactor.getPosition()), reactor, client.getPlayer(), false, (byte) 2);
+                } else {
+                    Item drop;
+                    
+                    if (ItemConstants.getInventoryType(d.itemId) != MapleInventoryType.EQUIP) {
+                        drop = new Item(d.itemId, (short) 0, (short) 1);
+                    } else {
+                        drop = ii.randomizeStats((Equip) ii.getEquipById(d.itemId));
+                    }
+
+                    reactor.getMap().dropFromReactor(getPlayer(), reactor, drop, dropPos, (short) d.questid);
+                }
             }
-            dropPos.x += 25;
+        } else {
+            final MapleCharacter chr = client.getPlayer();
+            final MapleReactor r = reactor;
+            final List<ReactorDropEntry> dropItems = items;
+            final int worldMesoRate = client.getWorldServer().getMesoRate();
+            
+            dropPos.x -= (12 * items.size());
+            
+            sprayTask = TimerManager.getInstance().register(new Runnable() {
+                @Override
+                public void run() {
+                    if(dropItems.isEmpty()) {
+                        sprayTask.cancel(false);
+                        return;
+                    }
+                    
+                    ReactorDropEntry d = dropItems.remove(0);
+                    if (d.itemId == 0) {
+                        int range = maxMeso - minMeso;
+                        int displayDrop = (int) (Math.random() * range) + minMeso;
+                        int mesoDrop = (displayDrop * worldMesoRate);
+                        r.getMap().spawnMesoDrop(mesoDrop, r.getMap().calcDropPos(dropPos, r.getPosition()), r, chr, false, (byte) 2);
+                    } else {
+                        Item drop;
+                        
+                        if (ItemConstants.getInventoryType(d.itemId) != MapleInventoryType.EQUIP) {
+                            drop = new Item(d.itemId, (short) 0, (short) 1);
+                        } else {
+                            MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
+                            drop = ii.randomizeStats((Equip) ii.getEquipById(d.itemId));
+                        }
+
+                        r.getMap().dropFromReactor(getPlayer(), r, drop, dropPos, (short) d.questid);
+                    }
+                    
+                    dropPos.x += 25;
+                }
+            }, 100);
         }
     }
 
     private List<ReactorDropEntry> getDropChances() {
         return ReactorScriptManager.getInstance().getDrops(reactor.getId());
+    }
+    
+    private static List<ReactorDropEntry> generateDropList(List<ReactorDropEntry> drops, int dropRate, boolean meso, int mesoChance, int minItems) {
+        MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
+        
+        List<ReactorDropEntry> items = new ArrayList<>();
+        List<ReactorDropEntry> questItems = new ArrayList<>();
+        int numItems = 0;
+        
+        if (meso && Math.random() < (1 / (double) mesoChance)) {
+            items.add(new ReactorDropEntry(0, mesoChance, -1));
+        }
+        
+        for(ReactorDropEntry mde : drops) {
+            if (Math.random() < (dropRate / (double) mde.chance)) {
+                if(!ii.isQuestItem(mde.itemId)) {
+                    items.add(mde);
+                } else {
+                    questItems.add(mde);
+                }
+                
+                numItems++;
+            }
+        }
+        
+        while (numItems < minItems) {
+            items.add(new ReactorDropEntry(0, mesoChance, -1));
+            numItems++;
+        }
+        
+        java.util.Collections.shuffle(items);
+        java.util.Collections.shuffle(questItems);
+        
+        items.addAll(questItems);
+        return items;
     }
 
     public void spawnMonster(int id) {

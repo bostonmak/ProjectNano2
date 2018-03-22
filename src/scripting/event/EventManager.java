@@ -33,6 +33,8 @@ import java.util.logging.Logger;
 import javax.script.Invocable;
 import javax.script.ScriptException;
 
+import constants.ServerConstants;
+import client.MapleCharacter;
 import net.server.Server;
 import net.server.world.World;
 import net.server.channel.Channel;
@@ -44,15 +46,15 @@ import server.expeditions.MapleExpedition;
 import server.maps.MapleMap;
 import server.life.MapleMonster;
 import server.life.MapleLifeFactory;
+import server.quest.MapleQuest;
 
-import client.MapleCharacter;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import server.quest.MapleQuest;
+import tools.locks.MonitoredLockType;
+import tools.locks.MonitoredReentrantLock;
 
 /**
  *
@@ -73,13 +75,11 @@ public class EventManager {
     private Integer readyId = 0;
     private Properties props = new Properties();
     private String name;
-    private Lock lobbyLock = new ReentrantLock();
-    private Lock queueLock = new ReentrantLock();
-    
-    private static final int limitGuilds = 10;  // max numbers of guilds in queue for GPQ.
-    private static final int maxLobbys = 8;     // an event manager holds up to this amount of concurrent lobbys
-    private static final long lobbyDelay = 10;  // 10 seconds cooldown before reopening a lobby
+    private Lock lobbyLock = new MonitoredReentrantLock(MonitoredLockType.EM_LOBBY);
+    private Lock queueLock = new MonitoredReentrantLock(MonitoredLockType.EM_QUEUE);
 
+    private static final int maxLobbys = 8;     // an event manager holds up to this amount of concurrent lobbys
+    
     public EventManager(Channel cserv, Invocable iv, String name) {
         this.server = Server.getInstance();
         this.iv = iv;
@@ -107,7 +107,7 @@ public class EventManager {
     }
     
     public long getLobbyDelay() {
-        return lobbyDelay;
+        return ServerConstants.EVENT_LOBBY_DELAY;
     }
     
     private List<Integer> getLobbyRange() {
@@ -128,6 +128,7 @@ public class EventManager {
 
     public ScheduledFuture<?> schedule(final String methodName, final EventInstanceManager eim, long delay) {
         return TimerManager.getInstance().schedule(new Runnable() {
+            @Override
             public void run() {
                 try {
                     iv.invokeFunction(methodName, eim);
@@ -140,6 +141,7 @@ public class EventManager {
 
     public ScheduledFuture<?> scheduleAtTimestamp(final String methodName, long timestamp) {
         return TimerManager.getInstance().scheduleAtTimestamp(new Runnable() {
+            @Override
             public void run() {
                 try {
                     iv.invokeFunction(methodName, (Object) null);
@@ -190,7 +192,7 @@ public class EventManager {
                 freeLobbyInstance(name);
                 instances.remove(name);
             }
-        }, lobbyDelay * 1000);
+        }, ServerConstants.EVENT_LOBBY_DELAY * 1000);
     }
 
     public void setProperty(String key, String value) {
@@ -213,15 +215,6 @@ public class EventManager {
         return Integer.parseInt(props.getProperty(key));
     }
     
-    private boolean getLockLobby(int lobbyId) {
-        lobbyLock.lock();
-        try {
-            return openedLobbys.get(lobbyId);
-        } finally {
-            lobbyLock.unlock();
-        }
-    }
-    
     private void setLockLobby(int lobbyId, boolean lock) {
         lobbyLock.lock();
         try {
@@ -238,11 +231,11 @@ public class EventManager {
                 openedLobbys.set(lobbyId, true);
                 return true;
             }
+            
+            return false;
         } finally {
             lobbyLock.unlock();
         }
-        
-        return false;
     }
     
     private void freeLobbyInstance(String lobbyName) {
@@ -291,8 +284,7 @@ public class EventManager {
                 if(lobbyId == -1) return false;
             }
             else {
-                if(getLockLobby(lobbyId)) return false;
-                startLobbyInstance(lobbyId);
+                if(!startLobbyInstance(lobbyId)) return false;
             }
             
             EventInstanceManager eim = (EventInstanceManager) (iv.invokeFunction("setup", leader.getClient().getChannel()));
@@ -306,7 +298,7 @@ public class EventManager {
             exped.start();
             eim.registerExpedition(exped);
             
-            iv.invokeFunction("afterSetup", eim);
+            eim.startEvent();
         } catch (ScriptException | NoSuchMethodException ex) {
             Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -330,8 +322,7 @@ public class EventManager {
                 if(lobbyId == -1) return false;
             }
             else {
-                if(getLockLobby(lobbyId)) return false;
-                startLobbyInstance(lobbyId);
+                if(!startLobbyInstance(lobbyId)) return false;
             }
             
             EventInstanceManager eim = (EventInstanceManager) (iv.invokeFunction("setup", difficulty, (lobbyId > -1) ? lobbyId : leader.getId()));
@@ -343,7 +334,8 @@ public class EventManager {
             eim.setLeader(leader);
             
             if(chr != null) eim.registerPlayer(chr);
-            iv.invokeFunction("afterSetup", eim);
+            
+            eim.startEvent();
         } catch (ScriptException | NoSuchMethodException ex) {
             Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -367,8 +359,7 @@ public class EventManager {
                 if(lobbyId == -1) return false;
             }
             else {
-                if(getLockLobby(lobbyId)) return false;
-                startLobbyInstance(lobbyId);
+                if(!startLobbyInstance(lobbyId)) return false;
             }
             
             EventInstanceManager eim = (EventInstanceManager) (iv.invokeFunction("setup", (Object) null));
@@ -381,7 +372,8 @@ public class EventManager {
             
             eim.registerParty(party, map);
             party.setEligibleMembers(null);
-            iv.invokeFunction("afterSetup", eim);
+            
+            eim.startEvent();
         } catch (ScriptException | NoSuchMethodException ex) {
             Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -405,8 +397,7 @@ public class EventManager {
                 if(lobbyId == -1) return false;
             }
             else {
-                if(getLockLobby(lobbyId)) return false;
-                startLobbyInstance(lobbyId);
+                if(!startLobbyInstance(lobbyId)) return false;
             }
             
             EventInstanceManager eim = (EventInstanceManager) (iv.invokeFunction("setup", difficulty, (lobbyId > -1) ? lobbyId : party.getLeaderId()));
@@ -419,7 +410,8 @@ public class EventManager {
             
             eim.registerParty(party, map);
             party.setEligibleMembers(null);
-            iv.invokeFunction("afterSetup", eim);
+            
+            eim.startEvent();
         } catch (ScriptException | NoSuchMethodException ex) {
             Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -447,8 +439,7 @@ public class EventManager {
                 if(lobbyId == -1) return false;
             }
             else {
-                if(getLockLobby(lobbyId)) return false;
-                startLobbyInstance(lobbyId);
+                if(!startLobbyInstance(lobbyId)) return false;
             }
             
             if(eim == null) {
@@ -460,7 +451,8 @@ public class EventManager {
             
             iv.invokeFunction("setup", eim);
             eim.setProperty("leader", ldr);
-            iv.invokeFunction("afterSetup", eim);
+            
+            eim.startEvent();
         } catch (ScriptException | NoSuchMethodException ex) {
             Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -561,7 +553,7 @@ public class EventManager {
     
     public boolean isQueueFull() {
         synchronized(queuedGuilds) {
-            return queuedGuilds.size() >= limitGuilds;
+            return queuedGuilds.size() >= ServerConstants.EVENT_MAX_GUILD_QUEUE;
         }
     }
     

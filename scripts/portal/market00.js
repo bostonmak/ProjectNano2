@@ -22,9 +22,9 @@
 function enter(pi) {
     try {
         var toMap = pi.getPlayer().getSavedLocation("FREE_MARKET");
-        pi.warp(toMap, pi.getMarketPortalId(toMap));
+        pi.playPortalSound(); pi.warp(toMap, pi.getMarketPortalId(toMap));
     } catch(err) {
-        pi.warp(100000000);
+        pi.playPortalSound(); pi.warp(100000000, 0);
     }
     return true;
 }

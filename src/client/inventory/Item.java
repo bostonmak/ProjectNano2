@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package client.inventory;
 
+import constants.ItemConstants;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -93,7 +94,11 @@ public class Item implements Comparable<Item> {
         return quantity;
     }
 
-    public byte getType() {
+    public MapleInventoryType getInventoryType() {
+        return ItemConstants.getInventoryType(id);
+    }
+    
+    public byte getItemType() { // 1: equip, 3: pet, 2: other
         if (getPetId() > -1) {
             return 3;
         }
@@ -116,13 +121,14 @@ public class Item implements Comparable<Item> {
         this.petid = id;
     }
  
+    @Override
     public int compareTo(Item other) {
         if (this.id < other.getItemId()) {
             return -1;
         } else if (this.id > other.getItemId()) {
             return 1;
         }
-         return 0;
+        return 0;
     }
     
     @Override

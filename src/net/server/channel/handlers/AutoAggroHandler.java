@@ -24,26 +24,28 @@ package net.server.channel.handlers;
 import client.MapleClient;
 import net.AbstractMaplePacketHandler;
 import server.life.MapleMonster;
+import server.maps.MapleMap;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class AutoAggroHandler extends AbstractMaplePacketHandler {
 
     @Override
     public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        int oid = slea.readInt();
-        MapleMonster monster = c.getPlayer().getMap().getMonsterByOid(oid);
-        
         if(c.getPlayer().isHidden())
             return; // Don't auto aggro GM's in hide...
         
+        MapleMap map = c.getPlayer().getMap();
+        int oid = slea.readInt();
+        
+        MapleMonster monster = map.getMonsterByOid(oid);
         if (monster != null && monster.getController() != null) {
             if (!monster.isControllerHasAggro()) {
-                if (c.getPlayer().getMap().getCharacterById(monster.getController().getId()) == null) {
+                if (map.getCharacterById(monster.getController().getId()) == null) {
                     monster.switchController(c.getPlayer(), true);
                 } else {
                     monster.switchController(monster.getController(), true);
                 }
-            } else if (c.getPlayer().getMap().getCharacterById(monster.getController().getId()) == null) {
+            } else if (map.getCharacterById(monster.getController().getId()) == null) {
                 monster.switchController(c.getPlayer(), true);
             }
         } else if (monster != null && monster.getController() == null) {

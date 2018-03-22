@@ -7,7 +7,7 @@ importPackage(Packages.client.inventory);
 
 var isPq = true;
 var minPlayers = 3, maxPlayers = 6;
-var minLevel = 21, maxLevel = 200;
+var minLevel = 21, maxLevel = 120;
 var entryMap = 196000000;
 var exitMap = 193000000;
 var recruitMap = 193000000;
@@ -134,6 +134,12 @@ function playerExit(eim, player) {
         player.changeMap(exitMap, 0);
 }
 
+function playerLeft(eim, player) {
+        if(!eim.isEventCleared()) {
+                playerExit(eim, player);
+        }
+}
+
 function changedMap(eim, player, mapid) {
         if (mapid < minMapId || mapid > maxMapId) {
                 if (eim.isEventTeamLackingNow(true, minPlayers, player)) {
@@ -174,15 +180,16 @@ function playerDisconnected(eim, player) {
 
 function leftParty(eim, player) {
         if (eim.isEventTeamLackingNow(false, minPlayers, player)) {
-                eim.unregisterPlayer(player);
                 end(eim);
         }
         else
-                eim.unregisterPlayer(player);
+                playerLeft(eim, player);
 }
 
 function disbandParty(eim) {
-        end(eim);
+        if (!eim.isEventCleared()) {
+                end(eim);
+        }
 }
 
 function monsterValue(eim, mobId) {

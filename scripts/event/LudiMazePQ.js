@@ -5,9 +5,8 @@
 
 var isPq = true;
 var minPlayers = 3, maxPlayers = 6;
-var minLevel = 1, maxLevel = 255;
+var minLevel = 51, maxLevel = 70;
 var entryMap = 809050000;
-var fmMap = 910000022;
 var exitMap = 809050017;
 var recruitMap = 220000000;
 var clearMap = 809050016;
@@ -71,7 +70,7 @@ function getEligibleParty(party) {      //selects, from the given party, the tea
                 for(var i = 0; i < party.size(); i++) {
                         var ch = partyList[i];
 
-                        if((ch.getMapId() == recruitMap || ch.getMapId() == fmMap) && ch.getLevel() >= minLevel && ch.getLevel() <= maxLevel) {
+                        if(ch.getMapId() == recruitMap && ch.getLevel() >= minLevel && ch.getLevel() <= maxLevel) {
                                 if(ch.isLeader()) hasLeader = true;
                                 eligible.push(ch);
                         }
@@ -115,7 +114,13 @@ function playerUnregistered(eim, player) {}
 
 function playerExit(eim, player) {
         eim.unregisterPlayer(player);
-        player.changeMap(fmMap, 0);
+        player.changeMap(exitMap, 0);
+}
+
+function playerLeft(eim, player) {
+        if(!eim.isEventCleared()) {
+                playerExit(eim, player);
+        }
 }
 
 function changedMap(eim, player, mapid) {
@@ -158,15 +163,16 @@ function playerDisconnected(eim, player) {
 
 function leftParty(eim, player) {
         if (eim.isEventTeamLackingNow(false, minPlayers, player)) {
-                eim.unregisterPlayer(player);
                 end(eim);
         }
         else
-                eim.unregisterPlayer(player);
+                playerLeft(eim, player);
 }
 
 function disbandParty(eim) {
-        end(eim);
+        if (!eim.isEventCleared()) {
+                end(eim);
+        }
 }
 
 function monsterValue(eim, mobId) {

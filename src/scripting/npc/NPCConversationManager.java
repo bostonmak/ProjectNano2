@@ -55,8 +55,7 @@ import client.SkillFactory;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MaplePet;
-import server.life.MapleLifeFactory;
-import server.life.MapleMonster;
+import constants.ItemConstants;
 
 /**
  *
@@ -208,6 +207,14 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 		}
 	}
 
+        public boolean forceStartQuest(int id) {
+                return MapleQuest.getInstance(id).forceStart(getPlayer(), npc);
+        }
+
+        public boolean forceCompleteQuest(int id) {
+                return MapleQuest.getInstance(id).forceComplete(getPlayer(), npc);
+        }
+        
 	public void startQuest(int id) {
 		try {
 			MapleQuest.getInstance(id).forceStart(getPlayer(), npc);
@@ -223,6 +230,38 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
                         ex.printStackTrace();
 		}
 	}
+        
+        public void startQuest(short id, int npcId) {
+                try {
+                        MapleQuest.getInstance(id).forceStart(getPlayer(), npcId);
+                } catch (NullPointerException ex) {
+                        ex.printStackTrace();
+                }
+        }
+        
+        public void startQuest(int id, int npcId) {
+                try {
+                        MapleQuest.getInstance(id).forceStart(getPlayer(), npcId);
+                } catch (NullPointerException ex) {
+                        ex.printStackTrace();
+                }
+        }
+        
+        public void completeQuest(short id, int npcId) {
+                try {
+                        MapleQuest.getInstance(id).forceComplete(getPlayer(), npcId);
+                } catch (NullPointerException ex) {
+                        ex.printStackTrace();
+                }
+        }
+        
+        public void completeQuest(int id, int npcId) {
+                try {
+                        MapleQuest.getInstance(id).forceComplete(getPlayer(), npcId);
+                } catch (NullPointerException ex) {
+                        ex.printStackTrace();
+                }
+        }
         
 	public int getMeso() {
 		return getPlayer().getMeso();
@@ -263,7 +302,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 	}
 
 	public int itemQuantity(int itemid) {
-		return getPlayer().getInventory(MapleItemInformationProvider.getInstance().getInventoryType(itemid)).countById(itemid);
+		return getPlayer().getInventory(ItemConstants.getInventoryType(itemid)).countById(itemid);
 	}
 
 	public void displayGuildRanks() {
@@ -311,18 +350,8 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 	}
 
 	public void resetStats() {
-        int totAp = getPlayer().getStr() + getPlayer().getDex() + getPlayer().getLuk() + getPlayer().getInt() + getPlayer().getRemainingAp();
-        getPlayer().setStr(4);
-        getPlayer().setDex(4);
-        getPlayer().setLuk(4);
-        getPlayer().setInt(4);
-        getPlayer().setRemainingAp(totAp - 16);
-        getPlayer().updateSingleStat(MapleStat.STR, 4);
-        getPlayer().updateSingleStat(MapleStat.DEX, 4);
-        getPlayer().updateSingleStat(MapleStat.LUK, 4);
-        getPlayer().updateSingleStat(MapleStat.INT, 4);
-        getPlayer().updateSingleStat(MapleStat.AVAILABLEAP, totAp);
-    } 
+		getPlayer().resetStats();
+	}
         
         public void openShopNPC(int id) {
             MapleShopFactory.getInstance().getShop(id).sendShop(c);
@@ -342,22 +371,6 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 			}
 		}
 	}
-        //This could not work however i hope it does? yeah idk why this isnt working?
-       
-	public void teachSkill() {
-            for (MapleData skill_ : MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/" + "String.wz")).getData("Skill.img").getChildren()) {
-                try{
-          Skill skill = SkillFactory.getSkill(Integer.parseInt(skill_.getName()));
-                    getPlayer().changeSkillLevel(skill,(byte) 0, (int) 10, (long) -1);
-	} catch (NumberFormatException nfe) {
-                                nfe.printStackTrace();
-				break;
-			} catch (NullPointerException npe) {
-                                npe.printStackTrace();
-				continue;
-			}
-	}
-        }
 
 	public void doGachapon() {
 		int[] maps = {100000000, 101000000, 102000000, 103000000, 105040300, 800000000, 809000101, 809000201, 600000000, 120000000};
@@ -373,7 +386,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 		LogHelper.logGacha(getPlayer(), item.getId(), map);
 		
 		if (item.getTier() > 0){ //Uncommon and Rare
-			Server.getInstance().broadcastMessage(MaplePacketCreator.gachaponMessage(itemGained, map, getPlayer()));
+			Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.gachaponMessage(itemGained, map, getPlayer()));
 		}
 	}
         
@@ -500,9 +513,6 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
         
         public Object[] getNamesWhoDropsItem(Integer itemId) {
                 return MapleItemInformationProvider.getInstance().getWhoDrops(itemId).toArray();
-        }
-        public void spawnMonster(int mobid){
-                getPlayer().getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(mobid), getPlayer().getPosition());
         }
         
 }

@@ -54,6 +54,7 @@ public final class CancelBuffHandler extends AbstractMaplePacketHandler implemen
             case Evan.ICE_BREATH:
                 c.getPlayer().getMap().broadcastMessage(c.getPlayer(), MaplePacketCreator.skillCancel(c.getPlayer(), sourceid), false);
                 break;
+                
             default:
                 c.getPlayer().cancelEffect(SkillFactory.getSkill(sourceid).getEffect(1), false, -1);
                 break;

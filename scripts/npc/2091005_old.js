@@ -79,9 +79,9 @@ function action(mode, type, selection) {
                             cm.sendNext("Haha! Who are you trying to impress with a heart like that?\r\nGo back home where you belong!");
                         } else {
                            if(cm.getClient().getChannelServer().getMapFactory().getMap(925020010).getCharacters().size() > 0) {
-								cm.sendOk("Someone is already in Dojo");
-								cm.dispose();
-								return;
+                                cm.sendOk("Someone is already in Dojo.");
+                                cm.dispose();
+                                return;
                             }
                             cm.warp(925020010, 0);
                             cm.getPlayer().setFinishedDojoTutorial();
@@ -154,7 +154,7 @@ function action(mode, type, selection) {
                 if (status == 0) {
                     var selStr = "You have #b" + cm.getPlayer().getDojoPoints() + "#k training points. Master prefers those with great talent. If you obtain more points than the average, you can receive a belt depending on your score.\r\n";
                     for (var i = 0; i < belts.length; i++) {
-                        if (cm.getPlayer().getItemQuantity(belts[i], true) > 0) {
+                        if (cm.haveItemWithId(belts[i], true)) {
                             selStr += "\r\n     #i" + belts[i] + "# #t" + belts[i] + "#(Obtain)";
                         } else
                             selStr += "\r\n#L" + i + "##i" + belts[i] + "# #t" + belts[i] + "#l";

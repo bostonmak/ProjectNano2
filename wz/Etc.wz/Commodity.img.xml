@@ -82212,7 +82212,7 @@
     <int name="SN" value="50200150"/>
     <int name="ItemId" value="5211060"/>
     <int name="Count" value="1"/>
-    <int name="Price" value="10000"/>
+    <int name="Price" value="4000"/>
     <int name="Period" value="1"/>
     <int name="Priority" value="11"/>
     <int name="Gender" value="2"/>

@@ -25,6 +25,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
+import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import com.mysql.jdbc.Statement;
 import constants.ItemConstants;
@@ -36,13 +37,15 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+import tools.locks.MonitoredReentrantLock;
 import net.server.Server;
 import server.MapleInventoryManipulator;
 import server.MapleItemInformationProvider;
-import server.MaplePlayerShopItem;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 import tools.Pair;
+import tools.locks.MonitoredLockType;
 
 /**
  *
@@ -50,7 +53,6 @@ import tools.Pair;
  * @author Ronan (concurrency protection)
  */
 public class MapleHiredMerchant extends AbstractMapleMapObject {
-
     private int ownerId, itemId, mesos = 0;
     private int channel, world;
     private long start;
@@ -62,6 +64,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
     private List<SoldItem> sold = new LinkedList<>();
     private AtomicBoolean open = new AtomicBoolean();
     private MapleMap map;
+    private Lock visitorLock = new MonitoredReentrantLock(MonitoredLockType.VISITOR_MERCH, true);
 
     public MapleHiredMerchant(final MapleCharacter owner, int itemId, String desc) {
         this.setPosition(owner.getPosition());
@@ -76,8 +79,11 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
     }
 
     public void broadcastToVisitorsThreadsafe(final byte[] packet) {
-        synchronized(visitors) {
+        visitorLock.lock();
+        try {
             broadcastToVisitors(packet);
+        } finally {
+            visitorLock.unlock();
         }
     }
     
@@ -90,7 +96,8 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
     }
 
     public boolean addVisitor(MapleCharacter visitor) {
-        synchronized(visitors) {
+        visitorLock.lock();
+        try {
             int i = this.getFreeSlot();
             if (i > -1) {
                 visitors[i] = visitor;
@@ -100,25 +107,33 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
             }
             
             return false;
+        } finally {
+            visitorLock.unlock();
         }
     }
 
     public void removeVisitor(MapleCharacter visitor) {
-        synchronized(visitors) {
+        visitorLock.lock();
+        try {
             int slot = getVisitorSlot(visitor);
-            if (slot < 0){ //Not found
-                    return;
+            if (slot < 0) { //Not found
+                return;
             }
             if (visitors[slot] != null && visitors[slot].getId() == visitor.getId()) {
                 visitors[slot] = null;
                 broadcastToVisitors(MaplePacketCreator.hiredMerchantVisitorLeave(slot + 1));
             }
+        } finally {
+            visitorLock.unlock();
         }
     }
 
     public int getVisitorSlotThreadsafe(MapleCharacter visitor) {
-        synchronized(visitors) {
+        visitorLock.lock();
+        try {
             return getVisitorSlot(visitor);
+        } finally {
+            visitorLock.unlock();
         }
     }
     
@@ -132,7 +147,8 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
     }
 
     public void removeAllVisitors() {
-        synchronized(visitors) {
+        visitorLock.lock();
+        try {
             for (int i = 0; i < 3; i++) {
                 if (visitors[i] != null) {
                     visitors[i].setHiredMerchant(null);
@@ -143,9 +159,15 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
                     visitors[i] = null;
                 }
             }
+        } finally {
+            visitorLock.unlock();
         }
     }
 
+    private static boolean canBuy(MapleClient c, Item newItem) {
+        return MapleInventoryManipulator.checkSpace(c, newItem.getItemId(), newItem.getQuantity(), newItem.getOwner()) && MapleInventoryManipulator.addFromDrop(c, newItem, false);
+    }
+    
     public void buy(MapleClient c, int item, short quantity) {
         synchronized (items) {
             MaplePlayerShopItem pItem = items.get(item);
@@ -158,17 +180,19 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
             if (quantity < 1 || pItem.getBundles() < 1 || !pItem.isExist() || pItem.getBundles() < quantity) {
                 c.announce(MaplePacketCreator.enableActions());
                 return;
-            } else if (newItem.getType() == 1 && newItem.getQuantity() > 1) {
+            } else if (newItem.getInventoryType().equals(MapleInventoryType.EQUIP) && newItem.getQuantity() > 1) {
                 c.announce(MaplePacketCreator.enableActions());
                 return;
             } else if (!pItem.isExist()) {
                 c.announce(MaplePacketCreator.enableActions());
                 return;
             }
-            int price = (int)Math.min((long)pItem.getPrice() * quantity, Integer.MAX_VALUE);
+            
+            int price = (int) Math.min((long)pItem.getPrice() * quantity, Integer.MAX_VALUE);
             if (c.getPlayer().getMeso() >= price) {
-                if (MapleInventoryManipulator.addFromDrop(c, newItem, false)) {
+                if (canBuy(c, newItem)) {
                     c.getPlayer().gainMeso(-price, false);
+                    announceItemSold(newItem, price);   // idea thanks to vcoc
                     
                     synchronized (sold) {
                         sold.add(new SoldItem(c.getPlayer().getName(), pItem.getItem().getItemId(), quantity, price));
@@ -206,6 +230,15 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+    
+    private void announceItemSold(Item item, int mesos) {
+        String qtyStr = (item.getQuantity() > 1) ? " (qty. " + item.getQuantity() + ")" : "";
+        
+        MapleCharacter player = Server.getInstance().getWorld(world).getPlayerStorage().getCharacterById(ownerId);
+        if(player != null && player.isLoggedin() && !player.isAwayFromWorld()) {
+            player.dropMessage(6, "[HIRED MERCHANT] Item '" + MapleItemInformationProvider.getInstance().getName(item.getItemId()) + "'" + qtyStr + " has been sold for " + mesos + " mesos.");
         }
     }
 
@@ -266,10 +299,12 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
                 List<MaplePlayerShopItem> copyItems = getItems();
                 if (check(c.getPlayer(), copyItems) && !timeout) {
                     for (MaplePlayerShopItem mpsi : copyItems) {
-                        if (mpsi.isExist() && (mpsi.getItem().getType() == MapleInventoryType.EQUIP.getType())) {
-                            MapleInventoryManipulator.addFromDrop(c, mpsi.getItem(), false);
-                        } else if (mpsi.isExist()) {
-                            MapleInventoryManipulator.addById(c, mpsi.getItem().getItemId(), (short) (mpsi.getBundles() * mpsi.getItem().getQuantity()), null, -1, mpsi.getItem().getFlag(), mpsi.getItem().getExpiration());
+                        if(mpsi.isExist()) {
+                            if (mpsi.getItem().getInventoryType().equals(MapleInventoryType.EQUIP)) {
+                                MapleInventoryManipulator.addFromDrop(c, mpsi.getItem(), false);
+                            } else {
+                                MapleInventoryManipulator.addById(c, mpsi.getItem().getItemId(), (short) (mpsi.getBundles() * mpsi.getItem().getQuantity()), null, -1, mpsi.getItem().getFlag(), mpsi.getItem().getExpiration());
+                            }
                         }
                     }
                     
@@ -313,11 +348,14 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
     }
 
     public MapleCharacter[] getVisitors() {
-        synchronized(visitors) {
+        visitorLock.lock();
+        try {
             MapleCharacter[] copy = new MapleCharacter[3];
             for(int i = 0; i < visitors.length; i++) copy[i] = visitors[i];
                     
             return copy;
+        } finally {
+            visitorLock.unlock();
         }
     }
 
@@ -358,12 +396,6 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
             this.saveItems(false);
         } catch (SQLException ex) {
             ex.printStackTrace();
-        }
-    }
-    
-    public int getFreeSlotThreadsafe() {
-        synchronized(visitors) {
-            return getFreeSlot();
         }
     }
     
@@ -438,7 +470,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
                 newItem.setQuantity((short) (pItems.getItem().getQuantity()));
             }
             if (newBundle > 0) {
-                itemsWithType.add(new Pair<>(newItem, MapleInventoryType.getByType(newItem.getType())));
+                itemsWithType.add(new Pair<>(newItem, newItem.getInventoryType()));
                 bundles.add(newBundle);
             }
         }
@@ -449,51 +481,17 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
     }
 
     private static boolean check(MapleCharacter chr, List<MaplePlayerShopItem> items) {
-        byte eq = 0, use = 0, setup = 0, etc = 0, cash = 0;
-        List<MapleInventoryType> li = new LinkedList<>();
+        List<Pair<Item, MapleInventoryType>> li = new ArrayList<>();
         for (MaplePlayerShopItem item : items) {
-            final MapleInventoryType invtype = MapleItemInformationProvider.getInstance().getInventoryType(item.getItem().getItemId());
-            if (!li.contains(invtype)) {
-                li.add(invtype);
-            }
-            if (invtype == MapleInventoryType.EQUIP) {
-                eq++;
-            } else if (invtype == MapleInventoryType.USE) {
-                use++;
-            } else if (invtype == MapleInventoryType.SETUP) {
-                setup++;
-            } else if (invtype == MapleInventoryType.ETC) {
-                etc++;
-            } else if (invtype == MapleInventoryType.CASH) {
-                cash++;
-            }
+            Item it = item.getItem().copy();
+            it.setQuantity((short)(it.getQuantity() * item.getBundles()));
+            
+            li.add(new Pair<>(it, it.getInventoryType()));
         }
-        for (MapleInventoryType mit : li) {
-            if (mit == MapleInventoryType.EQUIP) {
-                if (chr.getInventory(MapleInventoryType.EQUIP).getNumFreeSlot() <= eq) {
-                    return false;
-                }
-            } else if (mit == MapleInventoryType.USE) {
-                if (chr.getInventory(MapleInventoryType.USE).getNumFreeSlot() <= use) {
-                    return false;
-                }
-            } else if (mit == MapleInventoryType.SETUP) {
-                if (chr.getInventory(MapleInventoryType.SETUP).getNumFreeSlot() <= setup) {
-                    return false;
-                }
-            } else if (mit == MapleInventoryType.ETC) {
-                if (chr.getInventory(MapleInventoryType.ETC).getNumFreeSlot() <= etc) {
-                    return false;
-                }
-            } else if (mit == MapleInventoryType.CASH) {
-                if (chr.getInventory(MapleInventoryType.CASH).getNumFreeSlot() <= cash) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        
+        return MapleInventory.checkSpotsAndOwnership(chr, li);
     }
-
+    
     public int getChannel() {
         return channel;
     }

@@ -1,13 +1,17 @@
 importPackage(Packages.server.life);
 
-function start(ms) {   	       
-	spawnMob(251, -841, 9400613, ms.getPlayer().getMap());
-}
+function start(ms) {
+        var pos = new java.awt.Point(251, -841);
+	var mobId = 9400613;
+        var mobName = "Valefor";
+        
+	var player = ms.getPlayer();
+	var map = player.getMap();
 
-function spawnMob(x, y, id, map) {
-	if(map.getMonsterById(id) != null)
-		return;
-		
-	var mob = MapleLifeFactory.getMonster(id);
-	map.spawnMonsterOnGroundBelow(mob, new java.awt.Point(x, y));
+	if(map.getMonsterById(mobId) != null){
+		return;   	       
+	}
+
+	map.spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(mobId), pos);
+	player.message(mobName + " has appeared!");
 }

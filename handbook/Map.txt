@@ -1492,7 +1492,7 @@ ossyria
 270010300 - Time Lane - Memory Lane3
 270010310 - Time Lane - Resting Spot of Memory3
 270010400 - Time Lane - Memory Lane4
-270010410 - Memory Keeper - Resting Spot of Memory4
+270010410 - Time Lane - Resting Spot of Memory4
 270010500 - Time Lane - Memory Lane5
 270020000 - Time Lane - Frozen Past
 270020100 - Time Lane - Road of Regrets1
@@ -2175,10 +2175,10 @@ etc
 680100001 - Maple 7th Day Market - Maple 7th Day Market
 680100002 - Maple 7th Day Market - Maple 7th Day Market
 680100003 - Maple 7th Day Market - Maple 7th Day Market
-674030300 - Treasure Dungeon - (no map name)
 674030000 - Initiation - (no map name)
 674030100 - Entrance to MV's Lair - (no map name)
 674030200 - The Lair of MV - (no map name)
+674030300 - Treasure Dungeon - (no map name)
 910020000 - Hidden Street - Nest of a Baby Bird
 910100000 - Hidden Street - The Cursed Forest
 910100001 - Hidden Street - The Cursed Forest

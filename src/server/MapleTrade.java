@@ -75,7 +75,7 @@ public class MapleTrade {
         return fee;
     }
 
-    private void lock() {
+    private void lockTrade() {
         locked.set(true);
         partner.getChr().getClient().announce(MaplePacketCreator.getTradeConfirmation());
     }
@@ -194,14 +194,14 @@ public class MapleTrade {
     private boolean fitsInInventory() {
         List<Pair<Item, MapleInventoryType>> tradeItems = new LinkedList<>();
         for (Item item : exchangeItems) {
-            tradeItems.add(new Pair(item, MapleItemInformationProvider.getInstance().getInventoryType(item.getItemId())));
+            tradeItems.add(new Pair(item, item.getInventoryType()));
         }
         
         return MapleInventory.checkSpotsAndOwnership(chr, tradeItems);
     }
 
     public static void completeTrade(MapleCharacter c) {
-        c.getTrade().lock();
+        c.getTrade().lockTrade();
         MapleTrade local = c.getTrade();
         MapleTrade partner = local.getPartner();
         if (partner.isLocked()) {

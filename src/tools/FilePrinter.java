@@ -19,6 +19,7 @@ public class FilePrinter {
             ERROR38 = "error38.txt",
             PACKET_LOG = "log.txt",
             EXCEPTION = "exceptions.txt",
+            SQL_EXCEPTION = "sqlexceptions.txt",
             PACKET_HANDLER = "PacketHandler/",
             PORTAL = "portals/",
             NPC = "npcs/",
@@ -43,7 +44,11 @@ public class FilePrinter {
             QUEST_UNCODED = "uncodedQuests.txt",
             AUTOSAVING_CHARACTER = "saveCharAuto.txt",
             SAVING_CHARACTER = "saveChar.txt",
-            USED_COMMANDS = "usedCommands.txt";//more to come (maps)
+            USED_COMMANDS = "usedCommands.txt",
+            DEADLOCK_ERROR = "deadlocks.txt",
+            DEADLOCK_STACK = "deadlocks/path.txt",
+            DEADLOCK_LOCKS = "deadlocks/locks.txt",
+            DEADLOCK_STATE = "deadlocks/state.txt";
     
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); //for file system purposes, it's nice to use yyyy-MM-dd
     private static final String FILE_PATH = "logs/" + sdf.format(Calendar.getInstance().getTime()) + "/"; // + sdf.format(Calendar.getInstance().getTime()) + "/"

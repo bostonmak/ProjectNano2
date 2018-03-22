@@ -7,10 +7,9 @@ importPackage(Packages.server.life);
 importPackage(Packages.client.inventory);
 
 var isPq = true;
-var minPlayers = 3, maxPlayers = 30;
+var minPlayers = 6, maxPlayers = 30;
 var minLevel = 120, maxLevel = 255;
 var entryMap = 270050100;
-var fmMap = 910000022;
 var exitMap = 270050300;
 var recruitMap = 270050000;
 var clearMap = 270050300;
@@ -87,6 +86,7 @@ function setup(channel) {
     eim.getInstanceMap(270050300).resetPQ(level);
     
     var mob = MapleLifeFactory.getMonster(8820000);
+    mob.disableDrops();
     eim.getInstanceMap(270050100).spawnMonsterOnGroundBelow(mob, new java.awt.Point(0, -42));
     
     eim.startEventTimer(eventTime * 60000);
@@ -109,7 +109,7 @@ function scheduledTimeout(eim) {
 function changedMap(eim, player, mapid) {
     if (mapid < minMapId || mapid > maxMapId) {
 	if (eim.isEventTeamLackingNow(true, minPlayers, player)) {
-            eim.dropMessage(5, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue this expedition.");
+            eim.dropMessage(5, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.");
             eim.unregisterPlayer(player);
             end(eim);
         }
@@ -144,7 +144,7 @@ function playerRevive(eim, player) {
 
 function playerDisconnected(eim, player) {
     if (eim.isEventTeamLackingNow(true, minPlayers, player)) {
-        eim.dropMessage(5, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue this expedition.");
+        eim.dropMessage(5, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.");
         eim.unregisterPlayer(player);
         end(eim);
     }
@@ -166,7 +166,7 @@ function playerUnregistered(eim, player) {}
 
 function playerExit(eim, player) {
     eim.unregisterPlayer(player);
-    player.changeMap(fmMap, 0);
+    player.changeMap(exitMap, 0);
 }
 
 function end(eim) {
@@ -218,7 +218,7 @@ function monsterKilled(mob, eim) {
         eim.setIntProperty("defeatedBoss", 1);
         eim.showClearEffect(mob.getMap().getId());
         mob.getMap().killAllMonsters();
-        //eim.clearPQ();
+        eim.clearPQ();
         
         var ch = eim.getIntProperty("channel");
         mob.getMap().broadcastPinkBeanVictory(ch);

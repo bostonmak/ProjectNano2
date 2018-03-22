@@ -65,13 +65,12 @@ public class MaplePet extends Item {
             PreparedStatement ps = con.prepareStatement("SELECT name, level, closeness, fullness, summoned FROM pets WHERE petid = ?"); // Get pet details..
             ps.setInt(1, petid);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                ret.setName(rs.getString("name"));
-                ret.setCloseness(Math.min(rs.getInt("closeness"), 30000));
-                ret.setLevel((byte) Math.min(rs.getByte("level"), 30));
-                ret.setFullness(Math.min(rs.getInt("fullness"), 100));
-                ret.setSummoned(rs.getInt("summoned") == 1);
-            }
+            rs.next();
+            ret.setName(rs.getString("name"));
+            ret.setCloseness(Math.min(rs.getInt("closeness"), 30000));
+            ret.setLevel((byte) Math.min(rs.getByte("level"), 30));
+            ret.setFullness(Math.min(rs.getInt("fullness"), 100));
+            ret.setSummoned(rs.getInt("summoned") == 1);
             rs.close();
             ps.close();
             con.close();

@@ -30,10 +30,10 @@ function enter(pi) {
     }
     
     if (!pi.isQuestCompleted(100201)) {
-        pi.getPlayer().dropMessage(5,"You do not have completed all the trials yet. You may not attempt the boss right now.");
+        pi.getPlayer().dropMessage(5,"You haven't completed all the trials yet. You may not attempt the boss right now.");
         return false;
     }
     
-    pi.warp(211042400,"west00");
+    pi.playPortalSound(); pi.warp(211042400,"west00");
     return true;
 }

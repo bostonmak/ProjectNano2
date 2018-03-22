@@ -25,6 +25,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import net.AbstractMaplePacketHandler;
 import net.server.Server;
+import server.maps.MapleMiniDungeonInfo;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
@@ -41,6 +42,13 @@ public class EnterCashShopHandler extends AbstractMaplePacketHandler {
             if (mc.cannotEnterCashShop()) {
                 c.announce(MaplePacketCreator.enableActions());
                 return;
+                
+            }
+            
+            if(MapleMiniDungeonInfo.isDungeonMap(c.getPlayer().getMapId())) {
+                c.announce(MaplePacketCreator.serverNotice(5, "Changing channels or entering Cash Shop or MTS are disabled when inside a Mini-Dungeon."));
+                c.announce(MaplePacketCreator.enableActions());
+                return;
             }
             
             if (mc.getCashShop().isOpened()) {
@@ -49,12 +57,18 @@ public class EnterCashShopHandler extends AbstractMaplePacketHandler {
 
             mc.closePlayerInteractions();
 
+            mc.unregisterChairBuff();
             Server.getInstance().getPlayerBuffStorage().addBuffsToStorage(mc.getId(), mc.getAllBuffs());
+            mc.setAwayFromWorld(true);
             mc.cancelAllBuffs(true);
             mc.cancelBuffExpireTask();
+            mc.cancelDiseaseExpireTask();
             mc.cancelSkillCooldownTask();
             mc.cancelExpirationTask();
-
+            
+            mc.forfeitExpirableQuests();
+            mc.cancelQuestExpirationTask();
+            
             c.announce(MaplePacketCreator.openCashShop(c, false));
             c.announce(MaplePacketCreator.showCashInventory(c));
             c.announce(MaplePacketCreator.showGifts(mc.getCashShop().loadGifts()));

@@ -40,14 +40,21 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import tools.locks.MonitoredReentrantLock;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.concurrent.ScheduledFuture;
 
+import scripting.event.EventInstanceManager;
 import server.TimerManager;
 import server.maps.MapleHiredMerchant;
-import server.MaplePlayerShop;
+import server.maps.MapleMap;
+import server.maps.MaplePlayerShop;
+import server.maps.MaplePlayerShopItem;
+import server.maps.AbstractMapleMapObject;
 import net.server.worker.CharacterAutosaverWorker;
 import net.server.worker.MountTirednessWorker;
 import net.server.worker.PetFullnessWorker;
@@ -58,53 +65,63 @@ import net.server.channel.CharacterIdChannelPair;
 import net.server.guild.MapleGuild;
 import net.server.guild.MapleGuildCharacter;
 import net.server.guild.MapleGuildSummary;
-import server.MaplePlayerShopItem;
-import server.maps.AbstractMapleMapObject;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 import tools.Pair;
+import tools.locks.MonitoredLockType;
 
 /**
  *
  * @author kevintjuh93
+ * @author Ronan (thread-oriented world schedules)
  */
 public class World {
 
-    private int id, flag, exprate, droprate, mesorate, bossdroprate;
+    private int id, flag, exprate, droprate, mesorate, questrate;
     private String eventmsg;
     private List<Channel> channels = new ArrayList<>();
-    private Map<Integer, MapleParty> parties = new HashMap<>();
-    private AtomicInteger runningPartyId = new AtomicInteger();
     private Map<Integer, MapleMessenger> messengers = new HashMap<>();
     private AtomicInteger runningMessengerId = new AtomicInteger();
     private Map<Integer, MapleFamily> families = new LinkedHashMap<>();
     private Map<Integer, MapleGuildSummary> gsStore = new HashMap<>();
     private PlayerStorage players = new PlayerStorage();
+    
     private Set<Integer> queuedGuilds = new HashSet<>();
     
+    private Map<Integer, MapleParty> parties = new HashMap<>();
+    private AtomicInteger runningPartyId = new AtomicInteger();
+    private Lock partyLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_PARTY, true);
+    
+    private Map<Integer, Integer> owlSearched = new LinkedHashMap<>();
+    private Lock owlLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_OWL);
+    
+    private Lock activePetsLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_PETS, true);
     private Map<Integer, Byte> activePets = new LinkedHashMap<>();
     private ScheduledFuture<?> petsSchedule;
     private long petUpdate;
     
+    private Lock activeMountsLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_MOUNTS, true);
     private Map<Integer, Byte> activeMounts = new LinkedHashMap<>();
     private ScheduledFuture<?> mountsSchedule;
     private long mountUpdate;
     
+    private Lock activePlayerShopsLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_PSHOPS, true);
+    private Map<Integer, MaplePlayerShop> activePlayerShops = new LinkedHashMap<>();
+    
+    private Lock activeMerchantsLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_MERCHS, true);
     private Map<Integer, Pair<MapleHiredMerchant, Byte>> activeMerchants = new LinkedHashMap<>();
     private long merchantUpdate;
     
-    private Map<Integer, MaplePlayerShop> activePlayerShops = new LinkedHashMap<>();
-    
     private ScheduledFuture<?> charactersSchedule;
     
-    public World(int world, int flag, String eventmsg, int exprate, int droprate, int mesorate, int bossdroprate) {
+    public World(int world, int flag, String eventmsg, int exprate, int droprate, int mesorate, int questrate) {
         this.id = world;
         this.flag = flag;
         this.eventmsg = eventmsg;
         this.exprate = exprate;
         this.droprate = droprate;
         this.mesorate = mesorate;
-        this.bossdroprate = bossdroprate;
+        this.questrate = questrate;
         runningPartyId.set(1);
         runningMessengerId.set(1);
         
@@ -198,12 +215,12 @@ public class World {
         }
     }
 
-    public int getBossDropRate() {
-        return bossdroprate;
+    public int getQuestRate() {
+        return questrate;
     }
     
-    public void setBossDropRate(int bossdrop) {
-        this.bossdroprate = bossdrop;
+    public void setQuestRate(int quest) {
+        this.questrate = quest;
     }
 
     public PlayerStorage getPlayerStorage() {
@@ -319,7 +336,7 @@ public class World {
         }
         if (bDifferentGuild) {
             mc.getMap().broadcastMessage(mc, MaplePacketCreator.removePlayerFromMap(cid), false);
-            mc.getMap().broadcastMessage(mc, MaplePacketCreator.spawnPlayerMapobject(mc), false);
+            mc.getMap().broadcastMessage(mc, MaplePacketCreator.spawnPlayerMapObject(mc), false);
         }
     }
 
@@ -357,16 +374,33 @@ public class World {
     public MapleParty createParty(MaplePartyCharacter chrfor) {
         int partyid = runningPartyId.getAndIncrement();
         MapleParty party = new MapleParty(partyid, chrfor);
-        parties.put(party.getId(), party);
+        
+        partyLock.lock();
+        try {
+            parties.put(party.getId(), party);
+        } finally {
+            partyLock.unlock();
+        }
+        
         return party;
     }
 
     public MapleParty getParty(int partyid) {
-        return parties.get(partyid);
+        partyLock.lock();
+        try {
+            return parties.get(partyid);
+        } finally {
+            partyLock.unlock();
+        }
     }
 
     public MapleParty disbandParty(int partyid) {
-        return parties.remove(partyid);
+        partyLock.lock();
+        try {
+            return parties.remove(partyid);
+        } finally {
+            partyLock.unlock();
+        }
     }
 
     public void updateParty(MapleParty party, PartyOperation operation, MaplePartyCharacter target) {
@@ -392,8 +426,8 @@ public class World {
                     chr.setParty(null);
                     chr.setMPC(null);
                 }
-		default:
-			break;
+            default:
+                break;
         }
     }
 
@@ -419,8 +453,10 @@ public class World {
                 break;
             case CHANGE_LEADER:
                 MapleCharacter mc = party.getLeader().getPlayer();
-                if(mc.getEventInstance() != null && mc.getEventInstance().isEventLeader(mc)) {
-                    mc.getEventInstance().changedLeader(target.getPlayer());
+                EventInstanceManager eim = mc.getEventInstance();
+                
+                if(eim != null && eim.isEventLeader(mc)) {
+                    eim.changedLeader(target.getPlayer());
                 }
                 party.setLeader(target);
                 break;
@@ -430,6 +466,21 @@ public class World {
         updateParty(party, operation, target);
     }
 
+    public void removeMapPartyMembers(int partyid) {
+        MapleParty party = getParty(partyid);
+        if(party == null) return;
+        
+        for(MaplePartyCharacter mpc : party.getMembers()) {
+            MapleCharacter mc = mpc.getPlayer();
+            if(mc != null) {
+                MapleMap map = mc.getMap();
+                if(map != null) {
+                    map.removeParty(partyid);
+                }
+            }
+        }
+    }
+    
     public int find(String name) {
         int channel = -1;
         MapleCharacter chr = getPlayerStorage().getCharacterByName(name);
@@ -695,38 +746,83 @@ public class World {
         return (chr.getId() << 2) + petSlot;
     }
     
+    public void addOwlItemSearch(Integer itemid) {
+        owlLock.lock();
+        try {
+            Integer cur = owlSearched.get(itemid);
+            if(cur != null) {
+                owlSearched.put(itemid, cur + 1);
+            } else {
+                owlSearched.put(itemid, 1);
+            }
+        } finally {
+            owlLock.unlock();
+        }
+    }
+    
+    public List<Pair<Integer, Integer>> getOwlSearchedItems() {
+        if(ServerConstants.USE_ENFORCE_OWL_SUGGESTIONS) {
+            return new ArrayList<>(0);
+        }
+        
+        owlLock.lock();
+        try {
+            List<Pair<Integer, Integer>> searchCounts = new ArrayList<>(owlSearched.size());
+            
+            for(Entry<Integer, Integer> e : owlSearched.entrySet()) {
+                searchCounts.add(new Pair<>(e.getKey(), e.getValue()));
+            }
+            
+            return searchCounts;
+        } finally {
+            owlLock.unlock();
+        }
+    }
+    
     public void registerPetHunger(MapleCharacter chr, byte petSlot) {
         if(chr.isGM() && ServerConstants.GM_PETS_NEVER_HUNGRY || ServerConstants.PETS_NEVER_HUNGRY) {
             return;
         }
         
         Integer key = getPetKey(chr, petSlot);
-        synchronized(activePets) {
+        
+        activePetsLock.lock();
+        try {
             byte initProc;
             if(System.currentTimeMillis() - petUpdate > 55000) initProc = ServerConstants.PET_EXHAUST_COUNT - 2;
             else initProc = ServerConstants.PET_EXHAUST_COUNT - 1;
             
             activePets.put(key, initProc);
+        } finally {
+            activePetsLock.unlock();
         }
     }
     
     public void unregisterPetHunger(MapleCharacter chr, byte petSlot) {
         Integer key = getPetKey(chr, petSlot);
-        synchronized(activePets) {
+        
+        activePetsLock.lock();
+        try {
             activePets.remove(key);
+        } finally {
+            activePetsLock.unlock();
         }
     }
     
     public void runPetSchedule() {
         Map<Integer, Byte> deployedPets;
-        synchronized(activePets) {
+        
+        activePetsLock.lock();
+        try {
             petUpdate = System.currentTimeMillis();
             deployedPets = Collections.unmodifiableMap(activePets);
+        } finally {
+            activePetsLock.unlock();
         }
         
         for(Map.Entry<Integer, Byte> dp: deployedPets.entrySet()) {
             MapleCharacter chr = this.getPlayerStorage().getCharacterById(dp.getKey() / 4);
-            if(chr == null || !chr.isLoggedin()) continue;
+            if(chr == null || !chr.isLoggedin() || chr.isAwayFromWorld()) continue;
             
             Byte dpVal = (byte)(dp.getValue() + 1);
             if(dpVal == ServerConstants.PET_EXHAUST_COUNT) {
@@ -734,8 +830,11 @@ public class World {
                 dpVal = 0;
             }
             
-            synchronized(activePets) {
+            activePetsLock.lock();
+            try {
                 activePets.put(dp.getKey(), dpVal);
+            } finally {
+                activePetsLock.unlock();
             }
         }
     }
@@ -746,32 +845,42 @@ public class World {
         }
         
         Integer key = chr.getId();
-        synchronized(activeMounts) {
+        activeMountsLock.lock();
+        try {
             byte initProc;
             if(System.currentTimeMillis() - mountUpdate > 45000) initProc = ServerConstants.MOUNT_EXHAUST_COUNT - 2;
             else initProc = ServerConstants.MOUNT_EXHAUST_COUNT - 1;
             
             activeMounts.put(key, initProc);
+        } finally {
+            activeMountsLock.unlock();
         }
     }
     
     public void unregisterMountHunger(MapleCharacter chr) {
         Integer key = chr.getId();
-        synchronized(activeMounts) {
+        
+        activeMountsLock.lock();
+        try {
             activeMounts.remove(key);
+        } finally {
+            activeMountsLock.unlock();
         }
     }
     
     public void runMountSchedule() {
         Map<Integer, Byte> deployedMounts;
-        synchronized(activeMounts) {
+        activeMountsLock.lock();
+        try {
             mountUpdate = System.currentTimeMillis();
             deployedMounts = Collections.unmodifiableMap(activeMounts);
+        } finally {
+            activeMountsLock.unlock();
         }
         
         for(Map.Entry<Integer, Byte> dp: deployedMounts.entrySet()) {
             MapleCharacter chr = this.getPlayerStorage().getCharacterById(dp.getKey());
-            if(chr == null || !chr.isLoggedin()) continue;
+            if(chr == null || !chr.isLoggedin() || chr.isAwayFromWorld()) continue;
             
             Byte dpVal = (byte)(dp.getValue() + 1);
             if(dpVal == ServerConstants.MOUNT_EXHAUST_COUNT) {
@@ -779,60 +888,82 @@ public class World {
                 dpVal = 0;
             }
             
-            synchronized(activeMounts) {
+            activeMountsLock.lock();
+            try {
                 activeMounts.put(dp.getKey(), dpVal);
+            } finally {
+                activeMountsLock.unlock();
             }
         }
     }
     
     public void registerPlayerShop(MaplePlayerShop ps) {
-        synchronized(activePlayerShops) {
+        activePlayerShopsLock.lock();
+        try {
             activePlayerShops.put(ps.getOwner().getId(), ps);
+        } finally {
+            activePlayerShopsLock.unlock();
         }
     }
     
     public void unregisterPlayerShop(MaplePlayerShop ps) {
-        synchronized(activePlayerShops) {
+        activePlayerShopsLock.lock();
+        try {
             activePlayerShops.remove(ps.getOwner().getId());
+        } finally {
+            activePlayerShopsLock.unlock();
         }
     }
     
     public List<MaplePlayerShop> getActivePlayerShops() {
         List<MaplePlayerShop> psList = new ArrayList<>();
-        synchronized(activePlayerShops) {
+        activePlayerShopsLock.lock();
+        try {
             for(MaplePlayerShop mps : activePlayerShops.values()) {
                 psList.add(mps);
             }
             
             return psList;
+        } finally {
+            activePlayerShopsLock.unlock();
         }
     }
     
     public MaplePlayerShop getPlayerShop(int ownerid) {
-        synchronized(activePlayerShops) {
+        activePlayerShopsLock.lock();
+        try {
             return activePlayerShops.get(ownerid);
+        } finally {
+            activePlayerShopsLock.unlock();
         }
     }
     
     public void registerHiredMerchant(MapleHiredMerchant hm) {
-        synchronized(activeMerchants) {
+        activeMerchantsLock.lock();
+        try {
             byte initProc;
             if(System.currentTimeMillis() - merchantUpdate > 5 * 60 * 1000) initProc = 1;
             else initProc = 0;
             
             activeMerchants.put(hm.getOwnerId(), new Pair<>(hm, initProc));
+        } finally {
+            activeMerchantsLock.unlock();
         }
     }
     
     public void unregisterHiredMerchant(MapleHiredMerchant hm) {
-        synchronized(activeMerchants) {
+        activeMerchantsLock.lock();
+        try {
             activeMerchants.remove(hm.getOwnerId());
+        } finally {
+            activeMerchantsLock.unlock();
         }
     }
     
     public void runHiredMerchantSchedule() {
         Map<Integer, Pair<MapleHiredMerchant, Byte>> deployedMerchants;
-        synchronized(activeMerchants) {
+        activeMerchantsLock.lock();
+        try {
             merchantUpdate = System.currentTimeMillis();
             deployedMerchants = new LinkedHashMap<>(activeMerchants);
         
@@ -849,12 +980,15 @@ public class World {
                     activeMerchants.remove(dm.getKey());
                 }
             }
+        } finally {
+            activeMerchantsLock.unlock();
         }
     }
     
     public List<MapleHiredMerchant> getActiveMerchants() {
         List<MapleHiredMerchant> hmList = new ArrayList<>();
-        synchronized(activeMerchants) {
+        activeMerchantsLock.lock();
+        try {
             for(Pair<MapleHiredMerchant, Byte> hmp : activeMerchants.values()) {
                 MapleHiredMerchant hm = hmp.getLeft();
                 if(hm.isOpen()) {
@@ -863,16 +997,21 @@ public class World {
             }
             
             return hmList;
+        } finally {
+            activeMerchantsLock.unlock();
         }
     }
     
     public MapleHiredMerchant getHiredMerchant(int ownerid) {
-        synchronized(activeMerchants) {
+        activeMerchantsLock.lock();
+        try {
             if(activeMerchants.containsKey(ownerid)) {
                 return activeMerchants.get(ownerid).getLeft();
             }
             
             return null;
+        } finally {
+            activeMerchantsLock.unlock();
         }
     }
 

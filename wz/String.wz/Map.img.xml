@@ -5997,7 +5997,7 @@
       <string name="mapName" value="Memory Lane4"/>
     </imgdir>
     <imgdir name="270010410">
-      <string name="streetName" value="Memory Keeper"/>
+      <string name="streetName" value="Time Lane"/>
       <string name="mapName" value="Resting Spot of Memory4"/>
     </imgdir>
     <imgdir name="270010500">
@@ -8660,15 +8660,19 @@
     </imgdir>
     <imgdir name="674030300">
       <string name="streetName" value="Treasure Dungeon"/>
+      <string name="mapName" value="Treasure Dungeon"/>
     </imgdir>
-    <imgdir name="674030000">
-      <string name="streetName" value="Initiation"/>
+    <imgdir name="914090011">
+      <string name="streetName" value="Aran Tuto"/>
+      <string name="mapName" value="Aran Tuto 2"/>
     </imgdir>
     <imgdir name="674030100">
-      <string name="streetName" value="Entrance to MV&apos;s Lair"/>
+      <string name="streetName" value="Treasure Dungeon"/>
+      <string name="mapName" value="Entrance to MV&apos;s Lair"/>
     </imgdir>
     <imgdir name="674030200">
-      <string name="streetName" value="The Lair of MV"/>
+      <string name="streetName" value="Treasure Dungeon"/>
+      <string name="mapName" value="The Lair of MV"/>
     </imgdir>
     <imgdir name="910020000">
       <string name="streetName" value="Hidden Street"/>
@@ -13306,9 +13310,9 @@
       <string name="streetName" value="Hidden Street"/>
       <string name="mapName" value="The 4th Drill Hall"/>
     </imgdir>
-    <imgdir name="913030000">
-      <string name="streetName" value="Hidden Street"/>
-      <string name="mapName" value="Quiet Ereve"/>
+    <imgdir name="914090010">
+      <string name="streetName" value="Aran Tuto"/>
+      <string name="mapName" value="Aran Tuto 1"/>
     </imgdir>
     <imgdir name="913040000">
       <string name="streetName" value="Opening"/>
@@ -17289,6 +17293,22 @@
     <imgdir name="930010000">
       <string name="streetName" value="Hidden Street"/>
       <string name="mapName" value="Dangerous Library"/>
+    </imgdir>
+    <imgdir name="913030000">
+      <string name="streetName" value="Hidden Street"/>
+      <string name="mapName" value="Quiet Ereve"/>
+    </imgdir>
+    <imgdir name="914090012">
+      <string name="streetName" value="Aran Tuto"/>
+      <string name="mapName" value="Aran Tuto 3"/>
+    </imgdir>
+    <imgdir name="914090013">
+      <string name="streetName" value="Aran Tuto"/>
+      <string name="mapName" value="Aran Tuto 4"/>
+    </imgdir>
+    <imgdir name="674030000">
+      <string name="streetName" value="Treasure Dungeon"/>
+      <string name="mapName" value="Initiation"/>
     </imgdir>
   </imgdir>
   <imgdir name="singapore">

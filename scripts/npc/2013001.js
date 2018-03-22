@@ -66,8 +66,7 @@ function action(mode, type, selection) {
                     clearStage(0, eim);
 
                     cm.sendNext("Please save Minerva, She've been trapped in the seal by Papa Pixie, the terror of our tower! He misplaced all of our Minerva Statue's parts and we have to get it all back! Oh pardon me, I am the tower's Chamberlain, Eak. I am Minerva's royal servant.");
-                }
-                else {
+                } else {
                     cm.warp(920010000, 2);
                 }
                 cm.dispose();

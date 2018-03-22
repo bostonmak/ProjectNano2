@@ -11,13 +11,17 @@ function enter(pi) {
     if (map > 0) {
 	if (pi.getPlayerCount(map) == 0) {
 	    var mapp = pi.getMap(map);
-	    mapp.resetFully();
-	    mapp.respawn(true);
+	    mapp.resetPQ();
+            
+            pi.playPortalSound();
 	    pi.warp(map, 0);
+            return true;
 	} else {
 	    pi.playerMessage(5, "Someone is already in this map.");
+            return false;
 	}
     } else {
     	pi.playerMessage(5, "Hall #1 can only be entered if you're engaged in Kiku's Acclimation Training.");
+        return false;
     }
 }

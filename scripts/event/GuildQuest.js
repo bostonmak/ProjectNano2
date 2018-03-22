@@ -28,7 +28,6 @@ var isPq = true;
 var minPlayers = 6, maxPlayers = 30;
 var minLevel = 1, maxLevel = 255;
 var entryMap = 990000000;
-var fmMap = 910000022;
 var exitMap = 990001100;
 var recruitMap = 101030104;
 var clearMap = 990001000;
@@ -106,7 +105,7 @@ function getEligibleParty(party) {      //selects, from the given party, the tea
                 for(var i = 0; i < party.size(); i++) {
                         var ch = partyList[i];
 
-                        if((ch.getMapId() == recruitMap || ch.getMapId() == fmMap) && ch.getLevel() >= minLevel && ch.getLevel() <= maxLevel && ch.getGuildId() == guildId) {
+                        if(ch.getMapId() == recruitMap && ch.getLevel() >= minLevel && ch.getLevel() <= maxLevel && ch.getGuildId() == guildId) {
                                 if(ch.isLeader()) hasLeader = true;
                                 eligible.push(ch);
                         }

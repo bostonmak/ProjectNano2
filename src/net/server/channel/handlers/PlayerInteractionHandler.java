@@ -35,15 +35,15 @@ import java.util.Arrays;
 import net.AbstractMaplePacketHandler;
 import server.MapleInventoryManipulator;
 import server.MapleItemInformationProvider;
-import server.MapleMiniGame;
-import server.MaplePlayerShop;
-import server.MaplePlayerShopItem;
 import server.MapleTrade;
 import constants.GameConstants;
 import server.maps.FieldLimit;
 import server.maps.MapleHiredMerchant;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
+import server.maps.MapleMiniGame;
+import server.maps.MaplePlayerShop;
+import server.maps.MaplePlayerShopItem;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
@@ -229,11 +229,10 @@ public final class PlayerInteractionHandler extends AbstractMaplePacketHandler {
                     } else if (!merchant.isOpen()) {
                         c.announce(MaplePacketCreator.hiredMerchantMaintenanceMessage());
                         return;
-                    } else if (merchant.getFreeSlotThreadsafe() == -1) {
+                    } else if (!merchant.addVisitor(c.getPlayer())) {
                         chr.dropMessage(1, "This shop has reached it's maximum capacity, please come by later.");
                         return;
                     } else {
-                        merchant.addVisitor(c.getPlayer());
                         c.announce(MaplePacketCreator.getHiredMerchant(c.getPlayer(), merchant, false));
                     }
                     chr.setHiredMerchant(merchant);

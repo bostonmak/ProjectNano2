@@ -1,8 +1,22 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+    This file is part of the HeavenMS (MapleSolaxiaV2) MapleStory Server
+    Copyleft (L) 2017 RonanLana
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation version 3 as published by
+    the Free Software Foundation. You may not use, modify or distribute
+    this program under any other version of the GNU Affero General Public
+    License.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 package mapleidretriever;
 
 import java.io.*;
@@ -28,11 +42,13 @@ import java.util.ArrayList;
  * Set whether you are first installing the handbook on the SQL Server (TRUE) or just fetching whatever is on your "fetch.txt"
  * file (FALSE) on the INSTALL_SQLTABLE property and build the project. With all done, run the Java executable.
  * 
+ * Expected installing time: 30 minutes
+ * 
  */
 public class MapleIdRetriever {
-    private final static boolean INSTALL_SQLTABLE = true;
+    private final static boolean INSTALL_SQLTABLE = false;
     
-    static String host = "jdbc:mysql://localhost:3306/maplesolaxia";
+    static String host = "jdbc:mysql://localhost:3306/heavenms";
     static String driver = "com.mysql.jdbc.Driver";
     static String username = "root";
     static String password = "";
@@ -50,10 +66,6 @@ public class MapleIdRetriever {
     
     static String inputName = "lib/fetch.txt";
     static String outputName = "lib/result.txt";
-
-    /**
-     * @param args the command line arguments
-     */
     
     private static void listFiles(String directoryName, ArrayList<File> files) {
             File directory = new File(directoryName);
@@ -74,7 +86,12 @@ public class MapleIdRetriever {
         
         if(tokens.length > 1) {
             PreparedStatement ps = con.prepareStatement("INSERT INTO `handbook` (`id`, `name`) VALUES (?, ?)");
-            ps.setInt(1, Integer.parseInt(tokens[0]));
+            try {
+                ps.setInt(1, Integer.parseInt(tokens[0]));
+            } catch (NumberFormatException npe) {   // odd...
+                String num = tokens[0].substring(1);
+                ps.setInt(1, Integer.parseInt(num));
+            }
             ps.setString(2, tokens[1]);
             ps.execute();
         }

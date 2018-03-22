@@ -4,10 +4,9 @@
 */
 
 var isPq = true;
-var minPlayers = 3, maxPlayers = 6;
-var minLevel = 1, maxLevel = 255;
+var minPlayers = 5, maxPlayers = 6;
+var minLevel = 51, maxLevel = 70;
 var entryMap = 920010000;
-var fmMap = 910000022;
 var exitMap = 920011200;
 var recruitMap = 200080101;
 var clearMap = 920011300;
@@ -70,7 +69,8 @@ function getEligibleParty(party) {      //selects, from the given party, the tea
 
                 for(var i = 0; i < party.size(); i++) {
                         var ch = partyList[i];
-                        if((ch.getMapId() == recruitMap || ch.getMapId() == fmMap) && ch.getLevel() >= minLevel && ch.getLevel() <= maxLevel) {
+
+                        if(ch.getMapId() == recruitMap && ch.getLevel() >= minLevel && ch.getLevel() <= maxLevel) {
                                 if(ch.isLeader()) hasLeader = true;
                                 eligible.push(ch);
                         }
@@ -85,6 +85,7 @@ function setup(level, lobbyid) {
         var eim = em.newInstance("Orbis" + lobbyid);
         eim.setProperty("level", level);
         
+        eim.setProperty("statusStg0", -1);
         eim.setProperty("statusStg1", -1);
         eim.setProperty("statusStg2", -1);
         eim.setProperty("statusStg3", -1);
@@ -180,7 +181,13 @@ function playerUnregistered(eim, player) {
 
 function playerExit(eim, player) {
         eim.unregisterPlayer(player);
-        player.changeMap(fmMap, 0);
+        player.changeMap(exitMap, 0);
+}
+
+function playerLeft(eim, player) {
+        if(!eim.isEventCleared()) {
+                playerExit(eim, player);
+        }
 }
 
 function changedMap(eim, player, mapid) {
@@ -223,15 +230,16 @@ function playerDisconnected(eim, player) {
 
 function leftParty(eim, player) {
         if (eim.isEventTeamLackingNow(false, minPlayers, player)) {
-                eim.unregisterPlayer(player);
                 end(eim);
         }
         else
-                eim.unregisterPlayer(player);
+                playerLeft(eim, player);
 }
 
 function disbandParty(eim) {
-        end(eim);
+        if (!eim.isEventCleared()) {
+                end(eim);
+        }
 }
 
 function monsterValue(eim, mobId) {

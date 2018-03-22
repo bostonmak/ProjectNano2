@@ -26,7 +26,7 @@ function start(mode, type, selection) {
 		
 		var map = qm.getClient().getChannelServer().getMapFactory().getMap(914020000);
 		spawnMob(-365, 86, 9001014, map);
-		qm.warp(914020000);
+		qm.warp(914020000, 0);
 		qm.dispose();
 	}
 }
@@ -56,12 +56,6 @@ function end(mode, type, selection) {
 			
 			qm.gainItem(1142132, true);
 			qm.changeJobById(2112);
-			
-			
-			qm.teachSkill(21121000, 0, 10, -1);
-			qm.teachSkill(21120001, 0, 10, -1);
-			qm.teachSkill(21121003, 0, 10, -1);
-			qm.teachSkill(21120002, 0, 10, -1);
 			
 			qm.completeQuest();
 		}

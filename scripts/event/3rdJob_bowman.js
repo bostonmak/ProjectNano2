@@ -1,8 +1,6 @@
 /*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-					   Matthias Butz <matze@odinms.de>
-					   Jan Christian Meyer <vimes@odinms.de>
+    This file is part of the HeavenMS (MapleSolaxiaV2) MapleStory Server
+    Copyleft (L) 2017 RonanLana
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -85,6 +83,10 @@ function changedMap(eim, chr, mapid) {
 }
 
 function monsterKilled(mob, eim) {}
+
+function monsterValue(eim, mobId) {
+        return 1;
+}
 
 function allMonstersDead(eim) {}
 

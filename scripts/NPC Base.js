@@ -1,8 +1,6 @@
 /*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
+    This file is part of the HeavenMS (MapleSolaxiaV2) MapleStory Server
+    Copyleft (L) 2017 RonanLana
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -32,12 +30,10 @@ function start() {
 }
 
 function action(mode, type, selection) {
-        //print("mode" + mode + "type " + type + " selection" + selection + "\n");
-        
         if (mode == -1) {
                 cm.dispose();
         } else {
-                if (mode == 0 && type > 0) {    // hope types 2 & 3 works as well, as 1 and 4 END CHAT
+                if (mode == 0 && type > 0) {
                         cm.dispose();
                         return;
                 }
@@ -51,4 +47,12 @@ function action(mode, type, selection) {
                         cm.dispose();
                 }
         }
+}
+
+function generateSelectionMenu(array) {     // nice tool for generating a string for the sendSimple functionality
+        var menu = "";
+        for (var i = 0; i < array.length; i++) {
+                menu += "#L" + i + "#" + array[i] + "#l\r\n";
+        }
+        return menu;
 }

@@ -120,10 +120,10 @@ public class Equip extends Item {
     }
 
     @Override
-    public byte getType() {
+    public byte getItemType() {
         return 1;
     }
-
+    
     public byte getUpgradeSlots() {
         return upgradeSlots;
     }
@@ -553,7 +553,7 @@ public class Equip extends Item {
     }
 
     public final void showLevelupMessage(String msg, MapleClient c) {
-        c.getPlayer().showHint(msg);
+        c.getPlayer().showHint(msg, 300);
     }
     
     public void setItemExp(int exp) {

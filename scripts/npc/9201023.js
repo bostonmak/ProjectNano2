@@ -1,8 +1,8 @@
 /*
-    This file is part of the OdinMS Maple Story Server
+	This file is part of the OdinMS Maple Story Server
     Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-               Matthias Butz <matze@odinms.de>
-               Jan Christian Meyer <vimes@odinms.de>
+		       Matthias Butz <matze@odinms.de>
+		       Jan Christian Meyer <vimes@odinms.de>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -24,10 +24,10 @@
  *@author Jvlaple
  */
  
-//function start() {
-  //  cm.sendOk("Hi, I'm Nana the love fairy... Hows it going?");
-    //cm.dispose();
-//}
+function start() {
+    cm.sendOk("Hi, I'm Nana the love fairy... Hows it going?");
+    cm.dispose();
+}
 //
 //function action(mode, type, selection) {
 //    if (mode == -1) {
@@ -63,83 +63,3 @@
 //        }
 //    }
 //}
-// edited by LightRyuzaki for ProjectNano
-var status = -1;
-
-function start() {
-    status = -1;
-    action(1, 0, 0);
-}
-
-function action(mode, type, selection) {
-    if (mode == -1) {
-        cm.sendOk("Are you sure? Scaredy cat");
-        cm.dispose();
-    } else {
-        if (mode == 1) status++;
-        else status--;
-        if (status == 0) {
-            cm.sendSimple("Hello #h # ! I am the boss summoner NPC of ProjectNano! Each boss monster that I summon will cost some #b#v4001126##k's! You can get them by killing monsters in the maple world!. Would you like me to spawn some #e Special Boss Monsters #n for you? \r\n Please choose #b\r\n#L1#Papulatus clock #b#v4001126##k*1 #l\r\n#L2#Pianus #b#v4001126##k * 1#l\r\n#L3#Black Crow #b#v4001126##k * 1#l\r\n#L4#Anego #b#v4001126##k * 1#l\r\n#L5#BodyGuard A #b#v4001126##k *1#l\r\n#L6#Griffey #b#v4001126##k * 1#l\r\n#L7#Manon #b#v4001126##k * 1#l#k");
-        } else {
-            if (selection == 1) {
-        if(cm.haveItem(4001126, 1)) {
-        cm.gainItem(4001126,-1); 
-                cm.spawnMonster(8500001);
-                } else{
-        cm.sendOk("Sorry, you don't have enough #b#v4001126##k!'s to summon Papulatus");
-        }
-        cm.dispose();
-            } else if (selection == 2) {
-        if(cm.haveItem(4001126, 1)) {
-        cm.gainItem(4001126,-1); 
-                cm.spawnMonster(8510000);
-                } else{
-        cm.sendOk("Sorry, you don't have enough #b#v4001126##k!'s to summon Pianus");
-        }
-        cm.dispose();
-            } else if (selection == 3) {
-        if(cm.haveItem(4001126, 1)) {
-        cm.gainItem(4001126,-1); 
-                cm.spawnMonster(9400014);
-                } else{
-        cm.sendOK("Sorry, you don't have enough #b#v4001126##k!'s to summon Black Crow");
-        }
-        cm.dispose();
-            } else if (selection == 4) {
-        if(cm.haveItem(4001126, 1)) {
-        cm.gainItem(4001126,-1); 
-                cm.spawnMonster(9400121);
-                } else{
-        cm.sendOk("Sorry, you don't have enough #b#v4001126##k!'s to summon Anego");
-        }
-        cm.dispose();
-            } else if (selection == 5) {
-        if(cm.haveItem(4001126, 1)) {
-        cm.gainItem(4001126,-1); 
-                cm.spawnMonster(9400112);
-                } else{
-        cm.sendOk("Sorry, you don't have enough #b#v4001126##k!'s to summon Bodyguard A");
-        }
-        cm.dispose();
-            } else if (selection == 6) {
-        if(cm.haveItem(4001126, 1)) {
-        cm.gainItem(4001126,-1); 
-                cm.spawnMonster(8180001);
-                } else{
-        cm.sendOk("Sorry, you don't have enough #b#v4001126##k!'s to summon Griffey");
-        }
-        cm.dispose();
-            } else if (selection == 7) {
-        if(cm.haveItem(4001126, 1)) {
-        cm.gainItem(4001126,-1); 
-                cm.spawnMonster(8180000);
-                } else{
-        cm.sendOk("Sorry, you don't have enough #b#v4001126##k!'s to summon Manon");
-        }
-        cm.dispose();
-            } else {
-                cm.dispose();
-            }
-        }
-    }
-}  

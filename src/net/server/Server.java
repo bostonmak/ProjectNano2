@@ -33,14 +33,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
+import tools.locks.MonitoredReentrantLock;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.ScheduledFuture;
 
 import net.MapleServerHandler;
 import net.mina.MapleCodecFactory;
@@ -63,16 +65,20 @@ import server.TimerManager;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
 import tools.Pair;
+import client.MapleClient;
 import client.MapleCharacter;
 import client.SkillFactory;
+import client.newyear.NewYearCardRecord;
 import constants.ItemConstants;
 import constants.ServerConstants;
 import java.util.Calendar;
+import net.server.audit.ThreadTracker;
 import server.quest.MapleQuest;
+import tools.locks.MonitoredLockType;
 
 public class Server implements Runnable {
     private static final Set<Integer> activeFly = new HashSet<>();
-    private static final Map<Integer, Integer> couponRates = new LinkedHashMap<>();
+    private static final Map<Integer, Integer> couponRates = new HashMap<>(30);
     private static final List<Integer> activeCoupons = new LinkedList<>();
     
     private IoAcceptor acceptor;
@@ -81,10 +87,13 @@ public class Server implements Runnable {
     private final Properties subnetInfo = new Properties();
     private static Server instance = null;
     private List<Pair<Integer, String>> worldRecommendedList = new LinkedList<>();
-    private final Map<Integer, MapleGuild> guilds = new LinkedHashMap<>();
-    private final Lock shutdownLock = new ReentrantLock();
+    private final Map<Integer, MapleGuild> guilds = new HashMap<>(100);
+    private final Map<MapleClient, Long> inLoginState = new HashMap<>(100);
+    private final Lock srvLock = new MonitoredReentrantLock(MonitoredLockType.SERVER);
     private final PlayerBuffStorage buffStorage = new PlayerBuffStorage();
-    private final Map<Integer, MapleAlliance> alliances = new LinkedHashMap<>();
+    private final Map<Integer, MapleAlliance> alliances = new HashMap<>(100);
+    private final Map<Integer, NewYearCardRecord> newyears = new HashMap<>();
+    
     private boolean online = false;
     public static long uptime = System.currentTimeMillis();
     
@@ -101,6 +110,18 @@ public class Server implements Runnable {
 
     public List<Pair<Integer, String>> worldRecommendedList() {
         return worldRecommendedList;
+    }
+    
+    public void setNewYearCard(NewYearCardRecord nyc) {
+        newyears.put(nyc.getId(), nyc);
+    }
+    
+    public NewYearCardRecord getNewYearCard(int cardid) {
+        return newyears.get(cardid);
+    }
+    
+    public NewYearCardRecord removeNewYearCard(int cardid) {
+        return newyears.remove(cardid);
     }
 
     /*
@@ -248,7 +269,7 @@ public class Server implements Runnable {
             System.exit(0);
         }
 
-        System.out.println("MapleSolaxia v" + ServerConstants.VERSION + " starting up.\r\n");
+        System.out.println("HeavenMS v" + ServerConstants.VERSION + " starting up.\r\n");
 
 
         if(ServerConstants.SHUTDOWNHOOK)
@@ -279,6 +300,7 @@ public class Server implements Runnable {
         TimerManager tMan = TimerManager.getInstance();
         tMan.start();
         tMan.register(tMan.purge(), ServerConstants.PURGING_INTERVAL);//Purging ftw...
+        disconnectIdlesOnLoginTask();
         
         long timeLeft = getTimeLeftForNextHour();
         tMan.register(new CouponWorker(), ServerConstants.COUPON_INTERVAL, timeLeft);
@@ -297,7 +319,11 @@ public class Server implements Runnable {
 	timeToTake = System.currentTimeMillis();
 	MapleQuest.loadAllQuest();
 	System.out.println("Quest loaded in " + ((System.currentTimeMillis() - timeToTake) / 1000.0) + " seconds\r\n");
-		
+	
+        NewYearCardRecord.startPendingNewYearCardRequests();
+        
+        if(ServerConstants.USE_THREAD_TRACKER) ThreadTracker.getInstance().registerThreadTrackerTask();
+        
         try {
             Integer worldCount = Math.min(ServerConstants.WORLD_NAMES.length, Integer.parseInt(p.getProperty("worlds")));
             
@@ -309,11 +335,11 @@ public class Server implements Runnable {
                         ServerConstants.EXP_RATE,
                         ServerConstants.DROP_RATE,
                         ServerConstants.MESO_RATE,
-                        ServerConstants.BOSS_DROP_RATE);
+                        ServerConstants.QUEST_RATE);
 
                 worldRecommendedList.add(new Pair<>(i, p.getProperty("whyamirecommended" + i)));
                 worlds.add(world);
-                channels.add(new LinkedHashMap<Integer, String>());
+                channels.add(new HashMap<Integer, String>());
                 for (int j = 0; j < Integer.parseInt(p.getProperty("channels" + i)); j++) {
                     int channelid = j + 1;
                     Channel channel = new Channel(i, channelid);
@@ -339,7 +365,7 @@ public class Server implements Runnable {
         
         System.out.println("Listening on port 8484\r\n\r\n");
 
-        System.out.println("Solaxia is now online.\r\n");
+        System.out.println("HeavenMS is now online.\r\n");
         online = true;
     }
 
@@ -355,6 +381,7 @@ public class Server implements Runnable {
     }
 
     public static void main(String args[]) {
+        System.setProperty("wzpath", "wz");
         Server.getInstance().run();
     }
 
@@ -677,20 +704,20 @@ public class Server implements Runnable {
         worlda.reloadGuildSummary();
     }
 
-    public void broadcastMessage(final byte[] packet) {
-        for (Channel ch : getChannelsFromWorld(0)) {
+    public void broadcastMessage(int world, final byte[] packet) {
+        for (Channel ch : getChannelsFromWorld(world)) {
             ch.broadcastPacket(packet);
         }
     }
 
-    public void broadcastGMMessage(final byte[] packet) {
-        for (Channel ch : getChannelsFromWorld(0)) {
+    public void broadcastGMMessage(int world, final byte[] packet) {
+        for (Channel ch : getChannelsFromWorld(world)) {
             ch.broadcastGMPacket(packet);
         }
     }
     
-    public boolean isGmOnline() {
-        for (Channel ch : getChannelsFromWorld(0)) {
+    public boolean isGmOnline(int world) {
+        for (Channel ch : getChannelsFromWorld(world)) {
         	for (MapleCharacter player : ch.getPlayerStorage().getAllCharacters()) {
         		if (player.isGM()){
         			return true;
@@ -720,11 +747,64 @@ public class Server implements Runnable {
         return worlds;
     }
 
+    public void registerLoginState(MapleClient c) {
+        srvLock.lock();
+        try {
+            inLoginState.put(c, System.currentTimeMillis() + 600000);
+        } finally {
+            srvLock.unlock();
+        }
+    }
+    
+    public void unregisterLoginState(MapleClient c) {
+        srvLock.lock();
+        try {
+            inLoginState.remove(c);
+        } finally {
+            srvLock.unlock();
+        }
+    }
+    
+    private void disconnectIdlesOnLoginState() {
+        srvLock.lock();
+        try {
+            List<MapleClient> toDisconnect = new LinkedList<>();
+            long timeNow = System.currentTimeMillis();
+            
+            for(Entry<MapleClient, Long> mc : inLoginState.entrySet()) {
+                if(timeNow > mc.getValue()) {
+                    toDisconnect.add(mc.getKey());
+                }
+            }
+            
+            for(MapleClient c : toDisconnect) {
+                if(c.isLoggedIn()) {
+                    c.disconnect(false, false);
+                } else {
+                    c.getSession().close(true);
+                }
+                
+                inLoginState.remove(c);
+            }
+        } finally {
+            srvLock.unlock();
+        }
+    }
+    
+    private void disconnectIdlesOnLoginTask() {
+        TimerManager.getInstance().register(new Runnable() {
+            @Override
+            public void run() {
+                disconnectIdlesOnLoginState();
+            }
+        }, 300000);
+    }
+    
     public final Runnable shutdown(final boolean restart) {//no player should be online when trying to shutdown!
         return new Runnable() {
             @Override
             public void run() {
-                shutdownLock.lock();
+                srvLock.lock();
                 
                 try {
                     System.out.println((restart ? "Restarting" : "Shutting down") + " the server!\r\n");
@@ -750,6 +830,8 @@ public class Server implements Runnable {
                             }
                         }
                     }*/
+                    
+                    if(ServerConstants.USE_THREAD_TRACKER) ThreadTracker.getInstance().cancelThreadTrackerTask();
 
                     TimerManager.getInstance().purge();
                     TimerManager.getInstance().stop();
@@ -788,7 +870,7 @@ public class Server implements Runnable {
                         getInstance().run();//DID I DO EVERYTHING?! D:
                     }
                 } finally {
-                    shutdownLock.unlock();
+                    srvLock.unlock();
                 }
             }
         };

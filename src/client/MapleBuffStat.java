@@ -63,7 +63,7 @@ public enum MapleBuffStat {
     BERSERK_FURY(0x8000000L),
     DIVINE_BODY(0x10000000L),
     SPARK(0x20000000L),
-    //0x40000000L
+    MAP_CHAIR(0x40000000L),
     FINALATTACK(0x80000000L),
     BATTLESHIP(0xA00000040L), // weird one
     WATK(0x100000000L),
@@ -110,12 +110,13 @@ public enum MapleBuffStat {
     // needs Soul Stone
     //end incorrect buffstats
     
+    WIND_WALK(0x400000000L, true),
     ARAN_COMBO(0x1000000000L, true),
     COMBO_DRAIN(0x2000000000L, true),
     COMBO_BARRIER(0x4000000000L, true),
     BODY_PRESSURE(0x8000000000L, true),
     SMART_KNOCKBACK(0x10000000000L, true),
-    PYRAMID_PQ(0x20000000000L, true),
+    BERSERK(0x20000000000L, true),
     ENERGY_CHARGE(0x4000000000000L, true),
     DASH2(0x8000000000000L, true), // correct (speed)
     DASH(0x10000000000000L, true), // correct (jump)

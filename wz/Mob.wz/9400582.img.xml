@@ -3,16 +3,16 @@
   <imgdir name="info">
     <int name="bodyAttack" value="1"/>
     <int name="level" value="120"/>
-    <int name="maxHP" value="600000"/>
+    <int name="maxHP" value="120000"/>
     <int name="maxMP" value="2000"/>
     <int name="speed" value="-20"/>
-    <int name="PADamage" value="1300"/>
+    <int name="PADamage" value="650"/>
     <int name="PDDamage" value="1000"/>
-    <int name="MADamage" value="1600"/>
+    <int name="MADamage" value="800"/>
     <int name="MDDamage" value="800"/>
     <int name="acc" value="230"/>
     <int name="eva" value="40"/>
-    <int name="exp" value="61000"/>
+    <int name="exp" value="6100"/>
     <int name="undead" value="0"/>
     <int name="pushed" value="0"/>
     <string name="elemAttr" value="F2I2L2S2H1"/>

@@ -25,7 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import tools.locks.MonitoredLockType;
+import tools.locks.MonitoredReentrantLock;
 
 /**
  *
@@ -33,24 +34,24 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class PlayerBuffStorage {
     private int id = (int) (Math.random() * 100);
-    private final Lock mutex = new ReentrantLock();    
-    private Map<Integer, List<PlayerBuffValueHolder>> buffs = new HashMap<Integer, List<PlayerBuffValueHolder>>();
+    private final Lock lock = new MonitoredReentrantLock(MonitoredLockType.BUFF_STORAGE, true);    
+    private Map<Integer, List<PlayerBuffValueHolder>> buffs = new HashMap<>();
 
     public void addBuffsToStorage(int chrid, List<PlayerBuffValueHolder> toStore) {
-        mutex.lock();
+        lock.lock();
         try {
             buffs.put(chrid, toStore);//Old one will be replaced if it's in here.
         } finally {
-            mutex.unlock();
+            lock.unlock();
         }
     }
 
     public List<PlayerBuffValueHolder> getBuffsFromStorage(int chrid) {
-        mutex.lock();
+        lock.lock();
         try {
             return buffs.remove(chrid);
         } finally {
-            mutex.unlock();
+            lock.unlock();
         }        
     }
 

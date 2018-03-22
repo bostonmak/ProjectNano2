@@ -4,10 +4,9 @@
 */
 
 var isPq = true;
-var minPlayers = 3, maxPlayers = 6;
-var minLevel = 1, maxLevel = 255;
+var minPlayers = 6, maxPlayers = 6;
+var minLevel = 40, maxLevel = 255;
 var entryMap = 670010200;
-var fmMap = 910000022;
 var exitMap = 670011000;
 var recruitMap = 670010100;
 var clearMap = 670010800;
@@ -74,7 +73,7 @@ function getEligibleParty(party) {      //selects, from the given party, the tea
                 for(var i = 0; i < party.size(); i++) {
                         var ch = partyList[i];
 
-                        if((ch.getMapId() == recruitMap || ch.getMapId() == fmMap) && ch.getLevel() >= minLevel && ch.getLevel() <= maxLevel) {
+                        if(ch.getMapId() == recruitMap && ch.getLevel() >= minLevel && ch.getLevel() <= maxLevel) {
                                 if(ch.isLeader()) hasLeader = true;
                                 eligible.push(ch);
                                 
@@ -155,7 +154,7 @@ function playerEntry(eim, player) {
 
 function scheduledTimeout(eim) {
         if(eim.getIntProperty("statusStg6") == 1) {
-                eim.warpEventTeam(fmMap);
+                eim.warpEventTeam(exitMap);
         }
         else {
                 end(eim);
@@ -166,7 +165,13 @@ function playerUnregistered(eim, player) {}
 
 function playerExit(eim, player) {
         eim.unregisterPlayer(player);
-        player.changeMap(fmMap, 0);
+        player.changeMap(exitMap, 0);
+}
+
+function playerLeft(eim, player) {
+        if(!eim.isEventCleared()) {
+                playerExit(eim, player);
+        }
 }
 
 function changedMap(eim, player, mapid) {
@@ -209,15 +214,16 @@ function playerDisconnected(eim, player) {
 
 function leftParty(eim, player) {
         if (eim.isEventTeamLackingNow(false, minPlayers, player)) {
-                eim.unregisterPlayer(player);
                 end(eim);
         }
         else
-                eim.unregisterPlayer(player);
+                playerLeft(eim, player);
 }
 
 function disbandParty(eim) {
-        end(eim);
+        if (!eim.isEventCleared()) {
+                end(eim);
+        }
 }
 
 function monsterValue(eim, mobId) {

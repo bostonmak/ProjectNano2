@@ -33,11 +33,11 @@ function enter(pi) {
         }
         
         if(pi.getPlayer().getEventInstance().giveEventReward(pi.getPlayer(), evLevel)) {
-                pi.warp(970030000);
+                pi.playPortalSound(); pi.warp(970030000);
                 return true;
         }
         else {
-                pi.message("You cannot receive an event prize without having an empty room in your EQUIP, USE, SET-UP or ETC inventory.");
+                pi.message("Make a room available on all EQUIP, USE, SET-UP and ETC inventory to claim an event prize.");
                 return false;
         }
 }

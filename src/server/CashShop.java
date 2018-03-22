@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import tools.locks.MonitoredReentrantLock;
 
 import provider.MapleData;
 import provider.MapleDataProvider;
@@ -46,6 +46,7 @@ import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import constants.ItemConstants;
 import java.util.Collections;
+import tools.locks.MonitoredLockType;
 
 /*
  * @author Flav
@@ -88,7 +89,6 @@ public class CashShop {
         }
 
         public Item toItem() {
-            MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
             Item item;
 
             int petid = -1;
@@ -96,15 +96,25 @@ public class CashShop {
             if (ItemConstants.isPet(itemId))
                 petid = MaplePet.createPet(itemId);
 
-            if (ii.getInventoryType(itemId).equals(MapleInventoryType.EQUIP)) {
-                item = ii.getEquipById(itemId);
+            if (ItemConstants.getInventoryType(itemId).equals(MapleInventoryType.EQUIP)) {
+                item = MapleItemInformationProvider.getInstance().getEquipById(itemId);
             } else {
                 item = new Item(itemId, (byte) 0, count, petid);
             }
 
             if (ItemConstants.EXPIRING_ITEMS) {
-                    if(itemId == 5211048 || itemId == 5360042) { // 4 Hour 2X coupons, the period is 1, but we don't want them to last a day.
-                            item.setExpiration(System.currentTimeMillis() + (1000 * 60 * 60 * 4));
+                    if(period == 1) {
+                            if(itemId == 5211048 || itemId == 5360042) { // 4 Hour 2X coupons, the period is 1, but we don't want them to last a day.
+                                    item.setExpiration(System.currentTimeMillis() + (1000 * 60 * 60 * 4));
+                            /*
+                            } else if(itemId == 5211047 || itemId == 5360014) { // 3 Hour 2X coupons, unused as of now
+                                    item.setExpiration(System.currentTimeMillis() + (1000 * 60 * 60 * 3));
+                            */
+                            } else if(itemId == 5211060) { // 2 Hour 3X coupons.
+                                    item.setExpiration(System.currentTimeMillis() + (1000 * 60 * 60 * 2));
+                            } else {
+                                    item.setExpiration(System.currentTimeMillis() + (1000 * 60 * 60 * 24));
+                            }
                     } else {
                             item.setExpiration(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * period));
                     }
@@ -241,7 +251,7 @@ public class CashShop {
     private List<Item> inventory = new ArrayList<>();
     private List<Integer> wishList = new ArrayList<>();
     private int notes = 0;
-    private Lock lock = new ReentrantLock();
+    private Lock lock = new MonitoredReentrantLock(MonitoredLockType.CASHSHOP);
 
     public CashShop(int accountId, int characterId, int jobType) throws SQLException {
         this.accountId = accountId;
@@ -342,7 +352,7 @@ public class CashShop {
         boolean isRing = false;
         Equip equip = null;
         for (Item item : getInventory()) {
-            if (item.getType() == 1) {
+            if (item.getInventoryType().equals(MapleInventoryType.EQUIP)) {
                 equip = (Equip) item;
                 isRing = equip.getRingId() > -1;
             }
@@ -429,7 +439,7 @@ public class CashShop {
                 Item item = cItem.toItem();
                 Equip equip = null;
                 item.setGiftFrom(rs.getString("from"));
-                if (item.getType() == MapleInventoryType.EQUIP.getType()) {
+                if (item.getInventoryType().equals(MapleInventoryType.EQUIP)) {
                     equip = (Equip) item;
                     equip.setRingId(rs.getInt("ringid"));
                     gifts.add(new Pair<Item, String>(equip, rs.getString("message")));
@@ -480,7 +490,7 @@ public class CashShop {
 
         List<Item> inv = getInventory();
         for (Item item : inv) {
-            itemsWithType.add(new Pair<>(item, MapleItemInformationProvider.getInstance().getInventoryType(item.getItemId())));
+            itemsWithType.add(new Pair<>(item, item.getInventoryType()));
         }
 
         factory.saveItems(itemsWithType, accountId, con);

@@ -21,6 +21,7 @@
 */
 package net.server.world;
 
+import client.MapleClient;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -29,17 +30,22 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Map;
 import java.util.Comparator;
+import tools.locks.MonitoredReentrantLock;
+import java.util.concurrent.locks.Lock;
+import tools.locks.MonitoredLockType;
 
 public class MapleParty {
+    private int id;
+    
     private int leaderId;
-    private List<MaplePartyCharacter> members = new LinkedList<MaplePartyCharacter>();
+    private List<MaplePartyCharacter> members = new LinkedList<>();
     private List<MaplePartyCharacter> pqMembers = null;
     
     private Map<Integer, Integer> histMembers = new HashMap<>();
     private int nextEntry = 0;
     
-    private int id;
-
+    private Lock lock = new MonitoredReentrantLock(MonitoredLockType.PARTY, true);
+    
     public MapleParty(int id, MaplePartyCharacter chrfor) {
         this.leaderId = chrfor.getId();
         this.members.add(chrfor);
@@ -47,20 +53,35 @@ public class MapleParty {
     }
 
     public boolean containsMembers(MaplePartyCharacter member) {
-        return members.contains(member);
+        lock.lock();
+        try {
+            return members.contains(member);
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void addMember(MaplePartyCharacter member) {
-        histMembers.put(member.getId(), nextEntry);
-        nextEntry++;
-        
-        members.add(member);
+        lock.lock();
+        try {
+            histMembers.put(member.getId(), nextEntry);
+            nextEntry++;
+
+            members.add(member);
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void removeMember(MaplePartyCharacter member) {
-        histMembers.remove(member.getId());
-        
-        members.remove(member);
+        lock.lock();
+        try {
+            histMembers.remove(member.getId());
+
+            members.remove(member);
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void setLeader(MaplePartyCharacter victim) {
@@ -68,28 +89,48 @@ public class MapleParty {
     }
 
     public void updateMember(MaplePartyCharacter member) {
-        for (int i = 0; i < members.size(); i++) {
-            if (members.get(i).getId() == member.getId()) {
-                members.set(i, member);
+        lock.lock();
+        try {
+            for (int i = 0; i < members.size(); i++) {
+                if (members.get(i).getId() == member.getId()) {
+                    members.set(i, member);
+                }
             }
+        } finally {
+            lock.unlock();
         }
     }
     
     public MaplePartyCharacter getMemberById(int id) {
-        for (MaplePartyCharacter chr : members) {
-            if (chr.getId() == id) {
-                return chr;
+        lock.lock();
+        try {
+            for (MaplePartyCharacter chr : members) {
+                if (chr.getId() == id) {
+                    return chr;
+                }
             }
+            return null;
+        } finally {
+            lock.unlock();
         }
-        return null;
     }
 
     public Collection<MaplePartyCharacter> getMembers() {
-        return Collections.unmodifiableList(members);
+        lock.lock();
+        try {
+            return Collections.unmodifiableList(members);
+        } finally {
+            lock.unlock();
+        }
     }
     
     public List<MaplePartyCharacter> getPartyMembers() {
-        return members;
+        lock.lock();
+        try {
+            return Collections.unmodifiableList(members);
+        } finally {
+            lock.unlock();
+        }
     }
     
     // used whenever entering PQs: will draw every party member that can attempt a target PQ while ingnoring those unfit.
@@ -114,17 +155,30 @@ public class MapleParty {
     }
 
     public MaplePartyCharacter getLeader() {
-        for(MaplePartyCharacter mpc: members) {
-            if(mpc.getId() == leaderId) {
-                return mpc;
+        lock.lock();
+        try {
+            for(MaplePartyCharacter mpc: members) {
+                if(mpc.getId() == leaderId) {
+                    return mpc;
+                }
             }
+
+            return null;
+        } finally {
+            lock.unlock();
         }
-        
-        return null;
     }
     
     public byte getPartyDoor(int cid) {
-        List<Entry<Integer, Integer>> histList = new LinkedList<>(histMembers.entrySet());
+        List<Entry<Integer, Integer>> histList;
+        
+        lock.lock();
+        try {
+            histList = new LinkedList<>(histMembers.entrySet());
+        } finally {
+            lock.unlock();
+        }
+        
         Collections.sort(histList, new Comparator<Entry<Integer, Integer>>()
             {
                 @Override
@@ -133,14 +187,32 @@ public class MapleParty {
                     return ( o1.getValue() ).compareTo( o2.getValue() );
                 }
             });
-        
+
         byte slot = 0;
         for(Entry<Integer, Integer> e: histList) {
             if(e.getKey() == cid) break;
             slot++;
         }
-        
+
         return slot;
+    }
+    
+    public void assignNewLeader(MapleClient c) {
+        World world = c.getWorldServer();
+        MaplePartyCharacter newLeadr = null;
+        
+        lock.lock();
+        try {
+            for(MaplePartyCharacter mpc : members) {
+                if(mpc.getId() != leaderId && (newLeadr == null || newLeadr.getLevel() < mpc.getLevel())) {
+                    newLeadr = mpc;
+                }
+            }
+        } finally {
+            lock.unlock();
+        }
+
+        if(newLeadr != null) world.updateParty(this.getId(), PartyOperation.CHANGE_LEADER, newLeadr);
     }
     
     @Override
