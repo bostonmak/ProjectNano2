@@ -23,6 +23,8 @@ package net;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -41,6 +43,7 @@ import tools.data.input.GenericSeekableLittleEndianAccessor;
 import tools.data.input.SeekableLittleEndianAccessor;
 import client.MapleClient;
 import constants.ServerConstants;
+import java.util.Arrays;
 
 import java.util.concurrent.locks.Lock;
 import tools.locks.MonitoredReentrantLock;
@@ -53,7 +56,8 @@ import server.TimerManager;
 import tools.locks.MonitoredLockType;
 
 public class MapleServerHandler extends IoHandlerAdapter {
-
+    private final static Set<Short> ignoredDebugRecvPackets = new HashSet<>(Arrays.asList((short) 167, (short) 197, (short) 89, (short) 91, (short) 41));
+    
     private PacketProcessor processor;
     private int world = -1, channel = -1;
     private static final SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
@@ -108,13 +112,12 @@ public class MapleServerHandler extends IoHandlerAdapter {
             FilePrinter.print(FilePrinter.SESSION, "IoSession with " + session.getRemoteAddress() + " opened on " + sdf.format(Calendar.getInstance().getTime()), false);
         }
 
-        byte key[] = {0x13, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, (byte) 0xB4, 0x00, 0x00, 0x00, 0x1B, 0x00, 0x00, 0x00, 0x0F, 0x00, 0x00, 0x00, 0x33, 0x00, 0x00, 0x00, 0x52, 0x00, 0x00, 0x00};
         byte ivRecv[] = {70, 114, 122, 82};
         byte ivSend[] = {82, 48, 120, 115};
         ivRecv[3] = (byte) (Math.random() * 255);
         ivSend[3] = (byte) (Math.random() * 255);
-        MapleAESOFB sendCypher = new MapleAESOFB(key, ivSend, (short) (0xFFFF - ServerConstants.VERSION));
-        MapleAESOFB recvCypher = new MapleAESOFB(key, ivRecv, (short) ServerConstants.VERSION);
+        MapleAESOFB sendCypher = new MapleAESOFB(ivSend, (short) (0xFFFF - ServerConstants.VERSION));
+        MapleAESOFB recvCypher = new MapleAESOFB(ivRecv, (short) ServerConstants.VERSION);
         MapleClient client = new MapleClient(sendCypher, recvCypher, session);
         client.setWorld(world);
         client.setChannel(channel);
@@ -151,7 +154,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
         short packetId = slea.readShort();
         MapleClient client = (MapleClient) session.getAttribute(MapleClient.CLIENT_KEY);
         
-        if(ServerConstants.USE_DEBUG_SHOW_RCVD_PACKET) System.out.println("Received packet id " + packetId);
+        if(ServerConstants.USE_DEBUG_SHOW_RCVD_PACKET && !ignoredDebugRecvPackets.contains(packetId)) System.out.println("Received packet id " + packetId);
         final MaplePacketHandler packetHandler = processor.getHandler(packetId);
         if (packetHandler != null && packetHandler.validateState(client)) {
             try {

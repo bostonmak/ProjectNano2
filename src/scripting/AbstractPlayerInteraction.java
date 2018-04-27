@@ -23,6 +23,7 @@ package scripting;
 
 import java.awt.Point;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -89,11 +90,15 @@ public class AbstractPlayerInteraction {
                 return c.getPlayer().getMap();
         }
         
+        public static int getHourOfDay() {
+                return Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        }
+        
         public int getMarketPortalId(int mapId) {
             return getMarketPortalId(getWarpMap(mapId));
         }
         
-        private int getMarketPortalId(MapleMap map) {
+        private static int getMarketPortalId(MapleMap map) {
             return (map.findMarketPortal() != null) ? map.findMarketPortal().getId() : map.getRandomPlayerSpawnpoint().getId();
         }
         
@@ -177,6 +182,10 @@ public class AbstractPlayerInteraction {
 		return getPlayer().getEventInstance();
 	}
         
+        public MapleInventory getInventory(int type) {
+                return getPlayer().getInventory(MapleInventoryType.getByType((byte) type));
+        }
+        
         public MapleInventory getInventory(MapleInventoryType type) {
                 return getPlayer().getInventory(type);
         }
@@ -217,7 +226,7 @@ public class AbstractPlayerInteraction {
                 return getPlayer().canHold(itemid, quantity);
         }
         
-        private List<Integer> convertToIntegerArray(List<Double> list) {
+        private static List<Integer> convertToIntegerArray(List<Double> list) {
                 List<Integer> intList = new LinkedList<>();
                 for(Double d: list) intList.add(d.intValue());
 
@@ -503,8 +512,8 @@ public class AbstractPlayerInteraction {
 	}
         
         public void gainFame(int delta) {
-            c.getPlayer().addFame(delta);
-            c.announce(MaplePacketCreator.getShowFameGain(delta));
+                c.getPlayer().addFame(delta);
+                c.announce(MaplePacketCreator.getShowFameGain(delta));
         }
 
 	public void changeMusic(String songName) {
@@ -779,7 +788,7 @@ public class AbstractPlayerInteraction {
 		c.announce(MaplePacketCreator.modifyInventory(false, Collections.singletonList(new ModifyInventory(0, newItem))));
 	}
         
-        public void spawnNpc(int npcId, Point pos, MapleMap map) {
+        public static void spawnNpc(int npcId, Point pos, MapleMap map) {
                 MapleNPC npc = MapleLifeFactory.getNPC(npcId);
                 if (npc != null) {
                         npc.setPosition(pos);
@@ -798,8 +807,12 @@ public class AbstractPlayerInteraction {
 		getPlayer().getMap().spawnMonster(monster);
 	}
         
-	public MapleMonster getMonsterLifeFactory(int mid) {
+	public static MapleMonster getMonsterLifeFactory(int mid) {
 		return MapleLifeFactory.getMonster(mid);
+	}
+        
+        public static MobSkill getMobSkill(int skill, int level) {
+		return MobSkillFactory.getMobSkill(skill, level);
 	}
 
 	public void spawnGuide() {
@@ -855,10 +868,6 @@ public class AbstractPlayerInteraction {
 
 	public boolean containsAreaInfo(short area, String info) {
 		return c.getPlayer().containsAreaInfo(area, info);
-	}
-
-	public MobSkill getMobSkill(int skill, int level) {
-		return MobSkillFactory.getMobSkill(skill, level);
 	}
 
 	public void earnTitle(String msg) {

@@ -773,7 +773,7 @@ public class MaplePacketCreator {
                 mplew.write(channelLoad.size());
                 for (Channel ch : channelLoad) {
                         mplew.writeMapleAsciiString(serverName + "-" + ch.getId());
-                        mplew.writeInt((ch.getConnectedClients() * 1200) / ServerConstants.CHANNEL_LOAD);
+                        mplew.writeInt(ch.getChannelCapacity());
                         mplew.write(1);
                         mplew.writeShort(ch.getId() - 1);
                 }
@@ -1394,6 +1394,18 @@ public class MaplePacketCreator {
                 return spawnMonsterInternal(life, true, false, false, 0, true);
         }
 
+        private static void encodeParentlessMobSpawnEffect(MaplePacketLittleEndianWriter mplew, boolean newSpawn, int effect) {
+                if (effect > 0) {
+                        mplew.write(effect);
+                        mplew.write(0);
+                        mplew.writeShort(0);
+                        if (effect == 15) {
+                                mplew.write(0);
+                        }
+                }
+                mplew.write(newSpawn ? -2 : -1);
+        }
+        
         /**
          * Internal function to handler monster spawning and controlling.
          *
@@ -1446,7 +1458,7 @@ public class MaplePacketCreator {
         		 * 14: Angry ^
         		 * 15: Orb animation thing, ??
         		 * 16: ??
-        		 * 19: Mushroom kingdom boss thing
+        		 * 19: Mushroom castle boss thing
         		 */
                 
                 if (life.getParentMobOid() != 0) {
@@ -1455,10 +1467,10 @@ public class MaplePacketCreator {
                                 mplew.write(effect != 0 ? effect : -3);
                                 mplew.writeInt(life.getParentMobOid());
                         } else {
-                                mplew.write(newSpawn ? -2 : -1);
+                                encodeParentlessMobSpawnEffect(mplew, newSpawn, effect);
                         }
                 } else {
-                	mplew.write(newSpawn ? -2 : -1);
+                	encodeParentlessMobSpawnEffect(mplew, newSpawn, effect);
                 }
                 
                 mplew.write(life.getTeam());
@@ -2570,7 +2582,7 @@ public class MaplePacketCreator {
         }
 
         /**
-         * It is important that statups is in the correct order (see decleration
+         * It is important that statups is in the correct order (see declaration
          * order in MapleBuffStat) since this method doesn't do automagical
          * reordering.
          *
@@ -3352,13 +3364,31 @@ public class MaplePacketCreator {
                 return mplew.getPacket();
         }
         
-        public static byte[] customShowBossHP(byte call, int oid, int currHP, int maxHP, byte tagColor, byte tagBgColor) {
+        private static Pair<Integer, Integer> normalizedCustomMaxHP(long currHP, long maxHP) {
+                int sendHP, sendMaxHP;
+            
+                if(maxHP <= Integer.MAX_VALUE) {
+                    sendHP = (int) currHP;
+                    sendMaxHP = (int) maxHP;
+                } else {
+                    float f = ((float) currHP) / maxHP;
+                    
+                    sendHP = (int) (Integer.MAX_VALUE * f);
+                    sendMaxHP = Integer.MAX_VALUE;
+                }
+                
+                return new Pair<>(sendHP, sendMaxHP);
+        }
+        
+        public static byte[] customShowBossHP(byte call, int oid, long currHP, long maxHP, byte tagColor, byte tagBgColor) {
+                Pair<Integer, Integer> customHP = normalizedCustomMaxHP(currHP, maxHP);
+            
                 final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
                 mplew.writeShort(SendOpcode.FIELD_EFFECT.getValue());
                 mplew.write(call);
                 mplew.writeInt(oid);
-                mplew.writeInt(currHP);
-                mplew.writeInt(maxHP);
+                mplew.writeInt(customHP.left);
+                mplew.writeInt(customHP.right);
                 mplew.write(tagColor);
                 mplew.write(tagBgColor);
                 return mplew.getPacket();

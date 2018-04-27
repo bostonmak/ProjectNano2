@@ -52,17 +52,18 @@ public class AutoAssignHandler extends AbstractMaplePacketHandler {
     @Override
     public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
         MapleCharacter chr = c.getPlayer();
+        if (chr.getRemainingAp() < 1) return;
+        
         int[] statGain = new int[4];
         int[] statEqpd = new int[4];
-        
         statGain[0] = 0; statGain[1] = 0; statGain[2] = 0; statGain[3] = 0;
         
         slea.skip(8);
-        if (chr.getRemainingAp() < 1) return;
         
         if(ServerConstants.USE_SERVER_AUTOASSIGNER) {
             // --------- Ronan Lana's AUTOASSIGNER ---------
             // This method excels for assigning APs in such a way to cover all equipments AP requirements.
+            byte opt = slea.readByte();     // useful for pirate autoassigning
             
             int str = 0, dex = 0, luk = 0, int_ = 0;
             List<Short> eqpStrList = new ArrayList<>();
@@ -106,7 +107,7 @@ public class AutoAssignHandler extends AbstractMaplePacketHandler {
             //c.getPlayer().message("SDL: s" + eqpStr + " d" + eqpDex + " l" + eqpLuk + " BASE STATS --> STR: " + chr.getStr() + " DEX: " + chr.getDex() + " INT: " + chr.getInt() + " LUK: " + chr.getLuk());
             //c.getPlayer().message("SUM EQUIP STATS -> STR: " + str + " DEX: " + dex + " LUK: " + luk + " INT: " + int_);
             
-            MapleJob stance = c.getPlayer().getJobStyle();
+            MapleJob stance = c.getPlayer().getJobStyle(opt);
             int prStat = 0, scStat = 0, trStat = 0, temp, tempAp = chr.getRemainingAp(), CAP;
             
             MapleStat primary, secondary, tertiary = MapleStat.LUK;
@@ -322,16 +323,13 @@ public class AutoAssignHandler extends AbstractMaplePacketHandler {
             //----------------------------------------------------------------------------------------
             
             c.announce(MaplePacketCreator.serverNotice(1, "Better AP applications detected:\r\nSTR: +" + statGain[0] + "\r\nDEX: +" + statGain[1] + "\r\nINT: +" + statGain[3] + "\r\nLUK: +" + statGain[2]));
-        }
-        else {
-            int total = 0;
-            int extras = 0;
+        } else {
             if(slea.available() < 16) {
                 AutobanFactory.PACKET_EDIT.alert(chr, "Didn't send full packet for Auto Assign.");
                 c.disconnect(false, false);
                 return;
             }
-            
+
             MapleInventory iv = chr.getInventory(MapleInventoryType.EQUIPPED);
             Collection<Item> equippedC = iv.list();
             for (Item item : equippedC) {   //selecting the biggest AP value of each stat from each equipped item.
@@ -343,6 +341,8 @@ public class AutoAssignHandler extends AbstractMaplePacketHandler {
                 statEqpd[3] += nEquip.getInt();
             }
             
+            int total = 0;
+            int extras = 0;
             for (int i = 0; i < 2; i++) {
                 int type = slea.readInt();
                 int tempVal = slea.readInt();

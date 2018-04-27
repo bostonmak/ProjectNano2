@@ -22139,12 +22139,7 @@
     </imgdir>
     <imgdir name="1">
       <int name="npc" value="1061019"/>
-      <int name="infoNumber" value="21761"/>
-      <imgdir name="infoex">
-        <imgdir name="0">
-          <string name="value" value="0"/>
-        </imgdir>
-      </imgdir>
+      <string name="endscript" value="q21728e"/>
     </imgdir>
   </imgdir>
   <imgdir name="21729">
@@ -22806,6 +22801,12 @@
         <int name="1" value="2111"/>
         <int name="2" value="2112"/>
       </imgdir>
+      <imgdir name="quest">
+        <imgdir name="0">
+          <int name="id" value="21749"/>
+          <int name="state" value="2"/>
+        </imgdir>
+      </imgdir>
     </imgdir>
     <imgdir name="1">
       <int name="npc" value="2131000"/>
@@ -22881,12 +22882,6 @@
       <int name="npc" value="2131000"/>
       <int name="lvmin" value="63"/>
       <string name="startscript" value="q21753s"/>
-      <int name="infoNumber" value="21764"/>
-      <imgdir name="infoex">
-        <imgdir name="0">
-          <string name="value" value="1"/>
-        </imgdir>
-      </imgdir>
       <imgdir name="quest">
         <imgdir name="0">
           <int name="id" value="21751"/>
@@ -22908,12 +22903,6 @@
       <int name="npc" value="1012100"/>
       <int name="lvmin" value="63"/>
       <string name="startscript" value="q21754s"/>
-      <int name="infoNumber" value="21765"/>
-      <imgdir name="infoex">
-        <imgdir name="0">
-          <string name="value" value="2"/>
-        </imgdir>
-      </imgdir>
       <imgdir name="quest">
         <imgdir name="0">
           <int name="id" value="21753"/>

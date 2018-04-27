@@ -166,7 +166,7 @@ INSERT IGNORE INTO `shopitems` (`shopid`, `itemid`, `price`, `pitch`, `position`
 (9270022, 2030100, 450, 0, 118);
 
 # Thanks to Vcoc
-# GMShop: Sacks, GmEquip, Cheese & Onix, Utils, 
+# GMShop: Sacks, GmEquip, Cheese & Onyx, Utils, 
 #         Arrows, Bullets, Throwings and Capsules,
 #         Others, Equips, Mounts, Scrolls.
 
@@ -255,7 +255,8 @@ INSERT INTO `shopitems` ( `shopid`, `itemid`, `price`, `position`) VALUES
 (1337, 2043712, 1, 81),
 (1337, 2340000, 1, 82),
 (1337, 2040807, 1, 83),
-(1337, 2210032, 1, 84);
+(1337, 2210032, 1, 84),
+(1337, 2050004, 1, 85);
 
 # Thanks to DietStory dev team
 INSERT INTO `shopitems` ( `shopid`, `itemid`, `price`, `pitch`, `position`) VALUES
@@ -336,3 +337,15 @@ INSERT INTO `shopitems` ( `shopid`, `itemid`, `price`, `pitch`, `position`) VALU
  (1301000, 2000002, 320, 0, 164),
  (1301000, 2000015, 160, 0, 168),
  (1301000, 2000000, 50, 0, 172);
+
+# adding missing pirate items at Singapore npc's
+INSERT INTO `shopitems` ( `shopid`, `itemid`, `price`, `pitch`, `position`) VALUES
+ (9270019, 1492006, 160000, 0, 80),
+ (9270019, 1492005, 100000, 0, 84),
+ (9270019, 1492004, 75000, 0, 88),
+ (9270019, 1482006, 150000, 0, 92),
+ (9270019, 1482005, 100000, 0, 96),
+ (9270019, 1482004, 75000, 0, 100),
+ (9270020, 1052113, 120000, 0, 92),
+ (9270020, 1052110, 100000, 0, 96),
+ (9270020, 1002625, 75000, 0, 100);

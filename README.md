@@ -20,9 +20,17 @@ Server files: https://github.com/ronancpl/HeavenMS
 
 Client files & general tools: https://drive.google.com/drive/folders/0BzDsHSr-0V4MYVJ0TWIxd05hYUk
 
-Recommended localhost: https://hostr.co/r5QDmhlxpp8M
+**Important note about localhosts**: these executables are red-flagged by antivirus tools as __potentially malicious softwares__, this happens due to the reverse engineering methods that were applied onto these software artifacts. Those depicted here have been put to use for years already and posed no harm so far, so they are soundly assumed to be safe.
 
-* MapleSilver's starting on window-mode, with some string fixes. This is a variation of Fraysa's https://hostr.co/gJbLZITRVHmv
+Recommended localhost: https://hostr.co/fuzm4X9j7TWh
+
+* Current revision: 'n' problem fixed and removed caps for WATK, WDEF, MDEF, ACC, AVOID.
+
+  * 'n' problem fixed https://hostr.co/r5QDmhlxpp8M
+
+  * Fraysa's https://hostr.co/gJbLZITRVHmv
+
+  * MapleSilver's starting on window-mode
 
 ---
 ### Support us
@@ -57,16 +65,6 @@ Now install the Java 7 Development Kit:
 
 * jdk-7u79-windows-x64.exe
 * netbeans-8.0.2-javase-windows.exe -> It's a NetBeans project, use other IDE at your own risk.
-
-Overwrite whenever prompted with the JAR files under "jce_policy-7/UnlimitedJCEPolicy" in these Java folders:
-
-* C:\Program Files\Java\jre7\lib
-* C:\Program Files\Java\jre7\lib\ext
-* C:\Program Files\Java\jre7\lib\security
-* C:\Program Files\Java\jdk1.7.0_01\lib
-* C:\Program Files\Java\jdk1.7.0_01\jre\lib
-* C:\Program Files\Java\jdk1.7.0_01\jre\lib\ext
-* C:\Program Files\Java\jdk1.7.0_01\jre\lib\security
 
 Now that the tools have been installed, test if they are working.
 

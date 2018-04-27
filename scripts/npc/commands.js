@@ -8,6 +8,9 @@
 
 var status;
 
+var common_heading = "@";
+var staff_heading = "!";
+
 var comm_lv6 = [];
 var desc_lv6 = [];
 
@@ -99,6 +102,7 @@ function writeSolaxiaCommandsLv3() {    //GM
         comm_cursor = comm_lv3;
         desc_cursor = desc_lv3;
 
+        addCommand("debuff", "");
         addCommand("fly", "");
         addCommand("spawn", "");
         addCommand("mutemap", "");
@@ -152,6 +156,7 @@ function writeSolaxiaCommandsLv2() {    //JrGM
         comm_cursor = comm_lv2;
         desc_cursor = desc_lv2;
 
+        addCommand("whereami", "");
         addCommand("hide", "");
         addCommand("unhide", "");
         addCommand("sp", "");
@@ -175,6 +180,7 @@ function writeSolaxiaCommandsLv2() {    //JrGM
         addCommand("setstat", "");
         addCommand("maxstat", "");
         addCommand("maxskill", "");
+        addCommand("resetskill", "");
         addCommand("mesos", "");
         addCommand("search", "");
         addCommand("jail", "");
@@ -187,10 +193,13 @@ function writeSolaxiaCommandsLv1() {    //Donator
         comm_cursor = comm_lv1;
         desc_cursor = desc_lv1;
 
+        addCommand("bosshp", "");
+        addCommand("mobhp", "");
+        addCommand("whatdropsfrom", "");
+        addCommand("whodrops", "");
         addCommand("buffme", "");
         addCommand("goto", "");
         addCommand("recharge", "");
-        addCommand("whereami", "");
 }
 
 function writeSolaxiaCommandsLv0() {    //Common
@@ -203,20 +212,21 @@ function writeSolaxiaCommandsLv0() {    //Common
         addCommand("credits", "");
         addCommand("uptime", "");
         addCommand("gacha", "");
-        addCommand("whatdropsfrom", "");
-        addCommand("whodrops", "");
         addCommand("dispose", "");
         addCommand("equiplv", "");
         addCommand("showrates", "");
         addCommand("rates", "");
         addCommand("online", "");
         addCommand("gm", "");
-        addCommand("bug", "");
+        addCommand("reportbug", "");
 	//addCommand("points", "");
         addCommand("joinevent", "");
         addCommand("leaveevent", "");
-        addCommand("bosshp", "");
         addCommand("ranks", "");
+        addCommand("str", "");
+        addCommand("dex", "");
+        addCommand("int", "");
+        addCommand("luk", "");
 }
 
 function writeSolaxiaCommands() {
@@ -256,7 +266,7 @@ function action(mode, type, selection) {
 
                         cm.sendSimple(sendStr);
                 } else if(status == 1) {
-                        var lvComm, lvDesc;
+                        var lvComm, lvDesc, lvHead = (cm.getPlayer().gmLevel() < 2) ? common_heading : staff_heading;
 
                         if(selection == 0) {
                                 lvComm = comm_lv0;
@@ -283,7 +293,7 @@ function action(mode, type, selection) {
 
                         var sendStr = "The following commands are available for #b" + levels[selection] + "#k:\r\n\r\n";
                         for(var i = 0; i < lvComm.length; i++) {
-                            sendStr += "  #L" + i + "# " + lvComm[i] + " - " + lvDesc[i];
+                            sendStr += "  #L" + i + "# " + lvHead + lvComm[i] + " - " + lvDesc[i];
                             sendStr += "#l\r\n";
                         }
 

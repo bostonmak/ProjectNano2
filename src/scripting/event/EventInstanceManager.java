@@ -271,10 +271,8 @@ public class EventInstanceManager {
 	}
         
         public void dropMessage(int type, String message) {
-                if(!eventCleared) {
-                        for (MapleCharacter chr : getPlayers()) {
-                                chr.dropMessage(type, message);
-                        }
+                for (MapleCharacter chr : getPlayers()) {
+                        chr.dropMessage(type, message);
                 }
         }
 
@@ -422,6 +420,16 @@ public class EventInstanceManager {
                 rL.lock();
                 try {
                         return chars.size();
+                }
+                finally {
+                        rL.unlock();
+                }
+	}
+        
+        public MapleCharacter getPlayerById(int id) {
+                rL.lock();
+                try {
+                        return chars.get(id);
                 }
                 finally {
                         rL.unlock();
@@ -905,6 +913,21 @@ public class EventInstanceManager {
                 }
         }
         
+        public void dispatchUpdateQuestMobCount(int mobid, int mapid) {
+            Map<Integer, MapleCharacter> mapChars = getInstanceMap(mapid).getMapPlayers();
+            if(!mapChars.isEmpty()) {
+                List<MapleCharacter> eventMembers = getPlayers();
+                
+                for (MapleCharacter evChr : eventMembers) {
+                    MapleCharacter chr = mapChars.get(evChr.getId());
+
+                    if(chr != null && chr.isLoggedin() && !chr.isAwayFromWorld()) {
+                        chr.updateQuestMobCount(mobid);
+                    }
+                }
+            }
+        }
+        
         public MapleMonster getMonster(int mid) {
                 return(MapleLifeFactory.getMonster(mid));
         }
@@ -1328,6 +1351,15 @@ public class EventInstanceManager {
                 try {
                         Integer i = playerGrid.get(chr.getId());
                         return (i != null) ? i : -1;
+                } finally {
+                        rL.unlock();
+                }
+        }
+        
+        public final int gridSize() {
+                rL.lock();
+                try {
+                        return playerGrid.size();
                 } finally {
                         rL.unlock();
                 }

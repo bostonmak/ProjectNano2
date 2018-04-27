@@ -43,6 +43,7 @@ Quests:
 * Loads of quests have been patched.
 * Quest rewards according to jobs works properly.
 * Enchanced rewarding system: checks for stacking opportunities on the inventory before checking for new slots.
+* Complete overhaul on the 3rd job quiz (explorers), with all 40-question pool now made available.
 
 Player Social Network:
 
@@ -69,6 +70,7 @@ Monsters, Maps & Reactors:
 * Added meso drop data for basically every missing overworld mob.
 * Monsterbook displays drop data info conformant with the underlying DB (needs custom wz). See more on the MobBookUpdate feature.
 * Every skill/mastery book is now droppable by mobs.
+* Mobs now can drop more than one of the same equipment (number of possible drops defined at droptime, uses the minimum/maximum quantity fields on DB).
 * Added Boss HP Bar for dozens of bosses (needs provided custom wz).
 * If multiple bosses are on the same area, client will prioritize Boss HP bar of the target of the player.
 * Boats, elevator and other travelling mechanics fully working.
@@ -98,6 +100,7 @@ Server potentials:
 * Enhanced auto-pot system: pet uses as many potions as necessary to reach the desired threshold.
 * Enhanced buff system: smartly checks for the best available buff effects to be active on the player.
 * Enhanced AP auto-assigner: exactly matches AP with the needed for the player's current level, surplus assigned to the primary attribute.
+* Channel capacity bar functional and world servers with max capacity checks.
 * Mastery book announcer displays droppers of needed books of a player, by reading underlying DB.
 * Custom jail system (needs provided custom wz).
 * Delete Character (requires ENABLE_PIC activated).
@@ -115,6 +118,8 @@ Admin/GM commands:
 External tools:
 
 * MapleArrowFetcher - Updates min/max quantity dropped on all arrows drop data, calculations based on mob level and whether it's a boss or not.
+* MapleBossHpBarFetcher - Searches the quest WZ files and reports in all relevant data regarding mobs that has a boss HP bar whilst not having a proper "boss" label.
+* MapleCashDropFetcher - Searches the DB for any CASH drop data entry and lists them on a report file.
 * MapleCouponInstaller - Retrieves coupon info from the WZ and makes a SQL table with it. The server will use that table to gather info regarding rates and intervals.
 * MapleIdRetriever - Two behaviors: generates a SQL table with relation (id, name) of the handbook given as input. Given a file with names, outputs a file with ids.
 * MapleInvalidItemIdFetcher - Generates a file listing all inexistent itemid's currently laying on the DB.
@@ -122,6 +127,8 @@ External tools:
 * MapleMesoFetcher - Creates meso drop data for mobs with more than 4 items (thus overworld mobs), calculations based on mob level and whether it's a boss or not.
 * MapleMobBookIndexer - Generates a SQL table with all relations of cardid and mobid present in the mob book.
 * MapleMobBookUpdate - Generates a wz.xml that is a copy of the original MonsterBook.wz.xml, except it updates the drop data info in the book with those currently on DB.
+* MapleQuestlineFetcher - Searches the quest WZ files and reports in all questids that currently doesn't have script files.
+* MapleQuestItemCountFetcher - Searches the quest WZ files and reports in all relevant data regarding missing "count" labels on item acts at "complete quest".
 * MapleQuestItemFetcher - Searches the SQL tables and project files and reports in all relevant data regarding missing/erroneous quest items.
 * MapleQuestMesoFetcher - Searches the quest WZ files and reports in all relevant data regarding missing/erroneous quest fee checks.
 * MapleSkillMakerFetcher - Updates the DB Maker-related tables with the current info present on the WZs.
@@ -135,5 +142,16 @@ Project:
 * Reviewed many Java object aspects that needed concurrency protection.
 * Heavily reviewed future task management inside the project. Way less trivial schedules are spawned now, relieving task overload on the TimerManager.
 * ThreadTracker: embedded auditing tool for run-time deadlock scanning throughout the server source (relies heavily on memory usage, designed only for debugging purposes).
+
+Exploits patched:
+
+* Player being given free access to any character of any account once they have authenticated their account on login phase.
+* Player being given permission to delete any character of any account once they have authenticated their account on login phase.
+* Player being able to start/complete any quest freely.
+
+Localhost:
+
+* Removed the 'n' problem within NPC dialog.
+* Removed caps for MATK, WDEF, MDEF, ACC and AVOID.
 
 ---------------------------

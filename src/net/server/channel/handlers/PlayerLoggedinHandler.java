@@ -46,14 +46,17 @@ import client.BuddylistEntry;
 import client.CharacterNameAndId;
 import client.MapleCharacter;
 import client.MapleClient;
+import client.MapleDisease;
 import client.MapleFamily;
 import client.SkillFactory;
 import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import constants.GameConstants;
 import constants.ServerConstants;
+import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Map;
 
 public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
 
@@ -69,6 +72,11 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
         MapleCharacter player = c.getWorldServer().getPlayerStorage().getCharacterById(cid);
         boolean newcomer = false;
         if (player == null) {
+            if(!server.validateCharacteridInTransition((InetSocketAddress) c.getSession().getRemoteAddress(), cid)) {
+                c.disconnect(true, false);
+                return;
+            }
+            
             try {
                 player = MapleCharacter.loadCharFromDB(cid, c, true);
                 newcomer = true;
@@ -90,16 +98,22 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
         boolean allowLogin = true;
         Channel cserv = c.getChannelServer();
 
+        /*  is this check really necessary?
         if (state == MapleClient.LOGIN_SERVER_TRANSITION || state == MapleClient.LOGIN_NOTLOGGEDIN) {
-            for (String charName : c.loadCharacterNames(c.getWorld())) {
-                for (Channel ch : c.getWorldServer().getChannels()) {
-                    if (ch.isConnected(charName)) {
-                        allowLogin = false;
-                    }
+            List<String> charNames = c.loadCharacterNames(c.getWorld());
+            if(!newcomer) {
+                charNames.remove(player.getName());
+            }
+            
+            for (String charName : charNames) {
+                if(c.getWorldServer().getPlayerStorage().getCharacterByName(charName) != null) {
+                    allowLogin = false;
+                    break;
                 }
-                break;
             }
         }
+        */
+        
         if (state != MapleClient.LOGIN_SERVER_TRANSITION || !allowLogin) {
             c.setPlayer(null);
             c.announce(MaplePacketCreator.getAfterLoginError(7));
@@ -113,6 +127,11 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
         if (buffs != null) {
             List<Pair<Long, PlayerBuffValueHolder>> timedBuffs = getLocalStartTimes(buffs);
             player.silentGiveBuffs(timedBuffs);
+        }
+        
+        Map<MapleDisease, Long> diseases = server.getPlayerBuffStorage().getDiseasesFromStorage(cid);
+        if (diseases != null) {
+            player.silentApplyDiseases(diseases);
         }
         
         c.announce(MaplePacketCreator.getCharInfo(player));

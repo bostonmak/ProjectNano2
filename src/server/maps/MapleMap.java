@@ -559,7 +559,7 @@ public class MapleMap {
         }
         
         distn = Math.sqrt(distn);
-        return new Pair(getRoundedCoordinate(angle), Integer.valueOf((int)distn));
+        return new Pair<>(getRoundedCoordinate(angle), Integer.valueOf((int)distn));
     }
 
     private static void sortDropEntries(List<MonsterDropEntry> from, List<MonsterDropEntry> item, List<MonsterDropEntry> quest) {
@@ -667,7 +667,7 @@ public class MapleMap {
         
         final List<MonsterDropEntry>  dropEntry = new ArrayList<>();
         final List<MonsterDropEntry> questEntry = new ArrayList<>();
-        sortDropEntries(mi.retrieveDrop(mob.getId()), dropEntry, questEntry);
+        sortDropEntries(mi.retrieveEffectiveDrop(mob.getId()), dropEntry, questEntry);
         
         // Normal Drops
         d = dropItemsFromMonsterOnMap(dropEntry, pos, d, chRate, droptype, mobpos, chr, mob);
@@ -1077,7 +1077,7 @@ public class MapleMap {
             }
         }
     }
-
+    
     public void killMonster(final MapleMonster monster, final MapleCharacter chr, final boolean withDrops) {
         killMonster(monster, chr, withDrops, 1);
     }
@@ -1180,17 +1180,34 @@ public class MapleMap {
     }
 
     public void killMonster(int mobId) {
-        List<MapleMapObject> mmoL = new LinkedList(getMapObjects());
+        MapleCharacter chr = (MapleCharacter) getPlayers().get(0);
+        List<MapleMonster> mobList = getMonsters();
         
-        for (MapleMapObject mmo : mmoL) {
-            if (mmo instanceof MapleMonster) {
-                if (((MapleMonster) mmo).getId() == mobId) {
-                    this.killMonster((MapleMonster) mmo, (MapleCharacter) getPlayers().get(0), false);
+        for (MapleMonster mob : mobList) {    
+            if (mob.getId() == mobId) {
+                this.killMonster(mob, chr, false);
+            }
+        }
+    }
+    
+    public void killMonsterWithDrops(int mobId) {
+        Map<Integer, MapleCharacter> mapChars = this.getMapPlayers();
+        
+        if(!mapChars.isEmpty()) {
+            MapleCharacter defaultChr = mapChars.entrySet().iterator().next().getValue();
+            List<MapleMonster> mobList = getMonsters();
+            
+            for (MapleMonster mob : mobList) {
+                if (mob.getId() == mobId) {
+                    MapleCharacter chr = mapChars.get(mob.getHighestDamagerId());
+                    if(chr == null) chr = defaultChr;
+                    
+                    this.killMonster(mob, chr, true);
                 }
             }
         }
     }
-
+    
     public void monsterCloakingDevice() {
         for (MapleMapObject monstermo : getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.MONSTER))) {
             MapleMonster monster = (MapleMonster) monstermo;
@@ -1347,9 +1364,9 @@ public class MapleMap {
         
         objectRLock.lock();
         try {
-            for (Object obj : list) {
-                if(obj instanceof MapleMapObject) {
-                    MapleMapObject mmo = (MapleMapObject) obj;
+            for (Object ob : list) {
+                if(ob instanceof MapleMapObject) {
+                    MapleMapObject mmo = (MapleMapObject) ob;
                     
                     if(mapobjects.containsValue(mmo) && mmo.getType() == MapleMapObjectType.REACTOR) {
                         listObjects.add(mmo);
@@ -1429,6 +1446,19 @@ public class MapleMap {
         }
     }
 
+    public MapleNPC getNPCById(int id) {
+        for (MapleMapObject obj : getMapObjects()) {
+            if (obj.getType() == MapleMapObjectType.NPC) {
+                MapleNPC npc = (MapleNPC) obj;
+                if (npc.getId() == id) {
+                    return npc;
+                }
+            }
+        }
+        
+        return null;
+    }
+    
     public boolean containsNPC(int npcid) {
         if (npcid == 9000066) {
             return true;
@@ -2678,6 +2708,22 @@ public class MapleMap {
         }
     }
 
+    public Map<Integer, MapleCharacter> getMapPlayers() {
+        chrRLock.lock();
+        try {
+            Map<Integer, MapleCharacter> mapChars = new HashMap<>(characters.size());
+            
+            for(MapleCharacter chr : characters) {
+                mapChars.put(chr.getId(), chr);
+            }
+            
+            return mapChars;
+        }
+        finally {
+            chrRLock.unlock();
+        }
+    }
+    
     public Collection<MapleCharacter> getCharacters() {
         chrRLock.lock();
         try {

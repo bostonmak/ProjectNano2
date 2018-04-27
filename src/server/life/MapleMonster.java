@@ -35,7 +35,6 @@ import constants.skills.ILMage;
 import constants.skills.NightLord;
 import constants.skills.NightWalker;
 import constants.skills.Shadower;
-import constants.skills.SuperGM;
 import java.awt.Point;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -47,7 +46,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -384,7 +383,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
         }
         
         Collection<MapleCharacter> chrs = map.getCharacters();
-        Set<MapleCharacter> underleveled = new LinkedHashSet<>();
+        Set<MapleCharacter> underleveled = new HashSet<>();
         for (MapleCharacter mc : chrs) {
             if (expDist.containsKey(mc.getId())) {
                 boolean isKiller = (mc.getId() == killerId);
@@ -436,13 +435,8 @@ public class MapleMonster extends AbstractLoadedMapleLife {
                     partyExp = (int) (personalExp * partyModifier * ServerConstants.PARTY_BONUS_EXP_RATE);
                 }
                 Integer holySymbol = attacker.getBuffedValue(MapleBuffStat.HOLY_SYMBOL);
-                boolean GMHolySymbol = attacker.getBuffSource(MapleBuffStat.HOLY_SYMBOL) == SuperGM.HOLY_SYMBOL;
                 if (holySymbol != null) {
-                    if (numExpSharers == 1 && !GMHolySymbol) {
-                        personalExp *= 1.0 + (holySymbol.doubleValue() / 500.0);
-                    } else {
-                        personalExp *= 1.0 + (holySymbol.doubleValue() / 100.0);
-                    }
+                    personalExp *= 1.0 + (holySymbol.doubleValue() / 100.0);
                 }
                 
                 statiLock.lock();
@@ -457,7 +451,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
             
             attacker.gainExp(personalExp, partyExp, true, false, isKiller);
             attacker.increaseEquipExp(personalExp);
-            attacker.mobKilled(getId());
+            attacker.updateQuestMobCount(getId());
         }
     }
 
@@ -540,8 +534,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
                     }
                 }, getAnimationTime("die1"));
             }
-        }
-        else {  // is this even necessary?
+        } else {  // is this even necessary?
             System.out.println("[CRITICAL LOSS] toSpawn is null for " + this.getName());
         }
         
@@ -549,7 +542,29 @@ public class MapleMonster extends AbstractLoadedMapleLife {
         return looter != null ? looter : killer;
     }
     
+    private void dispatchUpdateQuestMobCount() {
+        Set<Integer> attackerChrids = takenDamage.keySet();
+        if(!attackerChrids.isEmpty()) {
+            Map<Integer, MapleCharacter> mapChars = map.getMapPlayers();
+            if(!mapChars.isEmpty()) {
+                int mobid = getId();
+                
+                for (Integer chrid : attackerChrids) {
+                    MapleCharacter chr = mapChars.get(chrid);
+
+                    if(chr != null && chr.isLoggedin() && !chr.isAwayFromWorld()) {
+                        chr.updateQuestMobCount(mobid);
+                    }
+                }
+            }
+        }
+    }
+    
     public void dispatchMonsterKilled(boolean hasKiller) {
+        if(!hasKiller) {
+            dispatchUpdateQuestMobCount();
+        }
+        
         if (getMap().getEventInstance() != null) {
             if (!this.getStats().isFriendly()) {
                 getMap().getEventInstance().monsterKilled(this, hasKiller);
@@ -575,8 +590,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
         }
     }
 
-    // should only really be used to determine drop owner
-    private int getHighestDamagerId() {
+    public int getHighestDamagerId() {
         int curId = 0;
         int curDmg = 0;
 
@@ -869,12 +883,12 @@ public class MapleMonster extends AbstractLoadedMapleLife {
         } else if (venom) {
             if (from.getJob() == MapleJob.NIGHTLORD || from.getJob() == MapleJob.SHADOWER || from.getJob().isA(MapleJob.NIGHTWALKER3)) {
                 int poisonLevel, matk, jobid = from.getJob().getId();
-                int skill = (jobid == 412 ? NightLord.VENOMOUS_STAR : (jobid == 422 ? Shadower.VENOMOUS_STAB : NightWalker.VENOM));
-                poisonLevel = from.getSkillLevel(SkillFactory.getSkill(skill));
+                int skillid = (jobid == 412 ? NightLord.VENOMOUS_STAR : (jobid == 422 ? Shadower.VENOMOUS_STAB : NightWalker.VENOM));
+                poisonLevel = from.getSkillLevel(SkillFactory.getSkill(skillid));
                 if (poisonLevel <= 0) {
                     return false;
                 }
-                matk = SkillFactory.getSkill(skill).getEffect(poisonLevel).getMatk();
+                matk = SkillFactory.getSkill(skillid).getEffect(poisonLevel).getMatk();
                 int luk = from.getLuk();
                 int maxDmg = (int) Math.ceil(Math.min(Short.MAX_VALUE, 0.2 * luk * matk));
                 int minDmg = (int) Math.ceil(Math.min(Short.MAX_VALUE, 0.1 * luk * matk));
@@ -904,7 +918,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
         } else if (status.getSkill().getId() == 4121004 || status.getSkill().getId() == 4221004) { // Ninja Ambush
             final Skill skill = SkillFactory.getSkill(status.getSkill().getId());
             final byte level = from.getSkillLevel(skill);
-            final int damage = (int) ((from.getStr() + from.getLuk()) * (1.5 + (level * 0.05)) * skill.getEffect(level).getDamage());
+            final int damage = (int) ((from.getStr() + from.getLuk()) * ((3.7 * skill.getEffect(level).getDamage()) / 100));
             
             status.setValue(MonsterStatus.NINJA_AMBUSH, Integer.valueOf(damage));
             animationTime = broadcastStatusEffect(status);
@@ -1169,7 +1183,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
             }
             if (damage > 0) {
                 damage(chr, damage, true);
-                if (type == 1 || type == 2) {
+                if (type == 1) {    // ninja ambush (type 2) is already displaying DOT
                     map.broadcastMessage(MaplePacketCreator.damageMonster(getObjectId(), damage), getPosition());
                 }
             }

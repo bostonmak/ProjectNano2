@@ -68,6 +68,8 @@ import server.life.MapleLifeFactory;
 import server.life.MapleMonster;
 import server.life.MapleMonsterInformationProvider;
 import server.life.MapleNPC;
+import server.life.MobSkill;
+import server.life.MobSkillFactory;
 import server.life.MonsterDropEntry;
 import server.maps.MapleMap;
 import server.maps.MapleMapItem;
@@ -89,6 +91,7 @@ import tools.data.output.MaplePacketLittleEndianWriter;
 import client.MapleBuffStat;
 import client.MapleCharacter;
 import client.MapleClient;
+import client.MapleDisease;
 import client.MapleJob;
 import client.MapleStat;
 import client.Skill;
@@ -294,6 +297,7 @@ public class Commands {
 		gotomaps.put("herb", 251000000);
 		gotomaps.put("omega", 221000000);
 		gotomaps.put("korean", 222000000);
+                gotomaps.put("ellin", 300000000);
 		gotomaps.put("nlc", 600000000);
 		gotomaps.put("excavation", 990000000);
 		gotomaps.put("pianus", 230040420);
@@ -351,7 +355,7 @@ public class Commands {
                 case "playercommands":
                         c.getAbstractPlayerInteraction().openNpc(9201143, "commands");
                         break;
-                    
+                
                 case "droplimit":
                         int dropCount = c.getPlayer().getMap().getDroppedItemCount();
                         if(((float) dropCount) / ServerConstants.ITEM_LIMIT_ON_MAP < 0.75f) {
@@ -402,90 +406,14 @@ public class Commands {
 				}
                         break;
 			}
-			String output = "The #b" + gachaName + "#k Gachapon contains the following items.\r\n\r\n";
+			String talkStr = "The #b" + gachaName + "#k Gachapon contains the following items.\r\n\r\n";
 			for (int i = 0; i < 2; i++){
 				for (int id : gacha.getItems(i)){
-					output += "-" + MapleItemInformationProvider.getInstance().getName(id) + "\r\n";
+					talkStr += "-" + MapleItemInformationProvider.getInstance().getName(id) + "\r\n";
 				}
 			}
-			output += "\r\nPlease keep in mind that there are items that are in all gachapons and are not listed here.";
-			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, output, "00 00", (byte) 0));
-			break;
-                    
-		case "whatdropsfrom":
-			if (sub.length < 2) {
-				player.dropMessage(5, "Please do @whatdropsfrom <monster name>");
-                        break;
-			}
-			String monsterName = joinStringFrom(sub, 1);
-			output = "";
-			int limit = 3;
-			Iterator<Pair<Integer, String>> listIterator = MapleMonsterInformationProvider.getMobsIDsFromName(monsterName).iterator();
-			for (int i = 0; i < limit; i++) {
-				if(listIterator.hasNext()) {
-					Pair<Integer, String> data = listIterator.next();
-					int mobId = data.getLeft();
-					String mobName = data.getRight();
-					output += mobName + " drops the following items:\r\n\r\n";
-					for (MonsterDropEntry drop : MapleMonsterInformationProvider.getInstance().retrieveDrop(mobId)){
-						try {
-							String name = MapleItemInformationProvider.getInstance().getName(drop.itemId);
-							if (name.equals("null") || drop.chance == 0){
-								continue;
-							}
-							float chance = 1000000 / drop.chance / player.getDropRate();
-							output += "- " + name + " (1/" + (int) chance + ")\r\n";
-						} catch (Exception ex){
-                                                        ex.printStackTrace();
-							continue;
-						}
-					}
-					output += "\r\n";
-				}
-			}
-			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, output, "00 00", (byte) 0));
-			break;
-                    
-		case "whodrops":
-			if (sub.length < 2) {
-				player.dropMessage(5, "Please do @whodrops <item name>");
-                        break;
-			}
-			String searchString = joinStringFrom(sub, 1);
-			output = "";
-			listIterator = MapleItemInformationProvider.getInstance().getItemDataByName(searchString).iterator();
-			if(listIterator.hasNext()) {
-				int count = 1;
-				while(listIterator.hasNext() && count <= 3) {
-					Pair<Integer, String> data = listIterator.next();
-					output += "#b" + data.getRight() + "#k is dropped by:\r\n";
-					try {
-                                                Connection con = DatabaseConnection.getConnection();
-						PreparedStatement ps = con.prepareStatement("SELECT dropperid FROM drop_data WHERE itemid = ? LIMIT 50");
-						ps.setInt(1, data.getLeft());
-						ResultSet rs = ps.executeQuery();
-						while(rs.next()) {
-							String resultName = MapleMonsterInformationProvider.getMobNameFromID(rs.getInt("dropperid"));
-							if (resultName != null) {
-								output += resultName + ", ";
-							}
-						}
-						rs.close();
-						ps.close();
-                                                con.close();
-					} catch (Exception e) {
-						player.dropMessage(6, "There was a problem retrieving the required data. Please try again.");
-						e.printStackTrace();
-						break;
-					}
-					output += "\r\n\r\n";
-					count++;
-				}
-			} else {
-				player.dropMessage(5, "The item you searched for doesn't exist.");
-                        break;
-			}
-			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, output, "00 00", (byte) 0));
+			talkStr += "\r\nPlease keep in mind that there are items that are in all gachapons and are not listed here.";
+			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, talkStr, "00 00", (byte) 0));
 			break;
                     
 		case "dispose":
@@ -560,7 +488,7 @@ public class Commands {
 			player.dropMessage(5, tips[Randomizer.nextInt(tips.length)]);
 			break;
                     
-		case "bug":
+		case "reportbug":
                     
 			if (sub.length < 2) {
 				player.dropMessage(5, "Message too short and not sent. Please do @bug <bug>");
@@ -636,21 +564,6 @@ public class Commands {
 			}
 			break;
                     
-		case "bosshp":
-			for(MapleMonster monster : player.getMap().getMonsters()) {
-				if(monster != null && monster.isBoss() && monster.getHp() > 0) {
-					long percent = monster.getHp() * 100L / monster.getMaxHp();
-					String bar = "[";
-					for (int i = 0; i < 100; i++){
-						bar += i < percent ? "|" : ".";
-					}
-					bar += "]";
-					player.yellowMessage(monster.getName() + " (" + monster.getId() + ") has " + percent + "% HP left.");
-					player.yellowMessage("HP: " + bar);
-				}
-			} 
-			break;
-                    
 		case "ranks":
 			PreparedStatement ps = null;
 			ResultSet rs = null;
@@ -682,6 +595,47 @@ public class Commands {
 				}
 			}
 			break;
+                    
+                // stat autoassigning command credited to HeliosMS dev team
+                case "str":
+                case "dex":
+                case "int":
+                case "luk":
+                        int amount = (sub.length > 1) ? Integer.parseInt(sub[1]) : player.getRemainingAp();
+                        boolean str = sub[0].equalsIgnoreCase("str");
+                        boolean Int = sub[0].equalsIgnoreCase("int");
+                        boolean luk = sub[0].equalsIgnoreCase("luk");
+                        boolean dex = sub[0].equalsIgnoreCase("dex");
+
+                        if (amount > 0 && amount <= player.getRemainingAp() && amount <= 32763 || amount < 0 && amount >= -32763 && Math.abs(amount) + player.getRemainingAp() <= 32767) {
+                            if (str && amount + player.getStr() <= 32767 && amount + player.getStr() >= 4) {
+                                player.setStr(player.getStr() + amount);
+                                player.updateSingleStat(MapleStat.STR, player.getStr());
+                                player.setRemainingAp(player.getRemainingAp() - amount);
+                                player.updateSingleStat(MapleStat.AVAILABLEAP, player.getRemainingAp());
+                            } else if (Int && amount + player.getInt() <= 32767 && amount + player.getInt() >= 4) {
+                                player.setInt(player.getInt() + amount);
+                                player.updateSingleStat(MapleStat.INT, player.getInt());
+                                player.setRemainingAp(player.getRemainingAp() - amount);
+                                player.updateSingleStat(MapleStat.AVAILABLEAP, player.getRemainingAp());
+                            } else if (luk && amount + player.getLuk() <= 32767 && amount + player.getLuk() >= 4) {
+                                player.setLuk(player.getLuk() + amount);
+                                player.updateSingleStat(MapleStat.LUK, player.getLuk());
+                                player.setRemainingAp(player.getRemainingAp() - amount);
+                                player.updateSingleStat(MapleStat.AVAILABLEAP, player.getRemainingAp());
+                            } else if (dex && amount + player.getDex() <= 32767 && amount + player.getDex() >= 4) {
+                                player.setDex(player.getDex() + amount);
+                                player.updateSingleStat(MapleStat.DEX, player.getDex());
+                                player.setRemainingAp(player.getRemainingAp() - amount);
+                                player.updateSingleStat(MapleStat.AVAILABLEAP, player.getRemainingAp());
+                            } else {
+                                player.dropMessage("Please make sure the stat you are trying to raise is not over 32,767 or under 4.");
+                            }
+                        } else {
+                            player.dropMessage("Please make sure your AP is not over 32,767 and you have enough to distribute.");
+                        }
+                    
+                        break;
                             
                 default:
                         return false;
@@ -693,7 +647,107 @@ public class Commands {
         public static boolean executeHeavenMsCommandLv1(Channel cserv, Server srv, MapleClient c, String[] sub) { //Donator
                 MapleCharacter player = c.getPlayer();
             
-                switch(sub[0]) {                
+                switch(sub[0]) {
+                case "bosshp":
+			for(MapleMonster monster : player.getMap().getMonsters()) {
+				if(monster != null && monster.isBoss() && monster.getHp() > 0) {
+					long percent = monster.getHp() * 100L / monster.getMaxHp();
+					String bar = "[";
+					for (int i = 0; i < 100; i++){
+						bar += i < percent ? "|" : ".";
+					}
+					bar += "]";
+					player.yellowMessage(monster.getName() + " (" + monster.getId() + ") has " + percent + "% HP left.");
+					player.yellowMessage("HP: " + bar);
+				}
+			} 
+			break;
+                    
+                case "mobhp":
+			for(MapleMonster monster : player.getMap().getMonsters()) {
+				if(monster != null && monster.getHp() > 0) {
+					player.yellowMessage(monster.getName() + " (" + monster.getId() + ") has " + monster.getHp() + " / " + monster.getMaxHp() + " HP.");
+					
+				}
+			} 
+			break;
+                    
+                case "whatdropsfrom":
+			if (sub.length < 2) {
+				player.dropMessage(5, "Please do @whatdropsfrom <monster name>");
+                        break;
+			}
+			String monsterName = joinStringFrom(sub, 1);
+			String output = "";
+			int limit = 3;
+			Iterator<Pair<Integer, String>> listIterator = MapleMonsterInformationProvider.getMobsIDsFromName(monsterName).iterator();
+			for (int i = 0; i < limit; i++) {
+				if(listIterator.hasNext()) {
+					Pair<Integer, String> data = listIterator.next();
+					int mobId = data.getLeft();
+					String mobName = data.getRight();
+					output += mobName + " drops the following items:\r\n\r\n";
+					for (MonsterDropEntry drop : MapleMonsterInformationProvider.getInstance().retrieveDrop(mobId)){
+						try {
+							String name = MapleItemInformationProvider.getInstance().getName(drop.itemId);
+							if (name.equals("null") || drop.chance == 0){
+								continue;
+							}
+							float chance = 1000000 / drop.chance / player.getDropRate();
+							output += "- " + name + " (1/" + (int) chance + ")\r\n";
+						} catch (Exception ex){
+                                                        ex.printStackTrace();
+							continue;
+						}
+					}
+					output += "\r\n";
+				}
+			}
+			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, output, "00 00", (byte) 0));
+			break;
+                    
+		case "whodrops":
+			if (sub.length < 2) {
+				player.dropMessage(5, "Please do @whodrops <item name>");
+                        break;
+			}
+			String searchString = joinStringFrom(sub, 1);
+			output = "";
+			listIterator = MapleItemInformationProvider.getInstance().getItemDataByName(searchString).iterator();
+			if(listIterator.hasNext()) {
+				int count = 1;
+				while(listIterator.hasNext() && count <= 3) {
+					Pair<Integer, String> data = listIterator.next();
+					output += "#b" + data.getRight() + "#k is dropped by:\r\n";
+					try {
+                                                Connection con = DatabaseConnection.getConnection();
+						PreparedStatement ps = con.prepareStatement("SELECT dropperid FROM drop_data WHERE itemid = ? LIMIT 50");
+						ps.setInt(1, data.getLeft());
+						ResultSet rs = ps.executeQuery();
+						while(rs.next()) {
+							String resultName = MapleMonsterInformationProvider.getMobNameFromID(rs.getInt("dropperid"));
+							if (resultName != null) {
+								output += resultName + ", ";
+							}
+						}
+						rs.close();
+						ps.close();
+                                                con.close();
+					} catch (Exception e) {
+						player.dropMessage(6, "There was a problem retrieving the required data. Please try again.");
+						e.printStackTrace();
+						break;
+					}
+					output += "\r\n\r\n";
+					count++;
+				}
+			} else {
+				player.dropMessage(5, "The item you searched for doesn't exist.");
+                        break;
+			}
+			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, output, "00 00", (byte) 0));
+                                break;
+                    
                 case "buffme":
                         //GM Skills : Haste(Super) - Holy Symbol - Bless - Hyper Body - Echo of Hero
                         SkillFactory.getSkill(4101004).getEffect(SkillFactory.getSkill(4101004).getMaxLevel()).applyTo(player);
@@ -709,7 +763,7 @@ public class Commands {
                         
                 case "goto":
                         if (sub.length < 2){
-				player.yellowMessage("Syntax: !goto <map name>");
+				player.yellowMessage("Syntax: @goto <map name>");
 				break;
 			}
                     
@@ -744,7 +798,20 @@ public class Commands {
                         }
                         player.dropMessage(5, "USE Recharged.");
                                 break;
-								
+		            
+                default:
+                        return false;
+                }
+                
+                return true;
+        }
+        
+        public static boolean executeHeavenMsCommandLv2(Channel cserv, Server srv, MapleClient c, String[] sub) { //JrGM
+                MapleCharacter player = c.getPlayer();
+                MapleCharacter victim;
+                Skill skill;
+            
+                switch(sub[0]) {
                 case "whereami":
 			player.yellowMessage("Map ID: " + player.getMap().getId());
 			player.yellowMessage("Players on this map:");
@@ -768,21 +835,8 @@ public class Commands {
 					}
 				}
 			}
-                                break;
-                            
-                default:
-                        return false;
-                }
-                
-                return true;
-        }
-        
-        public static boolean executeHeavenMsCommandLv2(Channel cserv, Server srv, MapleClient c, String[] sub) { //JrGM
-                MapleCharacter player = c.getPlayer();
-                MapleCharacter victim;
-                Skill skill;
-            
-                switch(sub[0]) {
+                    break;
+                    
                 case "hide":
                         SkillFactory.getSkill(9101004).getEffect(SkillFactory.getSkill(9101004).getMaxLevel()).applyTo(player);
                     break;
@@ -923,6 +977,7 @@ public class Commands {
                     
                 case "cleardrops":
 			player.getMap().clearDrops(player);
+                        player.dropMessage(5, "Cleared dropped items");
                     break;
                     
                 case "clearslot":
@@ -1328,6 +1383,30 @@ public class Commands {
                         player.yellowMessage("Skills maxed out.");
                     break;
                     
+                case "resetskill":
+			for (MapleData skill_ : MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/" + "String.wz")).getData("Skill.img").getChildren()) {
+				try {
+					skill = SkillFactory.getSkill(Integer.parseInt(skill_.getName()));
+                                        player.changeSkillLevel(skill, (byte) 0, skill.getMaxLevel(), -1);
+				} catch (NumberFormatException nfe) {
+                                        nfe.printStackTrace();
+					break;
+				} catch (NullPointerException npe) {
+					continue;
+				}
+			}
+                        
+                        if(player.getJob().isA(MapleJob.ARAN1) || player.getJob().isA(MapleJob.LEGEND)) {
+                                skill = SkillFactory.getSkill(5001005);
+                                player.changeSkillLevel(skill, (byte) -1, -1, -1);
+                        } else {
+                                skill = SkillFactory.getSkill(21001001);
+                                player.changeSkillLevel(skill, (byte) -1, -1, -1);
+                        }
+                        
+                        player.yellowMessage("Skills reseted.");
+                    break;
+                    
                 case "mesos":
                         if (sub.length >= 2) {
                                 player.gainMeso(Integer.parseInt(sub[1]), true);
@@ -1447,13 +1526,25 @@ public class Commands {
                     
                 case "job":
 			if (sub.length == 2) {
-				player.changeJob(MapleJob.getById(Integer.parseInt(sub[1])));
+                                int jobid = Integer.parseInt(sub[1]);
+                                if(jobid < 0 || jobid >= 2200) {
+                                        player.message("Jobid " + jobid + " is not available.");
+                                        break;
+                                }
+                            
+				player.changeJob(MapleJob.getById(jobid));
 				player.equipChanged();
 			} else if (sub.length == 3) {
 				victim = c.getChannelServer().getPlayerStorage().getCharacterByName(sub[1]);
                                 
                                 if(victim != null) {
-                                        victim.changeJob(MapleJob.getById(Integer.parseInt(sub[2])));
+                                        int jobid = Integer.parseInt(sub[2]);
+                                        if(jobid < 0 || jobid >= 2200) {
+                                                player.message("Jobid " + jobid + " is not available.");
+                                                break;
+                                        }
+                                    
+                                        victim.changeJob(MapleJob.getById(jobid));
                                         player.equipChanged();
                                 } else {
                                         player.message("Player '" + sub[1] + "' could not be found on this channel.");
@@ -1479,6 +1570,81 @@ public class Commands {
                 MapleCharacter victim;
             
                 switch(sub[0]) {
+                case "debuff":
+                        if (sub.length < 2) {
+				player.yellowMessage("Syntax: !debuff SLOW|SEDUCE|ZOMBIFY|CONFUSE|STUN|POISON|SEAL|DARKNESS|WEAKEN|CURSE");
+				break;
+			}
+                    
+                        MapleDisease disease = null;
+                        MobSkill skill = null;
+                        
+                        switch(sub[1].toUpperCase()) {
+                                case "SLOW":
+                                        disease = MapleDisease.SLOW;
+                                        skill = MobSkillFactory.getMobSkill(126, 7);
+                                        break;
+                                    
+                                case "SEDUCE":
+                                        disease = MapleDisease.SEDUCE;
+                                        skill = MobSkillFactory.getMobSkill(128, 7);
+                                        break;
+                                    
+                                case "ZOMBIFY":
+                                        disease = MapleDisease.ZOMBIFY;
+                                        skill = MobSkillFactory.getMobSkill(133, 1);
+                                        break;
+                                        
+                                case "CONFUSE":
+                                        disease = MapleDisease.CONFUSE;
+                                        skill = MobSkillFactory.getMobSkill(132, 2);
+                                        break;
+                                            
+                                case "STUN":
+                                        disease = MapleDisease.STUN;
+                                        skill = MobSkillFactory.getMobSkill(123, 7);
+                                        break;
+                                                
+                                case "POISON":
+                                        disease = MapleDisease.POISON;
+                                        skill = MobSkillFactory.getMobSkill(125, 5);
+                                        break;
+                                                    
+                                case "SEAL":
+                                        disease = MapleDisease.SEAL;
+                                        skill = MobSkillFactory.getMobSkill(120, 1);
+                                        break;
+                                                        
+                                case "DARKNESS":
+                                        disease = MapleDisease.DARKNESS;
+                                        skill = MobSkillFactory.getMobSkill(121, 1);
+                                        break;
+                                                            
+                                case "WEAKEN":
+                                        disease = MapleDisease.WEAKEN;
+                                        skill = MobSkillFactory.getMobSkill(122, 1);
+                                        break;
+                                
+                                case "CURSE":
+                                        disease = MapleDisease.CURSE;
+                                        skill = MobSkillFactory.getMobSkill(124, 1);
+                                        break;
+                        }
+                        
+                        if(disease == null) {
+                                player.yellowMessage("Syntax: !debuff SLOW|SEDUCE|ZOMBIFY|CONFUSE|STUN|POISON|SEAL|DARKNESS|WEAKEN|CURSE");
+				break;
+                        }
+                    
+                        for (MapleMapObject mmo : player.getMap().getMapObjectsInRange(player.getPosition(), 1000.0, Arrays.asList(MapleMapObjectType.PLAYER))) {
+                                MapleCharacter chr = (MapleCharacter) mmo;
+                                
+                                if(chr.getId() != player.getId()) {
+                                        chr.giveDebuff(disease, skill);
+                                }
+                        }
+                break;
+                    
                 case "fly":
                         if (sub.length < 2) {
 				player.yellowMessage("Syntax: !fly <on/off>");
@@ -1581,9 +1747,9 @@ public class Commands {
 			MapleMap newMap = c.getChannelServer().getMapFactory().resetMap(player.getMapId());
                         int callerid = c.getPlayer().getId();
                         
-			for (MapleCharacter ch : oldMap.getCharacters()) {
-				ch.changeMap(newMap);
-                                if(ch.getId() != callerid) ch.dropMessage("You have been relocated due to map reloading. Sorry for the inconvenience.");
+			for (MapleCharacter chr : oldMap.getCharacters()) {
+				chr.changeMap(newMap);
+                                if(chr.getId() != callerid) chr.dropMessage("You have been relocated due to map reloading. Sorry for the inconvenience.");
 			}
 			newMap.respawn();
                     break;
@@ -2381,8 +2547,8 @@ public class Commands {
                     case "cake":
                         MapleMonster monster = MapleLifeFactory.getMonster(9400606);
                         if(sub.length > 1) {
-                            int newHp = Integer.parseInt(sub[1]);
-                            if(newHp < 0) newHp = Integer.MAX_VALUE;
+                            double mobHp = Double.parseDouble(sub[1]);
+                            int newHp = (mobHp <= 0) ? Integer.MAX_VALUE : ((mobHp > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) mobHp);
                             
                             monster.getStats().setHp(newHp);
                             monster.setStartingHp(newHp);
