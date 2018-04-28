@@ -107,7 +107,7 @@ public class MapleMiniGame extends AbstractMapleMapObject {
     }
 
     public void setOwnerPoints() {
-        ownerpoints++;
+        /*  ownerpoints++;
         if (ownerpoints + visitorpoints == matchestowin) {
             if (ownerpoints == visitorpoints) {
                 this.broadcast(MaplePacketCreator.getMatchCardTie(this));
@@ -118,11 +118,13 @@ public class MapleMiniGame extends AbstractMapleMapObject {
             }
             ownerpoints = 0;
             visitorpoints = 0;
+         //WILL FIX LATER       
         }
+        */
     }
 
     public void setVisitorPoints() {
-        visitorpoints++;
+        /*visitorpoints++;
         if (ownerpoints + visitorpoints == matchestowin) {
             if (ownerpoints > visitorpoints) {
                 this.broadcast(MaplePacketCreator.getMiniGameOwnerWin(this));
@@ -134,6 +136,7 @@ public class MapleMiniGame extends AbstractMapleMapObject {
             ownerpoints = 0;
             visitorpoints = 0;
         }
+         */       
     }
 
     public void setMatchesToWin(int type) {
@@ -220,11 +223,11 @@ public class MapleMiniGame extends AbstractMapleMapObject {
     }
 
     public void sendOmok(MapleClient c, int type) {
-        c.announce(MaplePacketCreator.getMiniGame(c, this, isOwner(c.getPlayer()), type));
+        //c.announce(MaplePacketCreator.getMiniGame(c, this, isOwner(c.getPlayer()), type));
     }
 
     public void sendMatchCard(MapleClient c, int type) {
-        c.announce(MaplePacketCreator.getMatchCard(c, this, isOwner(c.getPlayer()), type));
+        //c.announce(MaplePacketCreator.getMatchCard(c, this, isOwner(c.getPlayer()), type));
     }
 
     public MapleCharacter getOwner() {
@@ -236,7 +239,7 @@ public class MapleMiniGame extends AbstractMapleMapObject {
     }
 
     public void setPiece(int move1, int move2, int type, MapleCharacter chr) {
-        int slot = move2 * 15 + move1 + 1;
+        /*int slot = move2 * 15 + move1 + 1;
         if (piece[slot] == 0) {
             piece[slot] = type;
             this.broadcast(MaplePacketCreator.getMiniGameMoveOmok(this, move1, move2, type));
@@ -279,6 +282,7 @@ public class MapleMiniGame extends AbstractMapleMapObject {
                 }
             }
         }
+        */        
     }
 
     private boolean searchCombo(int x, int y, int type) {

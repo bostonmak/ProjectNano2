@@ -171,7 +171,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
      * @param quantity
      */
     public void buy(MapleClient c, int item, short quantity) {
-        synchronized (items) {
+        /*synchronized (items) {
             if (isVisitor(c.getPlayer())) {
                 MaplePlayerShopItem pItem = items.get(item);
                 Item newItem = pItem.getItem().copy();
@@ -203,6 +203,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                 }
             }
         }
+        */        
     }
 
     public void broadcastToVisitors(final byte[] packet) {
@@ -216,7 +217,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
     }
     
     public void broadcastRestoreToVisitors() {
-        synchronized (visitors) {
+       /* synchronized (visitors) {
             for (int i = 0; i < 3; i++) {
                 if (visitors[i] != null) {
                     visitors[i].getClient().announce(MaplePacketCreator.getPlayerShopRemoveVisitor(i + 1));
@@ -231,6 +232,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
             
             recoverChatLog();
         }
+        */       
     }
 
     public void removeVisitors() {
@@ -322,9 +324,10 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
     }
 
     public void sendShop(MapleClient c) {
-        synchronized(visitors) {
+        /*synchronized(visitors) {
             c.announce(MaplePacketCreator.getPlayerShop(this, isOwner(c.getPlayer())));
         }
+        */        
     }
 
     public MapleCharacter getOwner() {
@@ -390,7 +393,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
     }
     
     public synchronized boolean visitShop(MapleCharacter chr) {
-        if(!open.get()) {
+        /* if(!open.get()) {
             chr.dropMessage(1, "This store is not yet open.");
             return false;
         }
@@ -407,8 +410,9 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
 
             return true;
         }
-        
-        return false;
+        */
+                return false;
+                
     }
     
     public List<MaplePlayerShopItem> sendAvailableBundles(int itemid) {

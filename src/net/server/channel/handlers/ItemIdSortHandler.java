@@ -43,7 +43,7 @@ import server.MapleItemInformationProvider;
  * @author Ronan
  */
 
-class PairedQuicksort {
+/*class PairedQuicksort {
     private int i = 0;
     private int j = 0;
     private final ArrayList<Integer> intersect;
@@ -231,3 +231,4 @@ public final class ItemIdSortHandler extends AbstractMaplePacketHandler {
         c.announce(MaplePacketCreator.enableActions());
     }
 }
+*/
