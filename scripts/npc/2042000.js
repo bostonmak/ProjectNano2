@@ -1,53 +1,82 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
+/**  *  [MENTION=19862]id[/MENTION] 2042000
+ *    [MENTION=806871]NPC[/MENTION] Spiegelmann
+ *    [MENTION=836108]Function[/MENTION] Monster Carnival Lobby NPC
+ * @author s4nta
+ */
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
+// Relevant Monster Carnival classes
+var MonsterCarnival = server.partyquest.mcpq.MonsterCarnival;
+var MCTracker = server.partyquest.mcpq.MCTracker;
+var MCParty = server.partyquest.mcpq.MCParty;
+var MCField = server.partyquest.mcpq.MCField;
+var MCTeam = server.partyquest.mcpq.MCField.MCTeam;
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-var status = 0;
+// NPC variables
+var status = -1;
+var carnival, field;
+var room = -1;
 
 function start() {
-    if (cm.getPlayer().getParty() != null)
-        cm.sendCPQMapLists();
-    else {
-        cm.sendOk("You must be in a party!");
+    if (cm.getMapId() != 980000000) {
+        MCTracker.log("Spiegelmann called on invalid map " + cm.getMapId() + " by player " + cm.getName());
+        cm.sendOk("You are not authorized to do this.");
         cm.dispose();
+        return;
     }
+    action(1, 0, 0);
 }
 
 function action(mode, type, selection) {
-    if (mode < 1)
+    if (mode == -1) {
         cm.dispose();
-    else {
-        status++;
-        if (status == 1) {
-            if (cm.fieldTaken(selection)) {
-                if (cm.fieldLobbied(selection)) {
-                    cm.challengeParty(selection);
-                    cm.dispose();
-                } else {
-                    cm.sendOk("The room is taken.");
-                    cm.dispose();
-                }
-            } else {
-                cm.cpqLobby(selection);
-                cm.dispose();
-            }
-        }
+        return;
     }
-}
+    if (mode == 1) status++;
+    else status--;
+
+    if (status == 0) {
+        if (cm.getParty() == null) {
+            cm.sendOk("You are not in a party.");
+            cm.dispose();
+            return;
+        } else if (!cm.isLeader()) {
+            cm.sendOk("If you want to try Carnival PQ, please tell the #bleader of your party#k to talk to me.");
+            cm.dispose();
+            return;
+        }
+        carnival = MonsterCarnival.getMonsterCarnival(cm.getChannel());
+        cm.sendSimple(carnival.getNPCAvailableFields());
+    } else if (status == 1) {
+        room = selection;
+        if (room < 1 || room > 6) {
+            cm.sendOk("That is not a valid room.");
+            cm.dispose();
+            return;
+        }
+        var code = carnival.registerStatus(cm.getParty(), selection);
+        if (code == MonsterCarnival.STATUS_FIELD_FULL) {
+            cm.sendOk("This room is currently full.")
+        } else if (code == MonsterCarnival.STATUS_PARTY_SIZE) {
+            cm.sendOk("Your party is not the right size for this field.");
+        } else if (code == MonsterCarnival.STATUS_PARTY_LEVEL) {
+            cm.sendOk("Please check to see that the members in your party are between level 30 and 50.");
+        } else if (code == MonsterCarnival.STATUS_PARTY_MISSING) {
+            cm.sendOk("Please make sure everyone in your party is in this lobby.");
+        } else if (code == MonsterCarnival.STATUS_FIELD_INVALID) {
+            cm.sendOk("Unauthorized request.");
+        }
+
+        if (code == MonsterCarnival.STATUS_PROCEED) {
+            field = carnival.getField(room);
+            party = carnival.createParty(cm.getParty());
+            field.register(party, MCTeam.RED);
+            cm.sendOk("You will have 3 minutes to accept challenges from other parties.");
+        } else if (code == MonsterCarnival.STATUS_REQUEST) {
+            cm.sendOk("Sending request to room " + room + ". You will be automatically warped in if they accept your challenge.");
+            field = carnival.getField(room);
+            party = carnival.createParty(cm.getParty());
+            field.request(party);
+        }
+        cm.dispose();
+    }
+}  
