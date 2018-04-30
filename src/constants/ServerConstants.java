@@ -26,11 +26,11 @@ public class ServerConstants {
     public static final long RANKING_INTERVAL = 60 * 60 * 1000;	//60 minutes, 3600000.
     public static final long  COUPON_INTERVAL = 60 * 60 * 1000;	//60 minutes, 3600000.
     
-    public static final boolean ENABLE_PIC = false;             //Pick true/false to enable or disable Pic. Delete character needs this feature ENABLED.
+    public static final boolean ENABLE_PIC = true;             //Pick true/false to enable or disable Pic. Delete character needs this feature ENABLED.
     public static final boolean ENABLE_PIN = false;             //Pick true/false to enable or disable Pin.
     
     public static final boolean AUTOMATIC_REGISTER = true;      //Automatically register players when they login with a nonexistent username.
-    public static final boolean BCRYPT_MIGRATION = true;        //Performs a migration from old SHA-1 and SHA-512 password to bcrypt.
+    public static final boolean BCRYPT_MIGRATION = false;        //Performs a migration from old SHA-1 and SHA-512 password to bcrypt.
     
     //Ip Configuration
     public static String HOST;
@@ -57,11 +57,11 @@ public class ServerConstants {
     public static final boolean USE_PARTY_FOR_STARTERS = true;      //Players level 10 or below can create/invite other players on the given level range.
     public static final boolean USE_AUTOBAN = false;                //Commands the server to detect infractors automatically.
     public static final boolean USE_AUTOSAVE = true;                //Enables server autosaving feature (saves characters to DB each 1 hour).
-    public static final boolean USE_SERVER_AUTOASSIGNER = false;     //HeavenMS-builtin autoassigner, uses algorithm based on distributing AP accordingly with required secondary stat on equipments.
+    public static final boolean USE_SERVER_AUTOASSIGNER = true;     //HeavenMS-builtin autoassigner, uses algorithm based on distributing AP accordingly with required secondary stat on equipments.
     public static final boolean USE_REFRESH_RANK_MOVE = true;
     public static final boolean USE_ENFORCE_HPMP_SWAP = false;      //Forces players to reuse stats (via AP Resetting) located on HP/MP pool only inside the HP/MP stats.
     public static final boolean USE_ENFORCE_MOB_LEVEL_RANGE = true; //Players N levels below the killed mob will gain no experience from defeating it.
-    public static final boolean USE_ENFORCE_JOB_LEVEL_RANGE = false;//Caps the player level on the minimum required to advance their current jobs.
+    public static final boolean USE_ENFORCE_JOB_LEVEL_RANGE = true;//Caps the player level on the minimum required to advance their current jobs.
     public static final boolean USE_ENFORCE_OWL_SUGGESTIONS = false;//Forces the Owl of Minerva to always display the defined item array on GameConstants.OWL_DATA instead of those featured by the players.
     public static final boolean USE_ENFORCE_UNMERCHABLE_PET = true; //Forces players to not sell pets via merchants. (since non-named pets gets dirty name and other possible DB-related issues)
     public static final boolean USE_ENFORCE_MDOOR_POSITION = true;  //Forces mystic door to be spawned near spawnpoints. (since things bugs out other way, and this helps players to locate the door faster)
@@ -80,12 +80,12 @@ public class ServerConstants {
     //Server Rates And Experience
     public static final int EXP_RATE = 10;
     public static final int MESO_RATE = 10;
-    public static final int DROP_RATE = 10;
+    public static final int DROP_RATE = 5;
     public static final int QUEST_RATE = 5;                         //Multiplier for Exp & Meso gains when completing a quest. Only available when USE_QUEST_RATE is true. Stacks with server Exp & Meso rates.
     public static final double EQUIP_EXP_RATE = 1.0;               //Rate for equipment exp gain, grows linearly. Set 1.0 for default (about 100~200 same-level range mobs killed to pass equip from level 1 to 2).
     
-    public static final double PARTY_BONUS_EXP_RATE = 1.0;          //Rate for the party exp reward.
-    public static final double PQ_BONUS_EXP_RATE = 0.5;             //Rate for the PQ exp reward.
+    public static final double PARTY_BONUS_EXP_RATE = 2.0;          //Rate for the party exp reward.
+    public static final double PQ_BONUS_EXP_RATE = 1.0;             //Rate for the PQ exp reward.
     
     public static final int PARTY_EXPERIENCE_MOD = 1;               //Change for event stuff.
     
@@ -133,9 +133,9 @@ public class ServerConstants {
     public static final boolean USE_EQUIPMNT_LVLUP_SLOTS = true;//Equips can upgrade slots at level up.
     public static final boolean USE_EQUIPMNT_LVLUP_POWER = true;//Enable more powerful stat upgrades at equip level up.
     public static final boolean USE_SPIKES_AVOID_BANISH = true; //Shoes equipped with spikes prevents mobs from banishing wearer.
-    public static final int MAX_EQUIPMNT_LVLUP_STAT_UP = 10000; //Max stat upgrade an equipment can have on a levelup.
+    public static final int MAX_EQUIPMNT_LVLUP_STAT_UP = 10; //Max stat upgrade an equipment can have on a levelup.
     public static final int MAX_EQUIPMNT_STAT = 32767;          //Max stat on an equipment by leveling up.
-    public static final int USE_EQUIPMNT_LVLUP = 7;             //All equips lvlup at max level of N, set 1 to disable.
+    public static final int USE_EQUIPMNT_LVLUP = 5;             //All equips lvlup at max level of N, set 1 to disable.
     
     //Map-Chair Configuration
     public static final boolean USE_CHAIR_EXTRAHEAL = true;     //Enable map chairs to further recover player's HP and MP (player must have the Chair Mastery skill).
