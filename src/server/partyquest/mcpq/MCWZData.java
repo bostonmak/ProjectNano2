@@ -33,7 +33,7 @@ public class MCWZData {
     }
 
     public void parse(MapleData src) {
-        populateMobGenPos(getChildByPath("mobGenPos"));
+        populateMobGenPos(src.getChildByPath("mobGenPos"));
         populateSummonMobs(src.getChildByPath("mob"));
         effectWin = MapleDataTool.getString("effectWin", src);
         effectLose = MapleDataTool.getString("effectLose", src);

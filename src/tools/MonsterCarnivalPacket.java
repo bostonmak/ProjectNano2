@@ -1,14 +1,14 @@
 package tools;
 import client.MapleCharacter;
-import net.server.SendPacketOpcode;
+import net.SendOpcode;
 import server.partyquest.mcpq.MCParty;
 import tools.data.output.MaplePacketLittleEndianWriter;
 
 public class MonsterCarnivalPacket {
 
-    public static MaplePacket startCPQ(MapleCharacter chr) {
+    public static byte[] startCPQ(MapleCharacter chr) {
         MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        mplew.writeShort(SendPacketOpcode.MONSTER_CARNIVAL_START.getValue());
+        mplew.writeShort(SendOpcode.MONSTER_CARNIVAL_START.getValue());
         mplew.write(chr.getTeam()); //team
         mplew.writeShort(chr.getAvailableCP()); //Available CP
         mplew.writeShort(chr.getTotalCP()); //Total Obtained CP
@@ -21,35 +21,35 @@ public class MonsterCarnivalPacket {
         return mplew.getPacket();
     }
 
-    public static MaplePacket updatePersonalCP(MapleCharacter chr) {
+    public static byte[] updatePersonalCP(MapleCharacter chr) {
         MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        mplew.writeShort(SendPacketOpcode.MONSTER_CARNIVAL_OBTAINED_CP.getValue());
+        mplew.writeShort(SendOpcode.MONSTER_CARNIVAL_OBTAINED_CP.getValue());
         mplew.writeShort(chr.getAvailableCP()); //Obtained CP - Used CP
         mplew.writeShort(chr.getTotalCP()); //Total Obtained CP
         return mplew.getPacket();
     }
 
-    public static MaplePacket updatePartyCP(MCParty pty) {
+    public static byte[] updatePartyCP(MCParty pty) {
         MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        mplew.writeShort(SendPacketOpcode.MONSTER_CARNIVAL_PARTY_CP.getValue());
+        mplew.writeShort(SendOpcode.MONSTER_CARNIVAL_PARTY_CP.getValue());
         mplew.write(pty.getTeam().code); //Team where the points are given to.
         mplew.writeShort(pty.getAvailableCP()); //Obtained CP - Used CP
         mplew.writeShort(pty.getTotalCP()); //Total Obtained CP
         return mplew.getPacket();
     }
 
-    public static MaplePacket CPQSummon(int tab, int num, String name) {
+    public static byte[] CPQSummon(int tab, int num, String name) {
         MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        mplew.writeShort(SendPacketOpcode.MONSTER_CARNIVAL_SUMMON.getValue());
+        mplew.writeShort(SendOpcode.MONSTER_CARNIVAL_SUMMON.getValue());
         mplew.write(tab); //Tab
         mplew.write(num); //Number of summon inside the tab
         mplew.writeMapleAsciiString(name); //Name of the player that summons
         return mplew.getPacket();
     }
 
-    public static MaplePacket CPQDied(MapleCharacter player, int loss) {
+    public static byte[] CPQDied(MapleCharacter player, int loss) {
         MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        mplew.writeShort(SendPacketOpcode.MONSTER_CARNIVAL_DIED.getValue());
+        mplew.writeShort(SendOpcode.MONSTER_CARNIVAL_DIED.getValue());
         mplew.write(player.getTeam()); //Team
         mplew.writeMapleAsciiString(player.getName()); //Name of the player that died
         mplew.write(loss); //Lost CP
@@ -68,16 +68,16 @@ public class MonsterCarnivalPacket {
      *
      *     [MENTION=2000183830]para[/MENTION]m message Displays a message inside Carnival PQ
      **/
-    public static MaplePacket CPQMessage(int message) {
+    public static byte[] CPQMessage(int message) {
         MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        mplew.writeShort(SendPacketOpcode.MONSTER_CARNIVAL_MESSAGE.getValue());
+        mplew.writeShort(SendOpcode.MONSTER_CARNIVAL_MESSAGE.getValue());
         mplew.write(message); //Message
         return mplew.getPacket();
     }
 
-    public static MaplePacket leaveCPQ(int team, String name) {
+    public static byte[] leaveCPQ(int team, String name) {
         MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-        mplew.writeShort(SendPacketOpcode.MONSTER_CARNIVAL_LEAVE.getValue());
+        mplew.writeShort(SendOpcode.MONSTER_CARNIVAL_LEAVE.getValue());
         mplew.write(0); //Something?
         mplew.write(team); //Team
         mplew.writeMapleAsciiString(name); //Player name

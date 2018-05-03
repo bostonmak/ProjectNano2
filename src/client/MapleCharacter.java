@@ -100,6 +100,7 @@ import server.maps.SavedLocationType;
 import server.partyquest.MonsterCarnival;
 import server.partyquest.MonsterCarnivalParty;
 import server.partyquest.PartyQuest;
+import server.partyquest.mcpq.MCField;
 import server.quest.MapleQuest;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
@@ -7990,6 +7991,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     private int obtainedcp = 0;
     private MonsterCarnivalParty carnivalparty;
     private MonsterCarnival carnival;
+    private MCField mcpqField;
 
     public MonsterCarnivalParty getCarnivalParty() {
         return carnivalparty;
@@ -8011,9 +8013,16 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
         return cp;
     }
 
+    public int getAvailableCP() {
+        return cp;
+    }    
+    
     public int getObtainedCP() {
         return obtainedcp;
     }
+     public int getTotalCP() {
+         return obtainedcp;
+     }
 
     public void addCP(int cp) {
         this.cp += cp;
@@ -8038,6 +8047,13 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
         }
 
         return rCP;
+    }
+    public MCField getMCPQField() {
+        return mcpqField;
+    }
+    
+    public void setMCPQField(MCField field) {
+        this.mcpqField = field;
     }
 
     public AutobanManager getAutobanManager() {
