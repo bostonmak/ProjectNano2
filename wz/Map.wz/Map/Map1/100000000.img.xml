@@ -464,7 +464,7 @@
     </imgdir>
     <imgdir name="27">
       <string name="type" value="n"/>
-      <string name="id" value="9250052"/>
+      <string name="id" value="1200002"/>
       <int name="x" value="946"/>
       <int name="y" value="87"/>
       <int name="mobTime" value="0"/>

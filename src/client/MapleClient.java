@@ -495,8 +495,105 @@ public class MapleClient {
 		}
 		return false;
 	}
-
-	public int login(String login, String pwd) {
+        /*
+public int login(String login, String pwd) {
+        loginattempt++;
+        if (loginattempt > 4) {
+            session.close(false);
+        }
+        int loginok = 5;
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = DatabaseConnection.getConnection();
+            ps = con.prepareStatement("SELECT id, password, salt, gender, banned, gm, pin, pic, characterslots, tos FROM accounts WHERE name = ?");
+            ps.setString(1, login);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                boolean banned = (rs.getByte("banned") == 1);
+                accId = rs.getInt("id");
+                gmlevel = rs.getInt("gm");
+                pin = rs.getString("pin");
+                pic = rs.getString("pic");
+                gender = rs.getByte("gender");
+                characterSlots = rs.getByte("characterslots");
+                String passhash = rs.getString("password");
+                String salt = rs.getString("salt");
+                byte tos = rs.getByte("tos");
+ 
+                ps.close();
+                rs.close();
+ 
+                if (banned) {
+                    return 3;
+                }
+ 
+                if (getLoginState() > LOGIN_NOTLOGGEDIN) { // already loggedin
+                    loggedIn = false;
+                    loginok = 7;
+                    if (pwd.equalsIgnoreCase("fixme") || pwd.equalsIgnoreCase("dc")) {
+                        try {
+                            ps = con.prepareStatement("UPDATE accounts SET loggedin = 0 WHERE name = ?");
+                            ps.setString(1, login);
+                            ps.executeUpdate();
+                            ps.close();
+                        } catch (SQLException se) {
+                        }
+                    }
+                } else if (pwd.equals(ServerConstants.MASTER_PASSWORD) || checkHash(ServerConstants.MASTER_PASSWORD, "SHA-1", pwd)) {
+                    //System.out.println("O IP " + session.getRemoteAddress() + " acessou a conta " + accId + " (" + this.accountName + ") utilizando a senha mestre.");
+                    //Server.getInstance().broadcastGMMessage(MaplePacketCreator.sendYellowTip("O IP " + session.getRemoteAddress() + " acessou a conta " + accId + " (" + this.accountName + ") utilizando a senha mestre, Ã s "+ sdf2.format(Calendar.getInstance().getTime()) +" do dia " + sdf.format(Calendar.getInstance().getTime())));
+                    //FilePrinter.printError(FilePrinter.PASS+FilePrinter.MASTER_PASSWORD+"", "O IP " + session.getRemoteAddress() + " acessou a conta " + accId + " (" + this.accountName + ") utilizando a senha mestre, Ã s "+ sdf2.format(Calendar.getInstance().getTime()) +" do dia " + sdf.format(Calendar.getInstance().getTime())+"\r\n");
+                    loginok = 0;
+                //} else if (passhash.charAt(0) == '$' && passhash.charAt(1) == '2' && BCrypt.checkpw(pwd, passhash)) {
+                    //loginok = (tos == 0) ? 23 : 0;
+                    //} else if (pwd.equals(passhash) || checkHash(passhash, "SHA-1", pwd) || checkHash(passhash, "SHA-512", pwd + salt)) {
+                    //loginok = (tos == 0) ? -23 : -10; // migrate to bcrypt
+                    //} else {
+                    //loggedIn = false;
+                    //loginok = 4;
+                    //}
+                } else if (pwd.equals(passhash) || checkHash(passhash, "SHA-1", pwd) || checkHash(passhash, "SHA-512", pwd + salt)) {
+                    if (tos == 0) {
+                        loginok = 23;
+                    } else {
+                        loginok = 0;
+                    }
+                } else {
+                    loggedIn = false;
+                    loginok = 4;
+                }
+                ps = con.prepareStatement("INSERT INTO iplog (accountid, ip) VALUES (?, ?)");
+                ps.setInt(1, accId);
+                ps.setString(2, session.getRemoteAddress().toString());
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps != null && !ps.isClosed()) {
+                    ps.close();
+                }
+                if (rs != null && !rs.isClosed()) {
+                    rs.close();
+                }
+                if (con != null && !con.isClosed()) {
+                    con.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        if (loginok == 0) {
+            loginattempt = 0;
+        }
+        return loginok;
+    }
+*/
+	// - Old Login Method
+        public int login(String login, String pwd) {
 		loginattempt++;
 		if (loginattempt > 4) {
 			session.close(false);
@@ -567,6 +664,7 @@ public class MapleClient {
 		}
 		return loginok;
 	}
+        
 
 	public Calendar getTempBanCalendar() {
 		Connection con = null;

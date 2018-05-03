@@ -274,9 +274,9 @@ public class Commands {
 	};
 
 	static {
-		gotomaps.put("gmmap", 180000000);
-		gotomaps.put("southperry", 60000);
-		gotomaps.put("amherst", 1000000);
+		//gotomaps.put("gmmap", 180000000);
+		//gotomaps.put("southperry", 60000);
+		//gotomaps.put("amherst", 1000000);
 		gotomaps.put("henesys", 100000000);
 		gotomaps.put("ellinia", 101000000);
 		gotomaps.put("perion", 102000000);
@@ -288,7 +288,7 @@ public class Commands {
                 gotomaps.put("ereve", 130000000);
                 gotomaps.put("rien", 140000000);
 		gotomaps.put("orbis", 200000000);
-		gotomaps.put("happy", 209000000);
+		gotomaps.put("happytown", 209000000);
 		gotomaps.put("elnath", 211000000);
 		gotomaps.put("ludi", 220000000);
 		gotomaps.put("aqua", 230000000);
@@ -299,13 +299,13 @@ public class Commands {
 		gotomaps.put("korean", 222000000);
                 gotomaps.put("ellin", 300000000);
 		gotomaps.put("nlc", 600000000);
-		gotomaps.put("excavation", 990000000);
+		gotomaps.put("gpq", 990000000);
 		gotomaps.put("pianus", 230040420);
 		gotomaps.put("horntail", 240060200);
 		gotomaps.put("mushmom", 100000005);
 		gotomaps.put("griffey", 240020101);
 		gotomaps.put("manon", 240020401);
-		gotomaps.put("horseman", 682000001);
+		//gotomaps.put("horseman", 682000001);
 		gotomaps.put("balrog", 105090900);
 		gotomaps.put("zakum", 211042300);
 		gotomaps.put("papu", 220080001);
@@ -318,7 +318,7 @@ public class Commands {
                 gotomaps.put("ariant", 260000000);
 		gotomaps.put("magatia", 261000000);
                 gotomaps.put("singapore", 540000000);
-                gotomaps.put("keep", 610020006);
+                gotomaps.put("cwk", 610020006);
                 gotomaps.put("amoria", 680000000);
                 gotomaps.put("temple", 270000100);
                 gotomaps.put("neo", 240070000);
@@ -371,6 +371,26 @@ public class Commands {
 			dateFormat.setTimeZone(TimeZone.getTimeZone(ServerConstants.TIMEZONE));
 			player.yellowMessage("Solaxia Server Time: " + dateFormat.format(new Date()));
 			break;
+                    
+                case "recharge":
+                        MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
+                        for (Item torecharge : c.getPlayer().getInventory(MapleInventoryType.USE).list()) {
+                                if (ItemConstants.isThrowingStar(torecharge.getItemId())){
+                                        torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
+                                        c.getPlayer().forceUpdateItem(torecharge);
+                                } else if (ItemConstants.isArrow(torecharge.getItemId())){
+                                        torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
+                                        c.getPlayer().forceUpdateItem(torecharge);
+                                } else if (ItemConstants.isBullet(torecharge.getItemId())){
+                                        torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
+                                        c.getPlayer().forceUpdateItem(torecharge);
+                                } //else if (ItemConstants.isConsumable(torecharge.getItemId())){
+                                  //      torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
+                                  //     c.getPlayer().forceUpdateItem(torecharge);
+                                //}
+                        }
+                        player.dropMessage(5, "Please remember to vote <3");
+                                break;
                 
                 case "credits":
 		case "staff":
@@ -426,6 +446,17 @@ public class Commands {
                 case "equiplv":
                         player.showAllEquipFeatures();
                         break;
+                case "buffme":
+                        //GM Skills : Haste(Super) - Holy Symbol - Bless - Hyper Body - Echo of Hero - maple warrior - sharp eyes
+                        SkillFactory.getSkill(9101001).getEffect(SkillFactory.getSkill(9101001).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(9101002).getEffect(SkillFactory.getSkill(9101002).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(9101003).getEffect(SkillFactory.getSkill(9101003).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(9101008).getEffect(SkillFactory.getSkill(9101008).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(2321000).getEffect(SkillFactory.getSkill(2321000).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(3121002).getEffect(SkillFactory.getSkill(3121002).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(1005).getEffect(SkillFactory.getSkill(1005).getMaxLevel()).applyTo(player);
+                                break;    
+                    
 
                 case "showrates":
                         String showMsg = "#eEXP RATE#n" + "\r\n";
@@ -500,6 +531,7 @@ public class Commands {
 			FilePrinter.printError("bug.txt", MapleCharacter.makeMapleReadable(player.getName()) + ": " + message + "\r\n");
 			player.dropMessage(5, "Your bug '" + message + "' was submitted successfully to our developers. Thank you!");
 			break;
+
 		/*
                 case "points":
 			player.dropMessage(5, "You have " + c.getVotePoints() + " vote point(s).");
@@ -595,6 +627,25 @@ public class Commands {
 				}
 			}
 			break;
+                    
+                    case "goto":
+                        if (sub.length < 2){
+				player.yellowMessage("Syntax: @goto <map name>");
+				break;
+			}
+                    
+			if (gotomaps.containsKey(sub[1])) {
+				MapleMap target = c.getChannelServer().getMapFactory().getMap(gotomaps.get(sub[1]));
+				MaplePortal targetPortal = target.getPortal(0);
+				if (player.getEventInstance() != null) {
+					player.getEventInstance().removePlayer(player);
+				}
+				player.changeMap(target, targetPortal);
+			} else {
+				player.dropMessage(5, "That map does not exist.");
+			}
+                                break;
+                        
                     
                 // stat autoassigning command credited to HeliosMS dev team
                 case "str":
@@ -748,20 +799,18 @@ public class Commands {
 			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, output, "00 00", (byte) 0));
                                 break;
                     
-                case "buffme":
-                        //GM Skills : Haste(Super) - Holy Symbol - Bless - Hyper Body - Echo of Hero
-                        SkillFactory.getSkill(4101004).getEffect(SkillFactory.getSkill(4101004).getMaxLevel()).applyTo(player);
-                        SkillFactory.getSkill(2311003).getEffect(SkillFactory.getSkill(2311003).getMaxLevel()).applyTo(player);
-                        SkillFactory.getSkill(1301007).getEffect(SkillFactory.getSkill(1301007).getMaxLevel()).applyTo(player);
-                        SkillFactory.getSkill(2301004).getEffect(SkillFactory.getSkill(2301004).getMaxLevel()).applyTo(player);
+              /*  case "buffme":
+                        //GM Skills : Haste(Super) - Holy Symbol - Bless - Hyper Body - Echo of Hero - maple warrior - sharp eyes
+                        SkillFactory.getSkill(9101001).getEffect(SkillFactory.getSkill(9101001).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(9101002).getEffect(SkillFactory.getSkill(9101002).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(9101003).getEffect(SkillFactory.getSkill(9101003).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(9101008).getEffect(SkillFactory.getSkill(9101008).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(2321000).getEffect(SkillFactory.getSkill(2321000).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(3121002).getEffect(SkillFactory.getSkill(3121002).getMaxLevel()).applyTo(player);
                         SkillFactory.getSkill(1005).getEffect(SkillFactory.getSkill(1005).getMaxLevel()).applyTo(player);
-                        player.setHp(player.getMaxHp());
-                        player.updateSingleStat(MapleStat.HP, player.getMaxHp());
-                        player.setMp(player.getMaxMp());
-                        player.updateSingleStat(MapleStat.MP, player.getMaxMp());
                                 break;
-                        
-                case "goto":
+                  */      
+                /*case "goto":
                         if (sub.length < 2){
 				player.yellowMessage("Syntax: @goto <map name>");
 				break;
@@ -778,8 +827,8 @@ public class Commands {
 				player.dropMessage(5, "That map does not exist.");
 			}
                                 break;
-								
-                case "recharge":
+			*/					
+             /*   case "recharge":
                         MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
                         for (Item torecharge : c.getPlayer().getInventory(MapleInventoryType.USE).list()) {
                                 if (ItemConstants.isThrowingStar(torecharge.getItemId())){
@@ -791,14 +840,14 @@ public class Commands {
                                 } else if (ItemConstants.isBullet(torecharge.getItemId())){
                                         torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
                                         c.getPlayer().forceUpdateItem(torecharge);
-                                } else if (ItemConstants.isConsumable(torecharge.getItemId())){
-                                        torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
-                                        c.getPlayer().forceUpdateItem(torecharge);
-                                }
+                                } //else if (ItemConstants.isConsumable(torecharge.getItemId())){
+                                  //      torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
+                                  //     c.getPlayer().forceUpdateItem(torecharge);
+                                //}
                         }
                         player.dropMessage(5, "USE Recharged.");
                                 break;
-		            
+		            */
                 default:
                         return false;
                 }
@@ -844,6 +893,7 @@ public class Commands {
                 case "unhide":
                         SkillFactory.getSkill(9101004).getEffect(SkillFactory.getSkill(9101004).getMaxLevel()).applyTo(player);
                     break;
+                    
                         
                 case "sp":
                         if (sub.length < 2){
@@ -1175,6 +1225,7 @@ public class Commands {
 				player.dropMessage(6, "Unknown player.");
 			}
                     break;
+                    
                     
                 case "reach":
                         if (sub.length < 2){

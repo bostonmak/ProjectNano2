@@ -179,6 +179,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     private int initialSpawnPoint;
     private int mapid;
     private int gender;
+    private int rewardpoints; //rewardpoints~@!@#
     private int currentPage, currentType = 0, currentTab = 1;
     private int itemEffect;
     private int guildid, guildRank, allianceRank;
@@ -311,7 +312,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     private int banishMap = -1;
     private int banishSp = -1;
     private long banishTime = 0;
-
+    
     private MapleCharacter() {
         useCS = false;
         
@@ -395,6 +396,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
         ret.getInventory(MapleInventoryType.USE).setSlotLimit(24);
         ret.getInventory(MapleInventoryType.SETUP).setSlotLimit(24);
         ret.getInventory(MapleInventoryType.ETC).setSlotLimit(24);
+        
         
         // Select a keybinding method
         int[] selectedKey;
@@ -1382,6 +1384,10 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     public void changePage(int page) {
         this.currentPage = page;
     }
+    
+    
+    
+    
 
     public void changeSkillLevel(Skill skill, byte newLevel, int newMasterlevel, long expiration) {
         if (newLevel > -1) {
@@ -3965,6 +3971,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
         return level;
     }
 
+
     public int getLuk() {
         return luk;
     }
@@ -5121,11 +5128,11 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
         } else if (level == 80) {
             yellowMessage("You think you are powerful enough? Try facing horntail!");
         } else if (level == 85) {
-            yellowMessage("Did you know? The majority of people who hit level 85 in Solaxia don't live to be 85 years old?");
+            yellowMessage("Did you know? The majority of people who hit level 85 in ProjectNano don't live to be 85 years old?");
         } else if (level == 90) {
             yellowMessage("Hey do you like the amusement park? I heard Spooky World is the best theme park around. I heard they sell cute teddy-bears.");
         } else if (level == 95) {
-            yellowMessage("100% of people who hit level 95 in Solaxia don't live to be 95 years old.");
+            yellowMessage("100% of people who hit level 95 in ProjectNano don't live to be 95 years old.");
         } else if (level == 100) {
             yellowMessage("Mid-journey so far... You just reached level 100! Now THAT's such a feat, however to manage the 200 you will need even more passion and determination than ever! Good hunting!");
         } else if (level == 105) {
@@ -5363,7 +5370,6 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
             MapleCharacter ret = new MapleCharacter();
             ret.client = client;
             ret.id = charid;
-            
             Connection con = DatabaseConnection.getConnection();
             PreparedStatement ps = con.prepareStatement("SELECT * FROM characters WHERE id = ?");
             ps.setInt(1, charid);
@@ -5440,6 +5446,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
             ret.getInventory(MapleInventoryType.USE).setSlotLimit(rs.getByte("useslots"));
             ret.getInventory(MapleInventoryType.SETUP).setSlotLimit(rs.getByte("setupslots"));
             ret.getInventory(MapleInventoryType.ETC).setSlotLimit(rs.getByte("etcslots"));
+            //ret.rewardpoints = rs.getInt("rewardpoints");//needs to be moved to account load
             for (Pair<Item, MapleInventoryType> item : ItemFactory.INVENTORY.loadItems(ret.id, !channelserver)) {
                 ret.getInventory(item.getRight()).addFromDB(item.getLeft());
                 Item itemz = item.getLeft();
@@ -5562,9 +5569,21 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
             rs = ps.executeQuery();
             if (rs.next()) {
                 ret.getClient().setAccountName(rs.getString("name"));
+				
             }
             rs.close();
             ps.close();
+            ps = con.prepareStatement("SELECT rewardpoints FROM accounts WHERE id = ?", Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, ret.accountid);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                ret.rewardpoints = rs.getInt("rewardpoints");
+				
+            }
+            rs.close();
+            ps.close();
+			
+			
             ps = con.prepareStatement("SELECT `area`,`info` FROM area_info WHERE charid = ?");
             ps.setInt(1, ret.id);
             rs = ps.executeQuery();
@@ -6524,6 +6543,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
             ps.setString(48, dataString);
             ps.setInt(49, quest_fame);
             ps.setLong(50, jailExpiration);
+			//ps.setInt(51, rewardpoints);
             ps.setInt(51, id);
 
             int updateRows = ps.executeUpdate();
@@ -6595,6 +6615,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
                 }
             }
             ItemFactory.INVENTORY.saveItems(itemsWithType, id, con);
+			
 			
             deleteWhereCharacterId(con, "DELETE FROM skills WHERE characterid = ?");
             ps = con.prepareStatement("INSERT INTO skills (characterid, skillid, skilllevel, masterlevel, expiration) VALUES (?, ?, ?, ?, ?)");
@@ -6693,13 +6714,13 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
                         }
                     }
                 }
-            }
+            }	
             psf.close();
-            ps = con.prepareStatement("UPDATE accounts SET gm = ? WHERE id = ?");
-            ps.setInt(1, gmLevel > 1 ? 1 : 0);
-            ps.setInt(2, client.getAccID());
-            ps.executeUpdate();
-            ps.close();
+            ps = con.prepareStatement("UPDATE accounts SET gm = ?  WHERE id = ?");
+                    ps.setInt(1, gmLevel > 1 ? 1 : 0);
+                    ps.setInt(2, client.getAccID());
+                    ps.executeUpdate();
+                    ps.close();
 			
             con.commit();
             con.setAutoCommit(true);
@@ -6710,6 +6731,15 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
             if (storage != null) {
                 storage.saveToDB(con);
             }
+			
+			ps = con.prepareStatement("UPDATE accounts SET rewardpoints = ?  WHERE id = ?");
+			ps.setInt(1, rewardpoints);
+			ps.setInt(2, client.getAccID());
+			ps.executeUpdate();
+			ps.close();
+                     
+                        //ret.rewardpoints = rs.getInt("rewardpoints");
+                        
         } catch (SQLException | RuntimeException t) {
             FilePrinter.printError(FilePrinter.SAVE_CHAR, t, "Error saving " + name + " Level: " + level + " Job: " + job.getId());
             try {
@@ -6728,6 +6758,14 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
                 e.printStackTrace();
             }
         }
+    }
+  
+  public void gainrewardpoints(int gain){
+        this.rewardpoints += gain;
+    }
+
+    public int getrewardpoints(){
+        return this.rewardpoints;
     }
 
     public void sendPolice(int greason, String reason, int duration) {
@@ -7403,10 +7441,22 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
             this.masterlevel = masterlevel;
             this.expiration = expiration;
         }
+        
 
         @Override
         public String toString() {
             return skillevel + ":" + masterlevel;
+        }
+    }
+    
+    public static class MasteryEntry {
+        
+        public int masterylevel;
+        public long expiration;
+        
+        public MasteryEntry(int masterylevel, long expiration) {
+            this.masterylevel = masterylevel;
+            this.expiration = expiration;
         }
     }
 
