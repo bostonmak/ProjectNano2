@@ -6732,13 +6732,13 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
                 storage.saveToDB(con);
             }
 			
-			ps = con.prepareStatement("UPDATE accounts SET rewardpoints = ?  WHERE id = ?");
-			ps.setInt(1, rewardpoints);
-			ps.setInt(2, client.getAccID());
-			ps.executeUpdate();
-			ps.close();
-                     
-                        //ret.rewardpoints = rs.getInt("rewardpoints");
+            ps = con.prepareStatement("UPDATE accounts SET rewardpoints = ?  WHERE id = ?");
+            ps.setInt(1, rewardpoints);
+            ps.setInt(2, client.getAccID());
+            ps.executeUpdate();
+            ps.close();
+
+            //ret.rewardpoints = rs.getInt("rewardpoints");
                         
         } catch (SQLException | RuntimeException t) {
             FilePrinter.printError(FilePrinter.SAVE_CHAR, t, "Error saving " + name + " Level: " + level + " Job: " + job.getId());

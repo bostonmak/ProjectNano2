@@ -103,6 +103,7 @@ import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import constants.ItemConstants;
 import constants.ServerConstants;
+import java.sql.Statement;
 import java.util.ArrayList;
 import server.life.SpawnPoint;
 import server.maps.FieldLimit;
@@ -1973,6 +1974,37 @@ public class Commands {
 				player.yellowMessage("Syntax: !givevp <playername> <gainvotepoint>");
 				break;
 			}
+                        victim = cserv.getPlayerStorage().getCharacterByName(sub[1]);
+                        Connection con = null;
+                        try {
+                            con = DatabaseConnection.getConnection();
+                            con.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+                            con.setAutoCommit(false);
+                            PreparedStatement ps;
+                            ps = con.prepareStatement("UPDATE accounts SET rewardpoints = ?  WHERE id = ?");
+                            ps.setInt(1, Integer.parseInt(sub[2]));
+                            ps.setInt(2, victim.getClient().getAccID());
+                            ps.executeUpdate();
+                            ps.close();
+                        }
+                        catch (SQLException | RuntimeException t) {
+                            FilePrinter.printError(FilePrinter.SAVE_CHAR, t, "Error saving " + sub[1]);
+                            try {
+                                con.rollback();
+                            } catch (SQLException se) {
+                                FilePrinter.printError(FilePrinter.SAVE_CHAR, se, "Error trying to rollback " + sub[1]);
+                            }
+                        } catch (Exception e) {
+                            FilePrinter.printError(FilePrinter.SAVE_CHAR, e, "Error saving " + sub[1]);
+                        } finally {
+                            try {
+                                con.setAutoCommit(true);
+                                con.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+                                con.close();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                         
                         victim = cserv.getPlayerStorage().getCharacterByName(sub[1]);
                         if(victim != null) {
