@@ -1271,6 +1271,23 @@ public class MapleMonster extends AbstractLoadedMapleLife {
         }
     }
     
+    public void dispel() {
+        if (!isAlive()) {
+            return;
+        }
+
+        for (MonsterStatus i : MonsterStatus.values()) {
+            if (getStati().containsKey(i)) {
+                debuffMob(i.getValue());
+                byte[] packet = MaplePacketCreator.cancelMonsterStatus(getObjectId(), Collections.singletonMap(i, Integer.valueOf(1)));
+                map.broadcastMessage(packet, getPosition());
+                if (getController() != null && !getController().isMapObjectVisible(MapleMonster.this)) {
+                    getController().getClient().getSession().write(packet);
+                }
+            }
+        }
+    }
+    
     // ---- one can always have fun trying these pieces of codes below in-game rofl ----
     
     public final ChangeableStats getChangedStats() {

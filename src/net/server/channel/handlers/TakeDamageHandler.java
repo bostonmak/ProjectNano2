@@ -146,7 +146,7 @@ public final class TakeDamageHandler extends AbstractMaplePacketHandler {
 	            mpattack += attackInfo.getMpBurn();
 	            MobSkill mobSkill = MobSkillFactory.getMobSkill(attackInfo.getDiseaseSkill(), attackInfo.getDiseaseLevel());
 	            if (mobSkill != null && damage > 0) {
-	                mobSkill.applyEffect(chr, attacker, false, banishPlayers);
+	                mobSkill.applyEffect(chr, attacker, false);
 	            }
 	            
                     attacker.setMp(attacker.getMp() - attackInfo.getMpCon());

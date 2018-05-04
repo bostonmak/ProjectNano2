@@ -400,7 +400,7 @@ public class MCField {
         loser.broadcast(MaplePacketCreator.showEffect(effectLose));
         loser.broadcast(MaplePacketCreator.playSound(soundLose));
 
-        this.getMap(MCMaps.BATTLEFIELD).killAllMonsters(false);
+        this.getMap(MCMaps.BATTLEFIELD).killAllMonsters();
         this.getMap(MCMaps.BATTLEFIELD).clearDrops();
         this.deregister(false);
 

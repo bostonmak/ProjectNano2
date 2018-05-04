@@ -101,6 +101,7 @@ import server.partyquest.MonsterCarnival;
 import server.partyquest.MonsterCarnivalParty;
 import server.partyquest.PartyQuest;
 import server.partyquest.mcpq.MCField;
+import server.partyquest.mcpq.MCParty;
 import server.quest.MapleQuest;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
@@ -312,6 +313,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     private int banishMap = -1;
     private int banishSp = -1;
     private long banishTime = 0;
+    private boolean isDead = false;
 
     private MapleCharacter() {
         useCS = false;
@@ -5881,6 +5883,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     private void playerDead() {
         cancelAllBuffs(false);
         dispelDebuffs();
+        this.isDead = true;
         
         EventInstanceManager eim = getEventInstance();
         if (eim != null) {
@@ -6980,6 +6983,9 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
         if (oldHp > hp && !isAlive()) {
             playerDead();
         }
+        else if (isDead) {
+            isDead = false;
+        }
     }
 
     public void setHpMpApUsed(int mpApUsed) {
@@ -7991,7 +7997,9 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     private int obtainedcp = 0;
     private MonsterCarnivalParty carnivalparty;
     private MonsterCarnival carnival;
-    private MCField mcpqField;
+    private MCField mcpqField;    
+    private MCField.MCTeam MCPQTeam;
+    private MCParty MCPQParty;
 
     public MonsterCarnivalParty getCarnivalParty() {
         return carnivalparty;
@@ -8020,16 +8028,33 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     public int getObtainedCP() {
         return obtainedcp;
     }
-     public int getTotalCP() {
+    public int getTotalCP() {
          return obtainedcp;
-     }
+    }
+    
+    public void setAvailableCP(int availableCP) {
+        cp = availableCP;
+    }
+    
+    public void setTotalCP(int totalCP) {
+        obtainedcp = totalCP;
+    }
 
     public void addCP(int cp) {
         this.cp += cp;
         this.obtainedcp += cp;
     }
+    
+    public void gainCP(int cp) {
+        this.cp += cp;
+        this.obtainedcp += cp;
+    }
 
     public void useCP(int cp) {
+        this.cp -= cp;
+    }
+    
+    public void loseCP(int cp) {
         this.cp -= cp;
     }
 
@@ -8054,6 +8079,22 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     
     public void setMCPQField(MCField field) {
         this.mcpqField = field;
+    }
+    
+    public MCField.MCTeam getMCPQTeam() {
+        return MCPQTeam;
+    }
+
+    public void setMCPQTeam(MCField.MCTeam MCPQTeam) {
+        this.MCPQTeam = MCPQTeam;
+    }
+    
+    public MCParty getMCPQParty() {
+        return MCPQParty;
+    }
+
+    public void setMCPQParty(MCParty MCPQParty) {
+        this.MCPQParty = MCPQParty;
     }
 
     public AutobanManager getAutobanManager() {
@@ -8277,5 +8318,9 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     
     public void removeJailExpirationTime() {
         jailExpiration = 0;
+    }
+    
+    public boolean isDead() {
+        return isDead;
     }
 }

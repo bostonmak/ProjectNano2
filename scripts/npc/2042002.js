@@ -6,13 +6,13 @@
  */
 var DISABLED = false;
 
-var SavedLocationType = src.server.maps.SavedLocationType;
+var SavedLocationType = Packages.src.server.maps.SavedLocationType;
 
 // Relevant Monster Carnival classes
-var MonsterCarnival = src.server.partyquest.mcpq.MonsterCarnival;
-var MCTracker = src.server.partyquest.mcpq.MCTracker;
-var MCParty = src.server.partyquest.mcpq.MCParty;
-var MCField = src.server.partyquest.mcpq.MCField;
+var MonsterCarnival = Packages.src.server.partyquest.mcpq.MonsterCarnival;
+var MCTracker = Packages.src.server.partyquest.mcpq.MCTracker;
+var MCParty = Packages.src.server.partyquest.mcpq.MCParty;
+var MCField = Packages.src.server.partyquest.mcpq.MCField;
 
 // NPC variables
 var status = -1;
@@ -213,7 +213,7 @@ function doTown(mode, type, selection) {
                     cm.dispose();
                     return;
                 }
-                cm.getChar().saveLocation(SavedLocationType.MONSTER_CARNIVAL);
+                cm.getChar().saveLocation(SavedLocationType.EVENT);
                 cm.warp(MonsterCarnival.MAP_LOBBY, 4);
                 cm.dispose();
                 return;

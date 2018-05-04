@@ -94,7 +94,7 @@ public final class MoveLifeHandler extends AbstractMovementPacketHandler {
 				} else if (toUse.getHP() < percHpLeft) {
 					toUse = null;
 				} else if (monster.canUseSkill(toUse)) {
-					toUse.applyEffect(c.getPlayer(), monster, true, banishPlayers);
+					toUse.applyEffect(c.getPlayer(), monster, true);
 					//System.out.println("Applied: " + nextCastSkill + " Level: " + nextCastSkillLevel);
 				}
 			} else {

@@ -1,6 +1,7 @@
 package server.partyquest.mcpq;
 import client.MapleCharacter;
 import client.MapleDisease;
+import net.server.Server;
 import net.server.channel.Channel;
 import net.server.world.MapleParty;
 import org.slf4j.Logger;
@@ -42,7 +43,7 @@ public class MonsterCarnival {
         if (instances.containsKey(channel)) {
             return instances.get(channel);
         }
-        Channel cserv = Channel.getInstance(channel);
+        Channel cserv = Server.getInstance().getChannel(0, channel);
         if (cserv == null) {
             log.error("Channel instance for channel " + channel + " is null.");
             return null;

@@ -126,7 +126,7 @@ public class MCBattlefield {
 
         MapleMonster monster = MapleLifeFactory.getMonster(mobToSummon.id);
         Point pos = new Point(spawnPos.x, spawnPos.y);
-        SpawnPoint sp = new SpawnPoint(monster, pos, mobToSummon.mobTime, chr.getTeam());
+        SpawnPoint sp = new SpawnPoint(monster, pos, !monster.isMobile(), mobToSummon.mobTime, 0, chr.getTeam());
 
         addedSpawns.add(sp);
         updateMonsterBuffs();
@@ -433,14 +433,17 @@ public class MCBattlefield {
     public void spawningTask() {
         for (SpawnPoint sp : originalSpawns) {
             if (sp.shouldSpawn()) {
-                MapleMonster mob = sp.spawnMonster(this.map);
-                giveMonsterBuffs(mob);
+                MapleMonster m = sp.getMonster();
+                giveMonsterBuffs(m);
+                this.map.spawnMonster(m);
             }
         }
         for (SpawnPoint sp : addedSpawns) {
             if (sp.shouldSpawn()) {
-                MapleMonster mob = sp.spawnMonster(this.map);
-                giveMonsterBuffs(mob);
+                MapleMonster m = sp.getMonster();
+                giveMonsterBuffs(m);
+                this.map.spawnMonster(m);
             }
         }
-    } }  
+    } 
+}  

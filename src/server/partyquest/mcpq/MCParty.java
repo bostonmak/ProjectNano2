@@ -1,7 +1,7 @@
 package server.partyquest.mcpq;
 import client.MapleCharacter;
 import client.MapleDisease;
-import net.server.channel.Channel;
+import net.server.Server;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import server.life.MobSkill;
@@ -35,7 +35,7 @@ public class MCParty {
         this.party = party;
         for (MaplePartyCharacter chr : party.getMembers()) {
             if (!chr.isOnline()) continue;
-            MapleCharacter c = Channel.getInstance(chr.getChannel()).getPlayerStorage().getCharacterById(chr.getId());
+            MapleCharacter c = Server.getInstance().getChannel(chr.getWorld(), chr.getChannel()).getPlayerStorage().getCharacterById(chr.getId());
 
             characters.add(c);
         }
@@ -245,13 +245,13 @@ public class MCParty {
         if (skill.getTarget() == 2) {
             for (MapleCharacter chr : getMembers()) {
                 if (MonsterCarnival.isBattlefieldMap(chr.getMapId())) {
-                    chr.giveDebuff(disease, s, true);
+                    chr.giveDebuff(disease, s);
                 }
             }
             return true;
         } else {
             if (getRandomMember() != null) {
-                getRandomMember().giveDebuff(disease, s, true);
+                getRandomMember().giveDebuff(disease, s);
                 return true;
             } else {
                 return false;
