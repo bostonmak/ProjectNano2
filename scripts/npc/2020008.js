@@ -25,6 +25,15 @@ var job;
 var sel;
 actionx = {"Mental" : false, "Physical" : false};
 
+function isWarriorOrAran(jobId) {
+    if (parseInt(jobId / 100) == 1) {
+        return true;
+    } else if (parseInt(jobId / 100) == 21) {
+        return true;
+    }
+    return false;
+}
+
 function start() {
     if(cm.isQuestStarted(6192)) {
         if(cm.getWarpMap(921100300).getCharacters().size() > 0)
@@ -38,7 +47,7 @@ function start() {
         return;
     }
     
-    if (!(cm.getPlayer().getLevel() >= 70 && parseInt(cm.getJobId() / 100) == 1)){
+    if (!(cm.getPlayer().getLevel() >= 70 && isWarriorOrAran(cm.getJobId()))){
         cm.sendNext("Hi there.");
         cm.dispose();
         return;
