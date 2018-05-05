@@ -1436,9 +1436,11 @@ public class Commands {
                     break;
                     
                 case "resetskill":
+                        int totalSP = player.getRemainingSp();
 			for (MapleData skill_ : MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/" + "String.wz")).getData("Skill.img").getChildren()) {
 				try {
 					skill = SkillFactory.getSkill(Integer.parseInt(skill_.getName()));
+                                        totalSP += player.getSkillLevel(skill);
                                         player.changeSkillLevel(skill, (byte) 0, skill.getMaxLevel(), -1);
 				} catch (NumberFormatException nfe) {
                                         nfe.printStackTrace();
@@ -1456,7 +1458,9 @@ public class Commands {
                                 player.changeSkillLevel(skill, (byte) -1, -1, -1);
                         }
                         
-                        player.yellowMessage("Skills reseted.");
+                        player.setRemainingSp(totalSP);
+                        
+                        player.yellowMessage("Skills reset.");
                     break;
                     
                 case "mesos":
