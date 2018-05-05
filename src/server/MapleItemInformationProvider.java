@@ -1096,7 +1096,12 @@ public class MapleItemInformationProvider {
                 return null;
             }
             MapleData spec = item.getChildByPath("spec");
-            ret = MapleStatEffect.loadItemEffectFromData(spec, itemId);
+            if (spec == null) {
+                ret = null;
+            }
+            else {
+                ret = MapleStatEffect.loadItemEffectFromData(spec, itemId);
+            }
             itemEffects.put(Integer.valueOf(itemId), ret);
         }
         return ret;
