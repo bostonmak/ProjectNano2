@@ -1441,7 +1441,13 @@ public class Commands {
 				try {
 					skill = SkillFactory.getSkill(Integer.parseInt(skill_.getName()));
                                         totalSP += player.getSkillLevel(skill);
-                                        player.changeSkillLevel(skill, (byte) 0, skill.getMaxLevel(), -1);
+                                        if (skill.isFourthJob()) {
+                                            // reset 4th job skills max level to 10
+                                            player.changeSkillLevel(skill, (byte) 0, 10, -1);
+                                        }
+                                        else {
+                                            player.changeSkillLevel(skill, (byte) 0, skill.getMaxLevel(), -1);
+                                        }
 				} catch (NumberFormatException nfe) {
                                         nfe.printStackTrace();
 					break;
