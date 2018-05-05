@@ -659,7 +659,7 @@ public class Commands {
                         boolean luk = sub[0].equalsIgnoreCase("luk");
                         boolean dex = sub[0].equalsIgnoreCase("dex");
 
-                        if (amount > 0 && amount <= player.getRemainingAp() && amount <= 32763 || amount < 0 && amount >= -32763 && Math.abs(amount) + player.getRemainingAp() <= 32767) {
+                        if (amount > 0 && amount <= player.getRemainingAp() && amount <= 32763) {
                             if (str && amount + player.getStr() <= 32767 && amount + player.getStr() >= 4) {
                                 player.setStr(player.getStr() + amount);
                                 player.updateSingleStat(MapleStat.STR, player.getStr());
