@@ -446,17 +446,7 @@ public class Commands {
                     
                 case "equiplv":
                         player.showAllEquipFeatures();
-                        break;
-                case "buffme":
-                        //GM Skills : Haste(Super) - Holy Symbol - Bless - Hyper Body - Echo of Hero - maple warrior - sharp eyes
-                        SkillFactory.getSkill(9101001).getEffect(SkillFactory.getSkill(9101001).getMaxLevel()).applyTo(player);
-                        SkillFactory.getSkill(9101002).getEffect(SkillFactory.getSkill(9101002).getMaxLevel()).applyTo(player);
-                        SkillFactory.getSkill(9101003).getEffect(SkillFactory.getSkill(9101003).getMaxLevel()).applyTo(player);
-                        SkillFactory.getSkill(9101008).getEffect(SkillFactory.getSkill(9101008).getMaxLevel()).applyTo(player);
-                        SkillFactory.getSkill(2321000).getEffect(SkillFactory.getSkill(2321000).getMaxLevel()).applyTo(player);
-                        SkillFactory.getSkill(3121002).getEffect(SkillFactory.getSkill(3121002).getMaxLevel()).applyTo(player);
-                        SkillFactory.getSkill(1005).getEffect(SkillFactory.getSkill(1005).getMaxLevel()).applyTo(player);
-                                break;    
+                        break;  
                     
 
                 case "showrates":
@@ -955,6 +945,17 @@ public class Commands {
                                 }
 			}
                     break;
+                    
+                case "buffme":
+                        //GM Skills : Haste(Super) - Holy Symbol - Bless - Hyper Body - Echo of Hero - maple warrior - sharp eyes
+                        SkillFactory.getSkill(9101001).getEffect(SkillFactory.getSkill(9101001).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(9101002).getEffect(SkillFactory.getSkill(9101002).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(9101003).getEffect(SkillFactory.getSkill(9101003).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(9101008).getEffect(SkillFactory.getSkill(9101008).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(2321000).getEffect(SkillFactory.getSkill(2321000).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(3121002).getEffect(SkillFactory.getSkill(3121002).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(1005).getEffect(SkillFactory.getSkill(1005).getMaxLevel()).applyTo(player);
+                                break; 
                     
                 case "empowerme":
 			final int[] array = {2311003, 2301004, 1301007, 4101004, 2001002, 1101007, 1005, 2301003, 5121009, 1111002, 4111001, 4111002, 4211003, 4211005, 1321000, 2321004, 3121002};
@@ -2257,7 +2258,7 @@ public class Commands {
 				//Ban ip
 				PreparedStatement ps = null;
 				try {
-					Connection con = DatabaseConnection.getConnection();
+					con = DatabaseConnection.getConnection();
 					if (ip.matches("/[0-9]{1,3}\\..*")) {
 						ps = con.prepareStatement("INSERT INTO ipbans VALUES (DEFAULT, ?, ?)");
 						ps.setString(1, ip);
@@ -2302,7 +2303,7 @@ public class Commands {
 			}
                     
 			try {
-                                Connection con = DatabaseConnection.getConnection();
+                                con = DatabaseConnection.getConnection();
                                 int aid = MapleCharacter.getAccountIdByName(sub[1]);
                                 
                                 PreparedStatement p = con.prepareStatement("UPDATE accounts SET banned = -1 WHERE id = " + aid);
