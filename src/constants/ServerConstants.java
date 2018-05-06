@@ -82,7 +82,7 @@ public class ServerConstants {
     //Server Rates And Experience
     public static final int EXP_RATE = 8;
     public static final int MESO_RATE = 5;
-    public static final int DROP_RATE = 5;
+    public static final int DROP_RATE = 3;
     public static final int QUEST_RATE = 5;                         //Multiplier for Exp & Meso gains when completing a quest. Only available when USE_QUEST_RATE is true. Stacks with server Exp & Meso rates.
     public static final double EQUIP_EXP_RATE = 1.0;               //Rate for equipment exp gain, grows linearly. Set 1.0 for default (about 100~200 same-level range mobs killed to pass equip from level 1 to 2).
     
