@@ -371,12 +371,12 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 			}
 		}
 	}
-public void teachSkill(int skillId, byte newLevel) {
+public void teachSkill(int skillId, byte newLevel, int newMaxLevel) {
     /*if(skill.getMaxLevel()=30)
     {
         getPlayer().changeSkillLevel(SkillFactory.getSkill(skillId), newLevel, 10, -1);
     }*/
-    getPlayer().changeSkillLevel(SkillFactory.getSkill(skillId), newLevel, 10, -1);
+    getPlayer().changeSkillLevel(SkillFactory.getSkill(skillId), newLevel, newMaxLevel, -1);
 }
 	public void doGachapon() {
 		int[] maps = {100000000, 101000000, 102000000, 103000000, 105040300, 800000000, 809000101, 809000201, 600000000, 120000000};

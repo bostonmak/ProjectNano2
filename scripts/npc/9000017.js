@@ -1,157 +1,197 @@
 function start() {
-    cm.sendYesNo("Hey are you an aran? Want me to teach you your hidden skills so you don't have to do quests? If so click yes and I will add them for you.");
+    cm.sendYesNo("Would you like me to teach you all your 4th job skills?  Make sure you reset your SP or you will lose the SP you currently used");
 }
 
 function action(mode, type, selection) {
         //cm.resetStats();
  // Double Swing
-        cm.teachSkill(21000000,0); // Combat Ability
+        /*cm.teachSkill(21000000,0,30); // Combat Ability
  // Combat Step
-        cm.teachSkill(21001003,0); // Pole Arm Booster
+        cm.teachSkill(21001003,0,30); // Pole Arm Booster
         // Aran Second job
  // Triple Swing
-        cm.teachSkill(21100000,0); // Pole Arm Mastery
-        cm.teachSkill(21100002,0); // Final Charge
+        cm.teachSkill(21100000,0,30); // Pole Arm Mastery
+        cm.teachSkill(21100002,0,30); // Final Charge
  // Body Pressure
-        cm.teachSkill(21100004,0); // Combo Smash
-        cm.teachSkill(21100005,0); // Combo Drain
+        cm.teachSkill(21100004,0,10); // Combo Smash
+        cm.teachSkill(21100005,0,10); // Combo Drain
+		cm.teachSkill(21121000,0,10); // Maple Warrior
+		cm.teachSkill(21120002,0,10); // Overswing
+		cm.teachSkill(21120001,0,10); // Aggression
+		cm.teachSkill(21120005,0,10); // Final Blow
+		cm.teachSkill(21121003,0,10); // Freezing Posture
+		cm.teachSkill(21120004,0,10); // High Class Defense
+		cm.teachSkill(21120006,0,10); // Combo Tempest
+		cm.teachSkill(21120007,0,10); // Combo Barrier
+		cm.teachSkill(21121008,0,10); // Solider's Will
+*/
+        cm.teachSkill(1007,3,3);     // maker skill for non-Arans
+        cm.teachSkill(20001007,3,3); // maker skill for arans
         
         // Aran Thief Job
-        cm.teachSkill(21110000,0); // Critical Combo
-        cm.teachSkill(21110002,0); // Full Swing
-        cm.teachSkill(21110003,0); // Final Toss
-        cm.teachSkill(21110004,0); // Fenir Phantom
-        cm.teachSkill(21111005,0); // Snow Charge
-        cm.teachSkill(21110006,0); // WhirlWind
-        cm.teachSkill(21111001,0); // Smart Knockback
-        cm.teachSkill(1120004,0); //Achilles
-        cm.teachSkill(1120003,0); //Advanced Combo
-        cm.teachSkill(1121011,0); //Hero's Will
-        cm.teachSkill(1120005,0); //Blocking
-        cm.teachSkill(1121008,0); //Brandish
-        cm.teachSkill(1121010,0); //Enrage
-        cm.teachSkill(1121000,0); //Maple Warrior
-        cm.teachSkill(1121001,0); //Monster Magnet
-        cm.teachSkill(1121006,0); //Rush
-        cm.teachSkill(1121002,0); //Stance
+        cm.teachSkill(21110000,0,10); // Critical Combo
+        cm.teachSkill(21110002,0,10); // Full Swing
+        cm.teachSkill(21110003,0,10); // Final Toss
+        cm.teachSkill(21110004,0,10); // Fenir Phantom
+        cm.teachSkill(21111005,0,10); // Snow Charge
+        cm.teachSkill(21110006,0,10); // WhirlWind
+        cm.teachSkill(21111001,0,10); // Smart Knockback
+        cm.teachSkill(1120004,0,10); //Achilles
+        cm.teachSkill(1120003,0,10); //Advanced Combo
+        cm.teachSkill(1121011,0,10); //Hero's Will
+        cm.teachSkill(1120005,0,10); //Blocking
+        cm.teachSkill(1121008,0,10); //Brandish
+        cm.teachSkill(1121010,0,10); //Enrage
+        cm.teachSkill(1121000,0,10); //Maple Warrior
+        cm.teachSkill(1121001,0,10); //Monster Magnet
+        cm.teachSkill(1121006,0,10); //Rush
+        cm.teachSkill(1121002,0,10); //Stance
         //Paladin (4th Job)
-        cm.teachSkill(1220005,0); //Achilles
-        cm.teachSkill(1220010,0); //Advanced Charge
-        cm.teachSkill(1221012,0); //Hero's Will
-        cm.teachSkill(1221009,0); //Blast
-        cm.teachSkill(1220006,0); //Blocking
-        cm.teachSkill(1221004,0); //Divine Charge: Mace
-        cm.teachSkill(1221003,0); //Holy Charge: Sword
-        cm.teachSkill(1221000,0); //Maple Warrior
-        cm.teachSkill(1221001,0); //Monster Magnet
-        cm.teachSkill(1221007,0); //Rush
-        cm.teachSkill(1221011,0); //Sanctuary
-        cm.teachSkill(1221002,0); //Stance
+        cm.teachSkill(1220005,0,10); //Achilles
+        cm.teachSkill(1220010,0,10); //Advanced Charge
+        cm.teachSkill(1221012,0,10); //Hero's Will
+        cm.teachSkill(1221009,0,10); //Blast
+        cm.teachSkill(1220006,0,10); //Blocking
+        cm.teachSkill(1221004,0,10); //Divine Charge: Mace
+        cm.teachSkill(1221003,0,10); //Holy Charge: Sword
+        cm.teachSkill(1221000,0,10); //Maple Warrior
+        cm.teachSkill(1221001,0,10); //Monster Magnet
+        cm.teachSkill(1221007,0,10); //Rush
+        cm.teachSkill(1221011,0,10); //Sanctuary
+        cm.teachSkill(1221002,0,10); //Stance
         //Dark Knight (4th Job)
-        cm.teachSkill(1320005,0); //Achilles
-        cm.teachSkill(1321010,0); //Hero's Will
-        cm.teachSkill(1321007,0); //Beholder
-        cm.teachSkill(1320009,0); //Beholder's Buff
-        cm.teachSkill(1320008,0); //Beholder's Healing
-        cm.teachSkill(1320006,0); //Berserk
-        cm.teachSkill(1321000,0); //Maple Warrior
-        cm.teachSkill(1321001,0); //Monster Magnet
-        cm.teachSkill(1321003,0); //Rush
-        cm.teachSkill(1321002,0); //Stance
+        cm.teachSkill(1320005,0,10); //Achilles
+        cm.teachSkill(1321010,0,10); //Hero's Will
+        cm.teachSkill(1321007,0,10); //Beholder
+        cm.teachSkill(1320009,0,30); //Beholder's Buff
+        cm.teachSkill(1320008,0,30); //Beholder's Healing
+        cm.teachSkill(1320006,0,10); //Berserk
+        cm.teachSkill(1321000,0,10); //Maple Warrior
+        cm.teachSkill(1321001,0,10); //Monster Magnet
+        cm.teachSkill(1321003,0,10); //Rush
+        cm.teachSkill(1321002,0,10); //Stance
         //Fire/Poison Arch Mage (4th Job)
-        cm.teachSkill(2121008,0); //Hero's Will
-        cm.teachSkill(2121001,0); //Big Bang
-        cm.teachSkill(2121005,0); //Elquines
-        cm.teachSkill(2121003,0); //Fire Demon
-        cm.teachSkill(2121004,0); //Infinity
-        cm.teachSkill(2121002,0); //Mana Reflection
-        cm.teachSkill(2121000,0); //Maple Warrior
-        cm.teachSkill(2121007,0); //Meteo
-        cm.teachSkill(2121006,0); //Paralyze
+        cm.teachSkill(2121008,0,10); //Hero's Will
+        cm.teachSkill(2121001,0,10); //Big Bang
+        cm.teachSkill(2121005,0,10); //Elquines
+        cm.teachSkill(2121003,0,10); //Fire Demon
+        cm.teachSkill(2121004,0,10); //Infinity
+        cm.teachSkill(2121002,0,10); //Mana Reflection
+        cm.teachSkill(2121000,0,10); //Maple Warrior
+        cm.teachSkill(2121007,0,10); //Meteo
+        cm.teachSkill(2121006,0,10); //Paralyze
         //Ice/Lightning Arch Mage (4th Job)
-        cm.teachSkill(2221008,0); //Hero's Will
-        cm.teachSkill(2221001,0); //Big Bang
-        cm.teachSkill(2221007,0); //Blizzard
-        cm.teachSkill(2221006,0); //Chain Lightning
-        cm.teachSkill(2221003,0); //Ice Demon
-        cm.teachSkill(2221005,0); //Ifrit
-        cm.teachSkill(2221004,0); //Infinity
-        cm.teachSkill(2221002,0); //Mana Reflection
-        cm.teachSkill(2221000,0); //Maple Warrior
+        cm.teachSkill(2221008,0,10); //Hero's Will
+        cm.teachSkill(2221001,0,10); //Big Bang
+        cm.teachSkill(2221007,0,10); //Blizzard
+        cm.teachSkill(2221006,0,10); //Chain Lightning
+        cm.teachSkill(2221003,0,10); //Ice Demon
+        cm.teachSkill(2221005,0,10); //Ifrit
+        cm.teachSkill(2221004,0,10); //Infinity
+        cm.teachSkill(2221002,0,10); //Mana Reflection
+        cm.teachSkill(2221000,0,10); //Maple Warrior
         //Bishop (4th Job)
-        cm.teachSkill(2321007,0); //Angel's Ray
-        cm.teachSkill(2321009,0); //Hero's Will
-        cm.teachSkill(2321003,0); //Bahamut
-        cm.teachSkill(2321001,0); //Big Bang
-        cm.teachSkill(2321008,0); //Genesis
-        cm.teachSkill(2321005,0); //Holy Shield
-        cm.teachSkill(2321004,0); //Infinity
-        cm.teachSkill(2321002,0); //Mana Reflection
-        cm.teachSkill(2321000,0); //Maple Warrior
-        cm.teachSkill(2321006,0); //Resurrection
+        cm.teachSkill(2321007,0,10); //Angel's Ray
+        cm.teachSkill(2321009,0,10); //Hero's Will
+        cm.teachSkill(2321003,0,10); //Bahamut
+        cm.teachSkill(2321001,0,10); //Big Bang
+        cm.teachSkill(2321008,0,10); //Genesis
+        cm.teachSkill(2321005,0,10); //Holy Shield
+        cm.teachSkill(2321004,0,10); //Infinity
+        cm.teachSkill(2321002,0,10); //Mana Reflection
+        cm.teachSkill(2321000,0,10); //Maple Warrior
+        cm.teachSkill(2321006,0,10); //Resurrection
         //Bow Master (4th Job)
-        cm.teachSkill(3121009,0); //Hero's Will
-        cm.teachSkill(3120005,0); //Bow Expert
-        cm.teachSkill(3121008,0); //Concentration
-        cm.teachSkill(3121003,0); //Dragon Pulse
-        cm.teachSkill(3121007,0); //Hamstring
-        cm.teachSkill(3121000,0); //Maple Warrior
-        cm.teachSkill(3121006,0); //Phoenix
-        cm.teachSkill(3121002,0); //Sharp Eyes
-        cm.teachSkill(3121004,0); //Storm Arrow
+        cm.teachSkill(3121009,0,10); //Hero's Will
+        cm.teachSkill(3120005,0,10); //Bow Expert
+        cm.teachSkill(3121008,0,10); //Concentration
+        cm.teachSkill(3121003,0,10); //Dragon Pulse
+        cm.teachSkill(3121007,0,10); //Hamstring
+        cm.teachSkill(3121000,0,10); //Maple Warrior
+        cm.teachSkill(3121006,0,10); //Phoenix
+        cm.teachSkill(3121002,0,10); //Sharp Eyes
+        cm.teachSkill(3121004,0,10); //Storm Arrow
         //Crossbow Master (4th Job)
-        cm.teachSkill(3221008,0); //Hero's Will
-        cm.teachSkill(3221006,0); //Blind
-        cm.teachSkill(3220004,0); //Crossbow Expert
-        cm.teachSkill(3221003,0); //Dragon Pulse
-        cm.teachSkill(3221005,0); //Freezer
-        cm.teachSkill(3221000,0); //Maple Warrior
-        cm.teachSkill(3221001,0); //Piercing
-        cm.teachSkill(3221002,0); //Sharp Eyes
-        cm.teachSkill(3221007,0); //Sniping
+        cm.teachSkill(3221008,0,10); //Hero's Will
+        cm.teachSkill(3221006,0,10); //Blind
+        cm.teachSkill(3220004,0,10); //Crossbow Expert
+        cm.teachSkill(3221003,0,10); //Dragon Pulse
+        cm.teachSkill(3221005,0,10); //Freezer
+        cm.teachSkill(3221000,0,10); //Maple Warrior
+        cm.teachSkill(3221001,0,10); //Piercing
+        cm.teachSkill(3221002,0,10); //Sharp Eyes
+        cm.teachSkill(3221007,0,10); //Sniping
         //Night Lord (4th Job)
-        //cm.teachSkill(4121009,0); //Hero's Will
-        cm.teachSkill(4120002,0); //Shadow Shifter
-        cm.teachSkill(4121000,0); //Maple Warrior
-        cm.teachSkill(4121004,0); //Ninja Ambush
-        cm.teachSkill(4121008,0); //Ninja Storm
-        cm.teachSkill(4121003,0); //Taunt
-        cm.teachSkill(4121006,0); //Spirit Claw
-        cm.teachSkill(4121007,0);/// Triple Throw
-        cm.teachSkill(4120005,0); //Venomous Star
+        //cm.teachSkill(4121009,0,10); //Hero's Will
+        cm.teachSkill(4120002,0,10); //Shadow Shifter
+        cm.teachSkill(4121000,0,10); //Maple Warrior
+        cm.teachSkill(4121004,0,10); //Ninja Ambush
+        cm.teachSkill(4121008,0,10); //Ninja Storm
+        cm.teachSkill(4121003,0,10); //Taunt
+        cm.teachSkill(4121006,0,10); //Spirit Claw
+        cm.teachSkill(4121007,0,10);/// Triple Throw
+        cm.teachSkill(4120005,0,10); //Venomous Star
         //Shadower (4th Job)
-        cm.teachSkill(4221001,0); //Assassinate
-        cm.teachSkill(4221008,0); //Hero's Will
-        cm.teachSkill(4221007,0); //Boomerang Step
-        cm.teachSkill(4220002,0); //Shadow Shifter
-        cm.teachSkill(4221000,0); //Maple Warrior
-        cm.teachSkill(4221004,0); //Ninja Ambush
-        cm.teachSkill(4221003,0); //Taunt
-        cm.teachSkill(4221006,0); //Smokescreen
-        cm.teachSkill(4220005,0); //Venomous Dagger
+        cm.teachSkill(4221001,0,10); //Assassinate
+        cm.teachSkill(4221008,0,10); //Hero's Will
+        cm.teachSkill(4221007,0,10); //Boomerang Step
+        cm.teachSkill(4220002,0,10); //Shadow Shifter
+        cm.teachSkill(4221000,0,10); //Maple Warrior
+        cm.teachSkill(4221004,0,10); //Ninja Ambush
+        cm.teachSkill(4221003,0,10); //Taunt
+        cm.teachSkill(4221006,0,10); //Smokescreen
+        cm.teachSkill(4220005,0,10); //Venomous Dagger
         //Buccaneer (4th Job)
-        cm.teachSkill(5121000,0); //Maple Warrior
-        cm.teachSkill(5121001,0); //Dragon Strike
-        cm.teachSkill(5121002,0); //Energy Orb
-        cm.teachSkill(5121003,0); //Super Transformation
-        cm.teachSkill(5121004,0); //Demolition
-        cm.teachSkill(5121005,0); //Snatch
-        cm.teachSkill(5121007,0); //Barrage
-        cm.teachSkill(5121008,0); //Pirate's Rage
-        cm.teachSkill(5121009,0); //Speed Infusion
-        cm.teachSkill(5121010,0); //Time Leap
+        cm.teachSkill(5121000,0,10); //Maple Warrior
+        cm.teachSkill(5121001,0,10); //Dragon Strike
+        cm.teachSkill(5121002,0,10); //Energy Orb
+        cm.teachSkill(5121003,0,10); //Super Transformation
+        cm.teachSkill(5121004,0,10); //Demolition
+        cm.teachSkill(5121005,0,10); //Snatch
+        cm.teachSkill(5121007,0,10); //Barrage
+        cm.teachSkill(5121008,0,10); //Pirate's Rage
+        cm.teachSkill(5121009,0,10); //Speed Infusion
+        cm.teachSkill(5121010,0,10); //Time Leap
         //Corsair (4th Job)
-        cm.teachSkill(5220001,0); //Elemental Boost
-        cm.teachSkill(5220002,0); //Wrath of the Octopi
-        cm.teachSkill(5220011,0); //Bullseye
-        cm.teachSkill(5221000,0); //Maple Warrior
-        cm.teachSkill(5221003,0); //Aerial Strike
-        cm.teachSkill(5221004,0); //Rapid Fire
-        cm.teachSkill(5221006,0); //Battleship
-        cm.teachSkill(5221007,0); //Battleship Cannon
-        cm.teachSkill(5221008,0); //Battleship Torpedo
-        cm.teachSkill(5221009,0); //Hypnotize
-        cm.teachSkill(5221010,0); //Speed Infusion
+        cm.teachSkill(5220001,0,10); //Elemental Boost
+        cm.teachSkill(5220002,0,10); //Wrath of the Octopi
+        cm.teachSkill(5220011,0,10); //Bullseye
+        cm.teachSkill(5221000,0,10); //Maple Warrior
+        cm.teachSkill(5221003,0,10); //Aerial Strike
+        cm.teachSkill(5221004,0,10); //Rapid Fire
+        cm.teachSkill(5221006,0,10); //Battleship
+        cm.teachSkill(5221007,0,10); //Battleship Cannon
+        cm.teachSkill(5221008,0,10); //Battleship Torpedo
+        cm.teachSkill(5221009,0,10); //Hypnotize
+        cm.teachSkill(5221010,0,10); //Speed Infusion
+        //Soul Warrior 3rd Job
+        cm.teachSkill(11110000,0,10); //Improving MP Recovery
+        cm.teachSkill(11110005,0,10); //Advance Combo
+        cm.teachSkill(11111001,0,10); //Combo Attack
+        cm.teachSkill(11111002,0,10); //Sword: Panic
+        cm.teachSkill(11111003,0,10); //Sword: Coma
+        cm.teachSkill(11111004,0,10); //Brandish
+        cm.teachSkill(11111006,0,10); //Soul Blow
+        cm.teachSkill(11111007,0,10); //Soul Charge
+        //Flame Wizard 3rd Job
+        cm.teachSkill(12110000,0,10); //Elemental Resistance
+        cm.teachSkill(12110001,0,10); //Element Amplification
+        cm.teachSkill(12111002,0,10); //Seal
+        cm.teachSkill(12111003,0,10); //Meteo
+        cm.teachSkill(12111004,0,10); //Ifrit
+        cm.teachSkill(12111005,0,10); //Flame Gear
+        cm.teachSkill(12111006,0,10); //Fire Strike
+        //Wind Breaker 3rd Job
+        cm.teachSkill(13110003,0,10); //Bow Expert
+        cm.teachSkill(13111000,0,10); //Arrow Rain
+        cm.teachSkill(13111001,0,10); //Strafe
+        cm.teachSkill(13111002,0,10); //Hurricane
+        cm.teachSkill(13111004,0,10); //Puppet
+        cm.teachSkill(13111005,0,10); //Albatross
+        cm.teachSkill(13111006,0,10); //Wind Piercing
+        cm.teachSkill(13111007,0,10); //Wind Shot
+
+
         
 cm.dispose();
         }
