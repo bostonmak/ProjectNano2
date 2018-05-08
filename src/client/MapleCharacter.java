@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Iterator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -483,60 +484,66 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
             effLock.unlock();
         }
     }
-    /*
+    
 public void saveInventory() throws SQLException {
        
-    	List<QueryResult> itemQueries = MapleDatabase.getInstance().query("SELECT * FROM `inventory_items` WHERE `player`=?", getId());
-    	
-    	Map<InventoryType, List<Integer>> items = new HashMap<>();//This will contain all the items we have, after we deal with one, we remove it to signify it has been handled
-    	
-    	for(InventoryType type : InventoryType.values()) {
-    		
-    		List<Integer> slots = new ArrayList<>();
-    		
-    		Inventory inv = getInventory(type);
-    		
-    		inv.getItems().keySet().stream().forEach(slots::add);
+        Connection con = DatabaseConnection.getConnection();
+        PreparedStatement ps = con.prepareStatement("SELECT * FROM `inventory_items` WHERE `player`=?", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        ResultSet rs = ps.executeQuery();
 
-    		items.put(type, slots);
-    		
-    	}
+        Map<MapleInventoryType, List<Integer>> items = new HashMap<>();//This will contain all the items we have, after we deal with one, we remove it to signify it has been handled
+
+        for(MapleInventoryType type : MapleInventoryType.values()) {
+
+                List<Integer> slots = new ArrayList<>();
+
+                MapleInventory inv = getInventory(type);
+
+                Iterator it = inv.getItems().entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry)it.next();
+                    slots.add((Integer)pair.getKey());
+                }
+
+                items.put(type, slots);
+
+        }
     	
     	BatchedScript updateBatch = new BatchedScript("UPDATE `inventory_items` SET `itemid`=?, `amount`=?, `owner`=?, `flag`=?, `expiration`=?, `unique_id`=?, `data`=? WHERE `id`=?");
     	BatchedScript deleteBatch = new BatchedScript("DELETE FROM `inventory_items` WHERE `id`=?");
-		BatchedScript insertBatch = new BatchedScript("INSERT INTO `inventory_items` (`inventory_type`,`slot`,`player`,`itemid`,`amount`,`owner`,`flag`,`expiration`,`unique_id`, `data`) VALUES (?,?,?,?,?,?,?,?,?,?)");
+	BatchedScript insertBatch = new BatchedScript("INSERT INTO `inventory_items` (`inventory_type`,`slot`,`player`,`itemid`,`amount`,`owner`,`flag`,`expiration`,`unique_id`, `data`) VALUES (?,?,?,?,?,?,?,?,?,?)");
 		
-    	for(QueryResult result : itemQueries) {
+    	while (rs.next()) {
     		
-    		InventoryType type = InventoryType.getById(result.get("inventory_type"));
+    		MapleInventoryType type = MapleInventoryType.getByType(rs.getByte("inventory_type"));
     		
-    		int slot = result.get("slot");
+    		int slot = rs.getInt("slot");
     		
-    		Item thisItem = ItemFactory.getItem(result);
+    		Item thisItem = new Item(rs.getInt("id"), rs.getShort("position"), rs.getShort("quantity"), rs.getInt("petid"));
     		
-    		Item current = getInventory(type).getItem(slot);
+    		Item current = getInventory(type).getItem((short)slot);
     		
     		items.get(type).remove((Integer) slot);
     		
     		if(current == null) {//We already know it existed in the past since we got it back in the query
     			//Delete the item from database
     			
-    			int id = result.get("id");
+    			int id = rs.getInt("id");
     			
     			deleteBatch.addBatch(id);
     			
     		}else if(!current.equals(thisItem)) {
     			//Update this item with the new data
 
-    			int id = result.get("id");
+    			int id = rs.getInt("id");
     			
-    			long expiration = Item.getExpiration(current);
-    			long uniqueId = Item.getUniqueId(current);
+    			long expiration = current.getExpiration();
+    			long uniqueId = current.getItemId();
     			
     			String data = null;
         		
-        		if(current instanceof EquipItem){
-        			EquipItem eq = (EquipItem) current;
+        		if(current instanceof Equip){
+        			Equip eq = (Equip) current;
         			
         			data = eq.getStatInfo().serialize().toString();
         		}
@@ -585,7 +592,7 @@ public void saveInventory() throws SQLException {
     	MapleDatabase.getInstance().execute(updateBatch, false);
     	MapleDatabase.getInstance().execute(insertBatch, false);
 }
-    This should fix equip inventories being deleted*/
+
     public void addCrushRing(MapleRing r) {
         crushRings.add(r);
     }
