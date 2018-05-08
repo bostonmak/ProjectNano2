@@ -1,0 +1,44 @@
+apply plugin: 'java'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+project.archivesBaseName = 'MapleSolaxia' // Temporary
+project.libsDirName = 'dist'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly  'com.zaxxer:HikariCP-java7:2.4.12'
+    compileOnly  'org.apache.directory.studio:org.apache.mina.core:2.0.7'
+    compileOnly  'mysql:mysql-connector-java:5.1.6'
+    compileOnly  'org.slf4j:slf4j-api:1.6.6'
+    compileOnly  'org.slf4j:slf4j-jdk14:1.7.5'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.bootClasspath = "$JDK7_HOME/jre/lib/rt.jar;$JDK7_HOME/jre/lib/jce.jar"
+}
+
+task copyJarToDist(type: Copy) {
+    from 'build/dist/MapleSolaxia.jar'
+    into 'dist'
+}
+
+task buildAndCopy {
+    dependsOn clean
+    dependsOn build
+
+    build.mustRunAfter clean
+    finalizedBy copyJarToDist
+}

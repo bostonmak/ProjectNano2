@@ -104,6 +104,7 @@ At the end of the execution of these SQLs, you should have installed a database 
 
 Configure the IP you want to use for your MapleStory server in "configuration.ini" file, or set it as "localhost" if you want to run it only on your machine. Alternatively, you can use the IP given by Hamachi to use on a Hamachi network, or you can use a non-Hamachi method of port-forwarding. Neither will be approached here.
 
+#### The following is no longer necessary. You may skip to "Building the JAR" or you can continue using the old method.
 Now open NetBeans, and click "Open a project..." . Select then the "HeavenMS" folder, that should already be a project recognizable by NetBeans. If it isn't, you have a problem.
 
 #### Inside the project, you may encounter some code errors.
@@ -115,6 +116,21 @@ Locate the "cores" folder inside the root directory of this project and manually
 Also, a new Java7 platform must be defined to run the server. Click "Manage Platforms...", then "Add platform", browse through until you locate the Java7 folder in the file system, it should be at "C:\Program Files\Java". Then, name this new platform "JDK 1.7".
 
 Finally, select "Clean and Build project" to build the JAR file for the MapleStory server. Once done, make sure both WampServer and Hamachi are on and functional, then execute "launch.bat" on the root of the project. If no errors were raised from this action, your MapleStory server is now online.
+
+---
+### Building the JAR (New Method)
+
+To construct the jar
+`./gradlew clean build` 
+
+The jar is now located at `build/dist`
+
+To construct the jar and copy it to the `dist/` directory
+`./gradlew buildAndCopy`
+
+### Running the Server
+
+Run `launch.bat`
 
 ---
 ### Installing the CLIENT 
