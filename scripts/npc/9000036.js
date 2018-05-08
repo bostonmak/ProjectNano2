@@ -125,7 +125,7 @@ function action(mode, type, selection) {
             var matQtySet = [[2, 2, 2], [2, 2, 2], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1]];
             var costSet = [10000, 10000, 10000, 20000, 15000, 15000, 10000];
         }else if (selectedType == 5) { //necklace refine
-            var matSet = [[4011007, 4011008, 4021009]];
+            var matSet = [[4011007, 4011008, 4021009]]; 
             var matQtySet = [[1, 1, 1]];
             var costSet = [10000];
         }
@@ -188,7 +188,7 @@ function action(mode, type, selection) {
                 cm.gainItem(item, qty);
                 cm.sendOk("The item is done! Take and try this piece of art yourself.");
             }else {
-                cm.sendOk("You got no free slot on your inventory.");
+                cm.sendOk("You got no free slot on your inventory");
             }
         }
         cm.dispose();
