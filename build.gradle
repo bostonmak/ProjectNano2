@@ -5,7 +5,6 @@ targetCompatibility = 1.7
 
 project.archivesBaseName = 'MapleSolaxia' // Temporary
 project.libsDirName = 'dist'
-compileJava.options.bootClasspath = "C:/Program Files/Java/jdk1.7.0_79/jre/lib/rt.jar;C:/Program Files/Java/jdk1.7.0_79/jre/lib/jce.jar"
 
 repositories {
     mavenCentral()
@@ -25,4 +24,8 @@ sourceSets {
             srcDir 'src'
         }
     }
+}
+
+tasks.withType(JavaCompile) {
+    options.bootClasspath = "$JDK7_HOME/jre/lib/rt.jar;$JDK7_HOME/jre/lib/jce.jar"
 }
