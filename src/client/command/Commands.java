@@ -306,7 +306,7 @@ public class Commands {
 		gotomaps.put("mushmom", 100000005);
 		gotomaps.put("griffey", 240020101);
 		gotomaps.put("manon", 240020401);
-		//gotomaps.put("horseman", 682000001);
+		gotomaps.put("horseman", 682000001);
 		gotomaps.put("balrog", 105090900);
 		gotomaps.put("zakum", 211042300);
 		gotomaps.put("papu", 220080001);
@@ -370,7 +370,7 @@ public class Commands {
 		case "time":
 			DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 			dateFormat.setTimeZone(TimeZone.getTimeZone(ServerConstants.TIMEZONE));
-			player.yellowMessage("Solaxia Server Time: " + dateFormat.format(new Date()));
+			player.yellowMessage("ProjectNano Server Time: " + dateFormat.format(new Date()));
 			break;
                     
                 case "recharge":
@@ -523,7 +523,7 @@ public class Commands {
 			player.dropMessage(5, "Your bug '" + message + "' was submitted successfully to our developers. Thank you!");
 			break;
 
-		/*
+		
                 case "points":
 			player.dropMessage(5, "You have " + c.getVotePoints() + " vote point(s).");
 			if (c.hasVotedAlready()) {
@@ -537,7 +537,7 @@ public class Commands {
 				player.yellowMessage("You are free to vote! Make sure to vote to gain a vote point!");
 			}
 			break;
-                */
+                
 		case "joinevent":
 			if(!FieldLimit.CANNOTMIGRATE.check(player.getMap().getFieldLimit())) {
 				MapleEvent event = c.getChannelServer().getEvent();
@@ -618,6 +618,16 @@ public class Commands {
 				}
 			}
 			break;
+                    case "haste":
+                        //GM Skills : Haste(Super) - Holy Symbol - Bless - Hyper Body - Echo of Hero - maple warrior - sharp eyes
+                        SkillFactory.getSkill(9101001).getEffect(SkillFactory.getSkill(9101001).getMaxLevel()).applyTo(player);
+                       // SkillFactory.getSkill(9101002).getEffect(SkillFactory.getSkill(9101002).getMaxLevel()).applyTo(player);
+                       // SkillFactory.getSkill(9101003).getEffect(SkillFactory.getSkill(9101003).getMaxLevel()).applyTo(player);
+                        //SkillFactory.getSkill(9101008).getEffect(SkillFactory.getSkill(9101008).getMaxLevel()).applyTo(player);
+                       // SkillFactory.getSkill(2321000).getEffect(SkillFactory.getSkill(2321000).getMaxLevel()).applyTo(player);
+                       // SkillFactory.getSkill(3121002).getEffect(SkillFactory.getSkill(3121002).getMaxLevel()).applyTo(player);
+                        //SkillFactory.getSkill(1005).getEffect(SkillFactory.getSkill(1005).getMaxLevel()).applyTo(player);
+                                break;
                     
                     case "goto":
                         if (sub.length < 2){
@@ -678,6 +688,7 @@ public class Commands {
                         }
                     
                         break;
+                    
                             
                 default:
                         return false;
@@ -790,17 +801,17 @@ public class Commands {
 			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, output, "00 00", (byte) 0));
                                 break;
                     
-              /*  case "buffme":
+                case "buffme":
                         //GM Skills : Haste(Super) - Holy Symbol - Bless - Hyper Body - Echo of Hero - maple warrior - sharp eyes
                         SkillFactory.getSkill(9101001).getEffect(SkillFactory.getSkill(9101001).getMaxLevel()).applyTo(player);
                         SkillFactory.getSkill(9101002).getEffect(SkillFactory.getSkill(9101002).getMaxLevel()).applyTo(player);
                         SkillFactory.getSkill(9101003).getEffect(SkillFactory.getSkill(9101003).getMaxLevel()).applyTo(player);
                         SkillFactory.getSkill(9101008).getEffect(SkillFactory.getSkill(9101008).getMaxLevel()).applyTo(player);
-                        SkillFactory.getSkill(2321000).getEffect(SkillFactory.getSkill(2321000).getMaxLevel()).applyTo(player);
-                        SkillFactory.getSkill(3121002).getEffect(SkillFactory.getSkill(3121002).getMaxLevel()).applyTo(player);
-                        SkillFactory.getSkill(1005).getEffect(SkillFactory.getSkill(1005).getMaxLevel()).applyTo(player);
+                       // SkillFactory.getSkill(2321000).getEffect(SkillFactory.getSkill(2321000).getMaxLevel()).applyTo(player);
+                       // SkillFactory.getSkill(3121002).getEffect(SkillFactory.getSkill(3121002).getMaxLevel()).applyTo(player);
+                        //SkillFactory.getSkill(1005).getEffect(SkillFactory.getSkill(1005).getMaxLevel()).applyTo(player);
                                 break;
-                  */      
+                       
                 /*case "goto":
                         if (sub.length < 2){
 				player.yellowMessage("Syntax: @goto <map name>");
@@ -2295,6 +2306,7 @@ public class Commands {
 				c.announce(MaplePacketCreator.getGMEffect(6, (byte) 1));
 			}
                     break;
+  
                     
                 case "unban":
                         if (sub.length < 2){
@@ -2760,6 +2772,91 @@ public class Commands {
                         player.dropMessage(6, st);
                         
                         break;
+                    case "pmob":
+                {
+                    int npcId = Integer.parseInt(sub[1]);
+                    int mobTime = Integer.parseInt(sub[2]);
+                    int xpos = player.getPosition().x;
+                    int ypos = player.getPosition().y;
+                    int fh = player.getMap().getFootholds().findBelow(player.getPosition()).getId();
+                    if (sub[2] == null) {
+                        mobTime = 0;
+                    }
+                    MapleMonster mob = MapleLifeFactory.getMonster(npcId);
+                    if (mob != null && !mob.getName().equals("MISSINGNO")) {
+                        mob.setPosition(player.getPosition());
+                        mob.setCy(ypos);
+                        mob.setRx0(xpos + 50);
+                        mob.setRx1(xpos - 50);
+                        mob.setFh(fh);
+                        try {
+                            Connection con = DatabaseConnection.getConnection();
+                            PreparedStatement ps = con.prepareStatement("INSERT INTO spawns ( idd, f, fh, cy, rx0, rx1, type, x, y, mid, mobtime ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
+                            ps.setInt(1, npcId);
+                            ps.setInt(2, 0);
+                            ps.setInt(3, fh);
+                            ps.setInt(4, ypos);
+                            ps.setInt(5, xpos + 50);
+                            ps.setInt(6, xpos - 50);
+                            ps.setString(7, "m");
+                            ps.setInt(8, xpos);
+                            ps.setInt(9, ypos);
+                            ps.setInt(10, player.getMapId());
+                            ps.setInt(11, mobTime);
+                            ps.executeUpdate();
+                        } catch (SQLException e) {
+                            player.dropMessage("Failed to save MOB to the database");
+                        }
+                        player.getMap().addMonsterSpawn(mob, mobTime, 0);
+                    } else {
+                        player.dropMessage("You have entered an invalid Mob-Id");
+                    }
+                    break;
+                }
+                    case "pnpc":
+        {
+            int npcId = Integer.parseInt(sub[1]);
+            MapleNPC npc = MapleLifeFactory.getNPC(npcId);
+            int xpos = player.getPosition().x;
+            int ypos = player.getPosition().y;
+            int fh = player.getMap().getFootholds().findBelow(player.getPosition()).getId();
+            if (npc != null && !npc.getName().equals("MISSINGNO"))
+            {
+                npc.setPosition(player.getPosition());
+                npc.setCy(ypos);
+                npc.setRx0(xpos + 50);
+                npc.setRx1(xpos - 50);
+                npc.setFh(fh);
+                //npc.setCustom(true);
+                try {
+                    Connection con = DatabaseConnection.getConnection();
+                    PreparedStatement ps = con.prepareStatement("INSERT INTO spawns ( idd, f, fh, cy, rx0, rx1, type, x, y, mid ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
+                    ps.setInt(1, npcId);
+                    ps.setInt(2, 0);
+                    ps.setInt(3, fh);
+                    ps.setInt(4, ypos);
+                    ps.setInt(5, xpos + 50);
+                    ps.setInt(6, xpos - 50);
+                    ps.setString(7, "n");
+                    ps.setInt(8, xpos);
+                    ps.setInt(9, ypos);
+                    ps.setInt(10, player.getMapId());
+                    ps.executeUpdate();
+                }
+                catch (SQLException e)
+                {
+                    player.dropMessage("Failed to save NPC to the database");
+                }
+                player.getMap().addMapObject(npc);
+                player.getMap().broadcastMessage(MaplePacketCreator.spawnNPC(npc));
+            }
+            else
+            {
+                player.dropMessage("You have entered an invalid Npc-Id");
+            }
+        }
+                
+                       
                         
                 case "debugtimer":
 			TimerManager tMan = TimerManager.getInstance();

@@ -5,7 +5,7 @@ import java.util.Properties;
 
 public class ServerConstants {
     //Thread Tracker Configuration
-    public static final boolean USE_THREAD_TRACKER = true;      //[SEVERE] This deadlock auditing thing will bloat the memory as fast as the time frame one takes to lose track of a raindrop on a tempesting day. Only for debugging purposes.
+    public static final boolean USE_THREAD_TRACKER = false;      //[SEVERE] This deadlock auditing thing will bloat the memory as fast as the time frame one takes to lose track of a raindrop on a tempesting day. Only for debugging purposes.
     
     //Database Configuration
     public static String DB_URL = "localhost";
@@ -87,7 +87,7 @@ public class ServerConstants {
     public static final double EQUIP_EXP_RATE = 1.0;               //Rate for equipment exp gain, grows linearly. Set 1.0 for default (about 100~200 same-level range mobs killed to pass equip from level 1 to 2).
     
     public static final double PARTY_BONUS_EXP_RATE = 30.0;          //Rate for the party exp reward.
-    public static final double PQ_BONUS_EXP_RATE = 10.0;             //Rate for the PQ exp reward.
+    public static final double PQ_BONUS_EXP_RATE = 5.0;             //Rate for the PQ exp reward.
     
     public static final int PARTY_EXPERIENCE_MOD = 1;               //Change for event stuff.
     
@@ -107,7 +107,7 @@ public class ServerConstants {
     public static final int ITEM_MONITOR_TIME = 5 * 60 * 1000;  //Interval between item monitoring tasks on maps, which checks for dangling (null) item objects on the map item history.
     public static final int LOCK_MONITOR_TIME = 30 * 1000;      //Waiting time for a lock to be released. If it reach timed out, a critical server deadlock has made present.
     public static final int ITEM_EXPIRE_CHECK = 10 * 1000;      //Interval between item expiring tasks on maps, which checks and makes disappear expired items.
-    public static final int ITEM_LIMIT_ON_MAP = 200;            //Max number of items allowed on a map.
+    public static final int ITEM_LIMIT_ON_MAP = 100;            //Max number of items allowed on a map.
     
     //Some Gameplay Enhancing Configurations
     //Scroll Configuration
