@@ -120,9 +120,13 @@ Finally, select "Clean and Build project" to build the JAR file for the MapleSto
 ---
 ### Building the JAR (New Method)
 
-`./gradlew clean build` To construct the jar
+To construct the jar
+`./gradlew clean build` 
 
 The jar is now located at `build/dist`
+
+To construct the jar and copy it to the `dist/` directory
+`./gradlew buildAndCopy`
 
 ### Running the Server
 

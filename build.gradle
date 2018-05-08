@@ -29,3 +29,16 @@ sourceSets {
 tasks.withType(JavaCompile) {
     options.bootClasspath = "$JDK7_HOME/jre/lib/rt.jar;$JDK7_HOME/jre/lib/jce.jar"
 }
+
+task copyJarToDist(type: Copy) {
+    from 'build/dist/MapleSolaxia.jar'
+    into 'dist'
+}
+
+task buildAndCopy {
+    dependsOn clean
+    dependsOn build
+
+    build.mustRunAfter clean
+    finalizedBy copyJarToDist
+}
