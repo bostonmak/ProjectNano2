@@ -124,6 +124,10 @@ public class Equip extends Item {
         return 1;
     }
     
+    public Object[] getDbValues() {
+        return new Object[]{getItemId(),upgradeSlots,level,str,dex,_int,luk,hp,mp,watk,matk,wdef,mdef,acc,avoid,hands,speed,jump,0,vicious,itemLevel,itemExp,ringid};
+    }
+    
     public byte getUpgradeSlots() {
         return upgradeSlots;
     }
