@@ -99,7 +99,7 @@ var facenew = Array();
 var colors = Array();
 
 function start() { 
-    cm.sendSimple("Hey #h #! I am the #eSexy Delivery Guy Stylist#n NPC of HiemsStory! Which of the category would you like to change?\r\n#L0#Skin#l\r\n\r\n#L5##rFemale#k Hair#l\r\n#L6##rFemale#k Eye#l\r\n\r\n#L2#Hair Colour#l                       \r\n#L4#Eye Colour#l\r\n"); 
+    cm.sendSimple("Hey #h #! I am #eShati, #n , the best Female hair stylist in all of ProjectNano! Which of the category would you like to change?\r\n#L0#Skin#l\r\n\r\n#L5##rFemale#k Hair#l\r\n#L6##rFemale#k Eye#l\r\n\r\n#L2#Hair Colour#l                       \r\n#L4#Eye Colour#l\r\n"); 
 } 
 
 function action(mode, type, selection) { 

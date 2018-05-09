@@ -300,7 +300,7 @@ public class Commands {
 		gotomaps.put("korean", 222000000);
                 gotomaps.put("ellin", 300000000);
 		gotomaps.put("nlc", 600000000);
-		gotomaps.put("gpq", 990000000);
+		gotomaps.put("gpq", 101030104);
 		gotomaps.put("pianus", 230040420);
 		gotomaps.put("horntail", 240060200);
 		gotomaps.put("mushmom", 100000005);
@@ -319,7 +319,7 @@ public class Commands {
                 gotomaps.put("ariant", 260000000);
 		gotomaps.put("magatia", 261000000);
                 gotomaps.put("singapore", 540000000);
-                gotomaps.put("cwk", 610020006);
+                gotomaps.put("cwk", 610030000);
                 gotomaps.put("amoria", 680000000);
                 gotomaps.put("temple", 270000100);
                 gotomaps.put("neo", 240070000);
