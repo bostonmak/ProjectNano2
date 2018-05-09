@@ -118,15 +118,27 @@ Also, a new Java7 platform must be defined to run the server. Click "Manage Plat
 Finally, select "Clean and Build project" to build the JAR file for the MapleStory server. Once done, make sure both WampServer and Hamachi are on and functional, then execute "launch.bat" on the root of the project. If no errors were raised from this action, your MapleStory server is now online.
 
 ---
-### Building the JAR (New Method)
+### To Setup Gradle
 
-To construct the jar
+Set your JDK7 Path
+
+Create a file called `gradle.properties`
+
+Create a variable called `JDK7_HOME` and set it to your JDK7 path
+
+For example: `JDK7_HOME=C:\Program Files\Java\jdk1.7.0_79`
+
+### Building the JAR with Gradle (New Method)
+
+To construct the jar, run:
+
 `./gradlew clean build` 
 
-The jar is now located at `build/dist`
+The jar is now created at `build/dist`
 
-To construct the jar and copy it to the `dist/` directory
-`./gradlew buildAndCopy`
+To construct the jar and copy it to the `dist/` directory:
+
+Run `./gradlew buildAndCopy`
 
 ### Running the Server
 
