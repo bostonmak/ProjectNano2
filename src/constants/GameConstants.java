@@ -75,23 +75,29 @@ public class GameConstants {
     }
     
     public static int getJobMaxLevel(MapleJob job) {
+        int BEGINNER_MAX_LEVEL = 10;
+        int FIRST_JOB_MAX_LEVEL = 30;
+        int SECOND_JOB_MAX_LEVEL = 70;
+        int THIRD_JOB_MAX_LEVEL = 120;
+        int FOURTH_JOB_MAX_LEVEL = 200;
+
         int jobBranch = getJobBranch(job);
         
         switch(jobBranch) {
             case 0:
-                return 10;   // beginner
+                return BEGINNER_MAX_LEVEL;   // beginner
                 
             case 1:
-                return 30;   // 1st job
+                return FIRST_JOB_MAX_LEVEL;   // 1st job
                 
             case 2:
-                return 70;   // 2nd job
+                return SECOND_JOB_MAX_LEVEL;   // 2nd job
                 
             case 3:
-                return 120;   // 3rd job
+                return THIRD_JOB_MAX_LEVEL;   // 3rd job
                 
             default:
-                return (job.getId() / 1000 == 1) ? 200 : 200;   // 4th job: cygnus is 120, rest is 200
+                return FOURTH_JOB_MAX_LEVEL;   // 4th job: cygnus default is 120. changing to 200 along to align with other classes.
         }
     }
     
