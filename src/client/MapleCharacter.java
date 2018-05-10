@@ -488,7 +488,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
 public void saveInventory() throws SQLException {
        
         Connection con = DatabaseConnection.getConnection();
-        PreparedStatement ps = con.prepareStatement("SELECT * FROM `inventoryitems` WHERE `characterid`=?", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        PreparedStatement ps = con.prepareStatement("SELECT * FROM inventoryitems WHERE characterid=?", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
         ps.setInt(1, this.id);
         ResultSet rs = ps.executeQuery();
 
@@ -510,17 +510,17 @@ public void saveInventory() throws SQLException {
 
         }
     	
-        PreparedStatement dels = con.prepareStatement("DELETE FROM `inventoryitems` WHERE `inventoryitemid`=?");
-        PreparedStatement upds = con.prepareStatement("UPDATE `inventoryitems` SET 'type'=?, 'characterid'=?, 'itemid'=?, 'inventorytype'=?, "
-                                + "'position'=?, 'quantity'=?, 'owner'=?, 'petid'=?, 'flag'=?, 'expiration'=?, 'giftFrom'=?, WHERE `inventoryitemid`=?");
-        PreparedStatement eqs = con.prepareStatement("UPDATE 'inventoryequipment' SET 'upgradeslots'=?, 'level'=?, 'str'=?, 'dex'=?, "
-                                    + "'int'=?, 'luk'=?, 'hp'=?, 'mp'=?, 'watk'=?, 'matk'=?, 'wdef'=?, 'mdef'=?, 'acc'=?, 'avoid'=?, 'hands'=?, 'speed'=?, "
-                                    + "'jump'=?, 'locked'=?, 'vicious'=?, 'itemlevel'=?, 'itemexp'=?, 'ringid'=?, WHERE 'inventoryitemid'=?");
-        PreparedStatement pets = con.prepareStatement("UPDATE 'pets' SET 'name'=?, 'level'=?, 'closeness'=?, 'fullness'=?, "
-                                        + "'summoned'=?, WHERE 'petid'=?");
-        PreparedStatement ins = con.prepareStatement("INSERT INTO `inventoryitems` VALUES (DEFAULT, ?, ?, DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-        PreparedStatement ieqs = con.prepareStatement("INSERT INTO `inventoryequipment` VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        PreparedStatement ipets = con.prepareStatement("INSERT INTO `pets` VALUES (DEFAULT, ?, ?, ?, ?, ?)");
+        PreparedStatement dels = con.prepareStatement("DELETE FROM inventoryitems WHERE inventoryitemid=?");
+        PreparedStatement upds = con.prepareStatement("UPDATE inventoryitems SET type=?, characterid=?, itemid=?, inventorytype=?, "
+                                + "position=?, quantity=?, owner=?, petid=?, flag=?, expiration=?, giftFrom=? WHERE inventoryitemid=?");
+        PreparedStatement eqs = con.prepareStatement("UPDATE inventoryequipment SET upgradeslots=?, level=?, str=?, dex=?, "
+                                    + "`int`=?, luk=?, hp=?, mp=?, watk=?, matk=?, wdef=?, mdef=?, acc=?, avoid=?, hands=?, speed=?, "
+                                    + "jump=?, locked=?, vicious=?, itemlevel=?, itemexp=?, ringid=? WHERE inventoryitemid=?");
+        PreparedStatement pets = con.prepareStatement("UPDATE pets SET name=?, level=?, closeness=?, fullness=?, "
+                                        + "summoned=? WHERE petid=?");
+        PreparedStatement ins = con.prepareStatement("INSERT INTO inventoryitems VALUES (DEFAULT, ?, ?, DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement ieqs = con.prepareStatement("INSERT INTO inventoryequipment VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        PreparedStatement ipets = con.prepareStatement("INSERT INTO pets VALUES (DEFAULT, ?, ?, ?, ?, ?)");
         
     	while (rs.next()) {
     		
@@ -557,7 +557,6 @@ public void saveInventory() throws SQLException {
                         upds.setString(11, current.getGiftFrom());
                         upds.setInt(12, rs.getInt("inventoryitemid"));
                         upds.addBatch();
-                        System.out.println(upds);
 
         		if(current instanceof Equip){
                             Equip eq = (Equip) current;
@@ -631,32 +630,36 @@ public void saveInventory() throws SQLException {
         		
         		if(item instanceof Equip){
                             Equip eq = (Equip) item;
-                            data = eq.getDbValues();
+                            System.out.println(eq.getStr());
+                            if (eq.getStr() != 0) {
+                                data = eq.getDbValues();
 
-                            ieqs.setByte(1, eq.getUpgradeSlots());
-                            ieqs.setByte(2, eq.getLevel());
-                            ieqs.setShort(3, eq.getStr());
-                            ieqs.setShort(4, eq.getDex());
-                            ieqs.setShort(5, eq.getInt());
-                            ieqs.setShort(6, eq.getLuk());
-                            ieqs.setShort(7, eq.getHp());
-                            ieqs.setShort(8, eq.getMp());
-                            ieqs.setShort(9, eq.getWatk());
-                            ieqs.setShort(10, eq.getMatk());
-                            ieqs.setShort(11, eq.getWdef());
-                            ieqs.setShort(12, eq.getMdef());
-                            ieqs.setShort(13, eq.getAcc());
-                            ieqs.setShort(14, eq.getAvoid());
-                            ieqs.setShort(15, eq.getHands());
-                            ieqs.setShort(16, eq.getSpeed());
-                            ieqs.setShort(17, eq.getJump());
-                            ieqs.setByte(18, (byte)0);
-                            ieqs.setShort(19, eq.getVicious());
-                            ieqs.setByte(20, eq.getItemLevel());
-                            ieqs.setInt(21, eq.getItemExp());
-                            ieqs.setInt(22, eq.getRingId());
-                            ieqs.setInt(23, eq.getItemId());
-                            ieqs.addBatch();
+                                ieqs.setByte(1, eq.getUpgradeSlots());
+                                ieqs.setByte(2, eq.getLevel());
+                                ieqs.setShort(3, eq.getStr());
+                                ieqs.setShort(4, eq.getDex());
+                                ieqs.setShort(5, eq.getInt());
+                                ieqs.setShort(6, eq.getLuk());
+                                ieqs.setShort(7, eq.getHp());
+                                ieqs.setShort(8, eq.getMp());
+                                ieqs.setShort(9, eq.getWatk());
+                                ieqs.setShort(10, eq.getMatk());
+                                ieqs.setShort(11, eq.getWdef());
+                                ieqs.setShort(12, eq.getMdef());
+                                ieqs.setShort(13, eq.getAcc());
+                                ieqs.setShort(14, eq.getAvoid());
+                                ieqs.setShort(15, eq.getHands());
+                                ieqs.setShort(16, eq.getSpeed());
+                                ieqs.setShort(17, eq.getJump());
+                                ieqs.setByte(18, (byte)0);
+                                ieqs.setShort(19, eq.getVicious());
+                                ieqs.setByte(20, eq.getItemLevel());
+                                ieqs.setInt(21, eq.getItemExp());
+                                ieqs.setInt(22, eq.getRingId());
+                                ieqs.setInt(23, eq.getItemId());
+                                ieqs.addBatch();
+                                System.out.println(eqs);
+                            }
                         }
         		
         		if(item instanceof MaplePet){
