@@ -308,7 +308,7 @@ public class Commands {
 		gotomaps.put("manon", 240020401);
 		gotomaps.put("horseman", 682000001);
 		gotomaps.put("balrog", 105090900);
-		gotomaps.put("zakum", 211042300);
+		gotomaps.put("zakum", 211042400);
 		gotomaps.put("papu", 220080001);
 		gotomaps.put("showa", 801000000);
 		gotomaps.put("guild", 200000301);
