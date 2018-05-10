@@ -41,11 +41,11 @@ import tools.data.input.SeekableLittleEndianAccessor;
 public final class DistributeAPHandler extends AbstractMaplePacketHandler {
     private static final int max = 32767;
 
-    private static int WARRIOR_OR_DAWN_WARRIOR_HP_INCREASE_PER_AP_DEFAULT = 20;
-    private static int MAGICIAN_OR_BLAZE_WIZARD_HP_INCREASE_PER_AP_DEFAULT = 6;
-    private static int THIEF_OR_NIGHTWALKER_HP_INCREASE_PER_AP_DEFAULT = 16;
-    private static int BOWMAN_OR_WINDARCHER_HP_INCREASE_PER_AP_DEFAULT = 16;
-    private static int PIRATE_OR_THUNDERBREAKER_HP_INCREASE_PER_AP_DEFAULT = 18;
+    private static final int WARRIOR_OR_DAWN_WARRIOR_HP_INCREASE_PER_AP_DEFAULT = 20;
+    private static final int MAGICIAN_OR_BLAZE_WIZARD_HP_INCREASE_PER_AP_DEFAULT = 6;
+    private static final int THIEF_OR_NIGHTWALKER_HP_INCREASE_PER_AP_DEFAULT = 16;
+    private static final int BOWMAN_OR_WINDARCHER_HP_INCREASE_PER_AP_DEFAULT = 16;
+    private static final int PIRATE_OR_THUNDERBREAKER_HP_INCREASE_PER_AP_DEFAULT = 18;
 
     @Override
     public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {

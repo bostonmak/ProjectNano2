@@ -10,6 +10,12 @@ import server.maps.FieldLimit;
  * @author Ronan
  */
 public class GameConstants {
+    private static final int BEGINNER_MAX_LEVEL = 10;
+    private static final int FIRST_JOB_MAX_LEVEL = 30;
+    private static final int SECOND_JOB_MAX_LEVEL = 70;
+    private static final int THIRD_JOB_MAX_LEVEL = 120;
+    private static final int FOURTH_JOB_MAX_LEVEL = 200;
+
     public static final int[] OWL_DATA = new int[]{1082002, 2070005, 2070006, 1022047, 1102041, 2044705, 2340000, 2040017, 1092030, 2040804};
     
     // Ronan's rates upgrade system
@@ -75,12 +81,6 @@ public class GameConstants {
     }
     
     public static int getJobMaxLevel(MapleJob job) {
-        int BEGINNER_MAX_LEVEL = 10;
-        int FIRST_JOB_MAX_LEVEL = 30;
-        int SECOND_JOB_MAX_LEVEL = 70;
-        int THIRD_JOB_MAX_LEVEL = 120;
-        int FOURTH_JOB_MAX_LEVEL = 200;
-
         int jobBranch = getJobBranch(job);
         
         switch(jobBranch) {
