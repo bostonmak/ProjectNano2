@@ -41,6 +41,12 @@ import tools.data.input.SeekableLittleEndianAccessor;
 public final class DistributeAPHandler extends AbstractMaplePacketHandler {
     private static final int max = 32767;
 
+    private static int WARRIOR_OR_DAWN_WARRIOR_HP_INCREASE_PER_AP_DEFAULT = 20;
+    private static int MAGICIAN_OR_BLAZE_WIZARD_HP_INCREASE_PER_AP_DEFAULT = 6;
+    private static int THIEF_OR_NIGHTWALKER_HP_INCREASE_PER_AP_DEFAULT = 16;
+    private static int BOWMAN_OR_WINDARCHER_HP_INCREASE_PER_AP_DEFAULT = 16;
+    private static int PIRATE_OR_THUNDERBREAKER_HP_INCREASE_PER_AP_DEFAULT = 18;
+
     @Override
     public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
         slea.readInt();
@@ -103,97 +109,101 @@ public final class DistributeAPHandler extends AbstractMaplePacketHandler {
         
         return MaxHP + calcHpChange(player, job, usedAPReset);
     }
+
+    private static int getExtraHPFromSkill(MapleCharacter player, Skill skillThatIncreasesHPGain) {
+        int extraHP = 0;
+        int skillLevel = player.getSkillLevel(skillThatIncreasesHPGain);
+        if (skillLevel > 0) {
+            extraHP += skillThatIncreasesHPGain.getEffect(skillLevel).getY();
+        }
+        return extraHP;
+    }
     
     private static int calcHpChange(MapleCharacter player, MapleJob job, boolean usedAPReset) {
-        int MaxHP = 0;
+        int numberToIncreaseHP = 0;
         
         if (job.isA(MapleJob.WARRIOR) || job.isA(MapleJob.DAWNWARRIOR1)) {
-            if(!usedAPReset) {
-                Skill increaseHP = SkillFactory.getSkill(job.isA(MapleJob.DAWNWARRIOR1) ? DawnWarrior.MAX_HP_INCREASE : Warrior.IMPROVED_MAXHP);
-                int sLvl = player.getSkillLevel(increaseHP);
+            Skill skillThatIncreasesHPGain = SkillFactory.getSkill(job.isA(MapleJob.DAWNWARRIOR1) ? DawnWarrior.MAX_HP_INCREASE : Warrior.IMPROVED_MAXHP);
+            int extraHPFromSkill = getExtraHPFromSkill(player, skillThatIncreasesHPGain);
+            numberToIncreaseHP += extraHPFromSkill;
 
-                if(sLvl > 0)
-                    MaxHP += increaseHP.getEffect(sLvl).getY();
-            }
-            
             if(ServerConstants.USE_RANDOMIZE_HPMP_GAIN) {
                 if (usedAPReset) {
-                    MaxHP += 20;
+                    numberToIncreaseHP += WARRIOR_OR_DAWN_WARRIOR_HP_INCREASE_PER_AP_DEFAULT;
                 } else {
-                    MaxHP += Randomizer.rand(18, 22);
+                    numberToIncreaseHP += Randomizer.rand(18, 22);
                 }
             } else {
-                MaxHP += 20;
+                numberToIncreaseHP += WARRIOR_OR_DAWN_WARRIOR_HP_INCREASE_PER_AP_DEFAULT;
             }
         } else if(job.isA(MapleJob.ARAN1)) {
+            // Why do the values on using an AP reset differ from the default value? Bug or intentional?
             if(ServerConstants.USE_RANDOMIZE_HPMP_GAIN) {
                 if (usedAPReset) {
-                    MaxHP += 20;
+                    numberToIncreaseHP += 20;
                 } else {
-                    MaxHP += Randomizer.rand(26, 30);
+                    numberToIncreaseHP += Randomizer.rand(26, 30);
                 }
             } else {
-                MaxHP += 28;
+                numberToIncreaseHP += 28;
             }
         } else if (job.isA(MapleJob.MAGICIAN) || job.isA(MapleJob.BLAZEWIZARD1)) {
             if(ServerConstants.USE_RANDOMIZE_HPMP_GAIN) {
                 if (usedAPReset) {
-                    MaxHP += 6;
+                    numberToIncreaseHP += MAGICIAN_OR_BLAZE_WIZARD_HP_INCREASE_PER_AP_DEFAULT;
                 } else {
-                    MaxHP += Randomizer.rand(5, 9);
+                    numberToIncreaseHP += Randomizer.rand(5, 9);
                 }
             } else {
-                MaxHP += 6;
+                numberToIncreaseHP += MAGICIAN_OR_BLAZE_WIZARD_HP_INCREASE_PER_AP_DEFAULT;
             }
         } else if (job.isA(MapleJob.THIEF) || job.isA(MapleJob.NIGHTWALKER1)) {
             if(ServerConstants.USE_RANDOMIZE_HPMP_GAIN) {
                 if (usedAPReset) {
-                    MaxHP += 16;
+                    numberToIncreaseHP += THIEF_OR_NIGHTWALKER_HP_INCREASE_PER_AP_DEFAULT;
                 } else {
-                    MaxHP += Randomizer.rand(14, 18);
+                    numberToIncreaseHP += Randomizer.rand(14, 18);
                 }
             } else {
-                MaxHP += 16;
+                numberToIncreaseHP += THIEF_OR_NIGHTWALKER_HP_INCREASE_PER_AP_DEFAULT;
             }
         } else if(job.isA(MapleJob.BOWMAN) || job.isA(MapleJob.WINDARCHER1)) {
             if(ServerConstants.USE_RANDOMIZE_HPMP_GAIN) {
                 if (usedAPReset) {
-                    MaxHP += 16;
+                    numberToIncreaseHP += BOWMAN_OR_WINDARCHER_HP_INCREASE_PER_AP_DEFAULT;
                 } else {
-                    MaxHP += Randomizer.rand(14, 18);
+                    numberToIncreaseHP += Randomizer.rand(14, 18);
                 }
             } else {
-                MaxHP += 16;
+                numberToIncreaseHP += BOWMAN_OR_WINDARCHER_HP_INCREASE_PER_AP_DEFAULT;
             }
         } else if (job.isA(MapleJob.PIRATE) || job.isA(MapleJob.THUNDERBREAKER1)) {
-            if(!usedAPReset) {
-                Skill increaseHP = SkillFactory.getSkill(Brawler.IMPROVE_MAX_HP);
-                int sLvl = player.getSkillLevel(increaseHP);
-
-                if(sLvl > 0)
-                    MaxHP += increaseHP.getEffect(sLvl).getY();
-            }
+            Skill skillThatIncreasesHPGain = SkillFactory.getSkill(Brawler.IMPROVE_MAX_HP);
+            int extraHPFromSkill = getExtraHPFromSkill(player, skillThatIncreasesHPGain);
+            numberToIncreaseHP += extraHPFromSkill;
             
             if(ServerConstants.USE_RANDOMIZE_HPMP_GAIN) {
                 if (usedAPReset) {
-                    MaxHP += 18;
+                    numberToIncreaseHP += PIRATE_OR_THUNDERBREAKER_HP_INCREASE_PER_AP_DEFAULT;
                 } else {
-                    MaxHP += Randomizer.rand(16, 20);
+                    numberToIncreaseHP += Randomizer.rand(16, 20);
                 }
             } else {
-                MaxHP += 18;
+                numberToIncreaseHP += PIRATE_OR_THUNDERBREAKER_HP_INCREASE_PER_AP_DEFAULT;
             }
         } else if (usedAPReset) {
-            MaxHP += 8;
+            // is this number supposed to be different to the default value?
+            numberToIncreaseHP += 8;
         } else {
             if(ServerConstants.USE_RANDOMIZE_HPMP_GAIN) {
-                MaxHP += Randomizer.rand(8, 12);
+                numberToIncreaseHP += Randomizer.rand(8, 12);
             } else {
-                MaxHP += 10;
+                // why is this different from the APReset value?
+                numberToIncreaseHP += 10;
             }
         }
         
-        return MaxHP;
+        return numberToIncreaseHP;
     }
 
     private static int addMP(MapleClient c, boolean usedAPReset) {
