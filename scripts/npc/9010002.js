@@ -29,13 +29,13 @@ function action(mode, type, selection) {
         else
             status--;
         if (status == 0) {
-            cm.sendSimple("Hello#b #h ##k, you currently have #b#c4001126# maple leaves.#k \r\nWhat would you like to do?\r\n#k#L1# Trade 1 leaf for 5,000 NX#l\r\n\#L2# Trade 1 leaf for 1 random chair #l\r\n\#L3# Trade 1 leaf for 3 random Maple Weapons #l\r\n\#L4# Trade 1 leaf for 3 Swiss Cheese and Onyx Apples#l\r\n#L5#Trade 1 leaf for a 10 day Hired Merchant#l");
+            cm.sendSimple("Hello#b #h ##k, you currently have #b#c4001126# #v4001126#.#k \r\nWhat would you like to do?\r\n#k#L1# Trade 5 leaf for 5,000 NX#l\r\n\#L2# Trade 2 leaf for 1 random chair #l\r\n\#L3# Trade 1 leaf for 3 random Maple Weapons #l\r\n\#L4# Trade 10 leaf for 3 Swiss Cheese and Onyx Apples#l\r\n#L5#Trade 1 leaf for a 10 day Hired Merchant#l\r\n#L6#Trade 25 leaf for a #v4001168# (Required To Rebirth)#l");
         } else if (status == 1) {
             if (selection == 1) {
                 if(cm.haveItem(leaf, 1)) {
 					cm.getPlayer().getCashShop().gainCash(1, 5000);
 					cm.getPlayer().announce(MaplePacketCreator.earnTitleMessage("You have earned 5,000 NX"));
-                    cm.gainItem(leaf, -1);
+                    cm.gainItem(leaf, -5);
                     cm.sendOk("Here is your 5,000 NX!");
 					cm.logLeaf("5k NX");
                 } else {
@@ -43,11 +43,11 @@ function action(mode, type, selection) {
 				}
                 cm.dispose();
             } else if (selection == 2) {
-                if(cm.haveItem(leaf, 1)) {
+                if(cm.haveItem(leaf, 2)) {
 					var chair1 = chairs[Math.floor(Math.random()*chairs.length)];
 					if(cm.canHold(chair1)){
 						cm.gainItem(chair1);
-						cm.gainItem(leaf, -1);
+						cm.gainItem(leaf, -2);
 						cm.sendOk("Here is your random chair!");
 						cm.logLeaf("Chair ID: " + chair1);
 					} else {
@@ -77,13 +77,13 @@ function action(mode, type, selection) {
 				}
                 cm.dispose();
 			} else if (selection == 4) {
-                if(cm.haveItem(leaf, 1)) {
+                if(cm.haveItem(leaf, 10)) {
 					var cheese = 2022273;
 					var apple = 2022179;
 					if(!cm.getPlayer().getInventory(Packages.client.inventory.MapleInventoryType.EQUIP).isFull(2)){
 						cm.gainItem(apple, 3);
 						cm.gainItem(cheese, 3);
-						cm.gainItem(leaf, -1);
+						cm.gainItem(leaf, -10);
 						cm.sendOk("Here are your 3 cheeses and apples!");
 						cm.logLeaf("3 cheeses and apples");
 					} else {
@@ -111,7 +111,23 @@ function action(mode, type, selection) {
 					cm.sendOk("Sorry, you don't have a maple leaf!");
 				}
 				cm.dispose();
-			} else {
+			}
+else if (selection == 6) {
+                if(cm.haveItem(leaf, 25)) {
+					var goldenleaf = 4001168;
+					if(!cm.getPlayer().getInventory(Packages.client.inventory.MapleInventoryType.EQUIP).isFull(2)){
+						cm.gainItem(goldenleaf, 1);
+						cm.gainItem(leaf, -10);
+						cm.sendOk("Here are your 3 cheeses and apples!");
+						cm.logLeaf("3 cheeses and apples");
+					} else {
+						cm.sendOk("Please make sure you have enough space to hold these items!");
+					}
+                 } else {
+                    cm.sendOk("Sorry, you don't have a maple leaf!");
+				}
+                cm.dispose();
+            }			else {
                 cm.sendOk("Come back later!");
 				cm.dispose();
 			}
