@@ -41,9 +41,9 @@ function action(mode, type, selection) {
         cm.sendOk("#bGood-Job#k, you have qualified for a #eRebirth#n.");
         }
          }else if (status == 2) {
-        cm.getPlayer().setLevel(2);
+        cm.getPlayer().setLevel(1);
         cm.changeJobById(0);
-		cm.resetStats();
+		//cm.resetStats();
         cm.sendNext("Enjoy your rebirth!(Note: You will have to Change Channels For the Full Effect to Take Place.PLEASE MAKE SURE TO SET YOUR AP BEFORE LEVELING USING any of the following @luk @int @str @dex.");
         cm.dispose();
         }            

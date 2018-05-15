@@ -2111,7 +2111,24 @@ public void saveInventory() throws SQLException {
             }
         }, healInterval, healInterval);
     }
+   /*
+    public int getReborns() {
+        return reborns;
+    }
 
+    public void setReborns(int reborn) {
+        reborns = reborn;
+    }
+*/
+    public void doReborn(MapleJob job, int jobid) {
+        //setReborns(getReborns + 1);
+        setLevel(1);
+        setExp(0);
+        setJob(job);
+        updateSingleStat(MapleStat.LEVEL, 1);
+        updateSingleStat(MapleStat.JOB, jobid);
+        updateSingleStat(MapleStat.EXP, 0);
+    }
     public void disableDoorSpawn() {
         canDoor = false;
         TimerManager.getInstance().schedule(new Runnable() {
@@ -6547,7 +6564,7 @@ public void saveInventory() throws SQLException {
             PreparedStatement ps;
             ps = con.prepareStatement("UPDATE characters SET level = ?, fame = ?, str = ?, dex = ?, luk = ?, `int` = ?, exp = ?, gachaexp = ?, hp = ?, mp = ?, maxhp = ?, maxmp = ?, sp = ?, ap = ?, gm = ?, skincolor = ?, gender = ?, job = ?, hair = ?, face = ?, map = ?, meso = ?, hpMpUsed = ?, spawnpoint = ?, party = ?, buddyCapacity = ?, messengerid = ?, messengerposition = ?, mountlevel = ?, mountexp = ?, mounttiredness= ?, equipslots = ?, useslots = ?, setupslots = ?, etcslots = ?,  monsterbookcover = ?, vanquisherStage = ?, dojoPoints = ?, lastDojoStage = ?, finishedDojoTutorial = ?, vanquisherKills = ?, matchcardwins = ?, matchcardlosses = ?, matchcardties = ?, omokwins = ?, omoklosses = ?, omokties = ?, dataString = ?, fquest = ?, jailexpire = ? WHERE id = ?", Statement.RETURN_GENERATED_KEYS);
             if (gmLevel < 1 && level > 199) {
-                ps.setInt(1, isCygnus() ? 120 : 200);
+                ps.setInt(1, isCygnus() ? 200 : 200);
             } else {
                 ps.setInt(1, level);
             }

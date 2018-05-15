@@ -372,6 +372,9 @@ public class Commands {
 			dateFormat.setTimeZone(TimeZone.getTimeZone(ServerConstants.TIMEZONE));
 			player.yellowMessage("ProjectNano Server Time: " + dateFormat.format(new Date()));
 			break;
+                case "rebirth":
+                    player.doReborn(MapleJob.BEGINNER, 1);
+                    break;
                     
                 case "recharge":
                         MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
