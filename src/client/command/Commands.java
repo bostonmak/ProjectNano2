@@ -103,7 +103,7 @@ import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import constants.ItemConstants;
 import constants.ServerConstants;
-import java.sql.Statement;
+
 import java.util.ArrayList;
 import server.life.SpawnPoint;
 import server.maps.FieldLimit;
@@ -372,9 +372,29 @@ public class Commands {
 			dateFormat.setTimeZone(TimeZone.getTimeZone(ServerConstants.TIMEZONE));
 			player.yellowMessage("ProjectNano Server Time: " + dateFormat.format(new Date()));
 			break;
-                case "rebirth":
-                    player.doReborn(MapleJob.BEGINNER, 1);
-                    break;
+            case "rebirth":
+                final int NUMBER_OF_ITEMS_REQUIRED_TO_REBIRTH = 1;
+                final String NAME_OF_ITEM_REQUIRED_TO_REBIRTH = "Golden Maple Leaf";
+                final int GOLDEN_MAPLE_LEAF_ID = 4001168;
+
+                final String LEVEL_REQUIREMENT_NOT_MET_MESSAGE = "You cannot rebirth. You do not meet the level requirement to rebirth.";
+                final String MISSING_ITEM_MESSAGE = "You cannot rebirth. You are missing " + NUMBER_OF_ITEMS_REQUIRED_TO_REBIRTH + " " + NAME_OF_ITEM_REQUIRED_TO_REBIRTH + ".";
+
+                if (player.isMaxLevel()) {
+                    if (player.haveItemWithId(GOLDEN_MAPLE_LEAF_ID, false)) {
+                        player.rebirth();
+                        final String REBIRTH_NOTICE_MESSAGE = "[Notice] " + player.getName() + " has just rebirthed! They have rebirthed " + player.getRebirths() + " time(s)!";
+                        Server.getInstance().broadcastMessage(
+                            c.getWorld(),
+                            MaplePacketCreator.serverNotice(6, REBIRTH_NOTICE_MESSAGE)
+                        );
+                    } else {
+                        player.yellowMessage(MISSING_ITEM_MESSAGE);
+                    }
+                } else {
+                    player.yellowMessage(LEVEL_REQUIREMENT_NOT_MET_MESSAGE);
+                }
+                break;
                     
                 case "recharge":
                         MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
