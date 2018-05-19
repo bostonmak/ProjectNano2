@@ -2121,7 +2121,7 @@ public void saveInventory() throws SQLException {
         this.rebirths = value;
     }
 
-    public void rebirth() {
+    private void rebirth(MapleJob jobToRebirthInto) {
         final int GOLDEN_MAPLE_LEAF_ID = 4001168;
         final int NUMBER_OF_ITEMS_REQUIRED_TO_REBIRTH = 1;
         final int REFUNDED_AP_FROM_REBIRTH = 1004;
@@ -2134,7 +2134,7 @@ public void saveInventory() throws SQLException {
         rebirthStats.add(new Pair<>(MapleStat.DEX, STARTING_STAT_VALUE));
         rebirthStats.add(new Pair<>(MapleStat.INT, STARTING_STAT_VALUE));
         rebirthStats.add(new Pair<>(MapleStat.LUK, STARTING_STAT_VALUE));
-        rebirthStats.add(new Pair<>(MapleStat.JOB, MapleJob.BEGINNER.getId()));
+        rebirthStats.add(new Pair<>(MapleStat.JOB, jobToRebirthInto.getId()));
         rebirthStats.add(new Pair<>(MapleStat.AVAILABLEAP, refundedAPMinusAPUsedForHPAndMP));
 
         MapleInventoryManipulator.removeById(
@@ -2151,11 +2151,21 @@ public void saveInventory() throws SQLException {
         this.setDex(STARTING_STAT_VALUE);
         this.setLuk(STARTING_STAT_VALUE);
         this.setInt(STARTING_STAT_VALUE);
-        this.setJob(MapleJob.BEGINNER);
+        this.setJob(jobToRebirthInto);
         this.setRemainingAp(refundedAPMinusAPUsedForHPAndMP);
         this.setRebirths(this.getRebirths() + 1);
         this.announce(MaplePacketCreator.updatePlayerStats(rebirthStats, this));
+
+        final String REBIRTH_NOTICE_MESSAGE = "[Notice] " + this.getName() + " has just rebirthed! They have rebirthed " + this.getRebirths() + " time(s)!";
+        Server.getInstance().broadcastMessage(
+                this.getWorld(),
+                MaplePacketCreator.serverNotice(6, REBIRTH_NOTICE_MESSAGE)
+        );
     }
+
+    public void rebirthToBeginner() { this.rebirth(MapleJob.BEGINNER); }
+    public void rebirthToNoblesse() { this.rebirth(MapleJob.NOBLESSE); }
+    public void rebirthToLegend() { this.rebirth(MapleJob.LEGEND); }
 
     public void disableDoorSpawn() {
         canDoor = false;
