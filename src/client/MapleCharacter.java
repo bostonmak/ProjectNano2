@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Iterator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -484,109 +485,211 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
             effLock.unlock();
         }
     }
-    /*
+    
 public void saveInventory() throws SQLException {
        
-    	List<QueryResult> itemQueries = MapleDatabase.getInstance().query("SELECT * FROM `inventory_items` WHERE `player`=?", getId());
-    	
-    	Map<InventoryType, List<Integer>> items = new HashMap<>();//This will contain all the items we have, after we deal with one, we remove it to signify it has been handled
-    	
-    	for(InventoryType type : InventoryType.values()) {
-    		
-    		List<Integer> slots = new ArrayList<>();
-    		
-    		Inventory inv = getInventory(type);
-    		
-    		inv.getItems().keySet().stream().forEach(slots::add);
+        Connection con = DatabaseConnection.getConnection();
+        PreparedStatement ps = con.prepareStatement("SELECT * FROM inventoryitems WHERE characterid=?", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        ps.setInt(1, this.id);
+        ResultSet rs = ps.executeQuery();
 
-    		items.put(type, slots);
-    		
-    	}
+        Map<MapleInventoryType, List<Short>> items = new HashMap<>();//This will contain all the items we have, after we deal with one, we remove it to signify it has been handled
+
+        for(MapleInventoryType type : MapleInventoryType.values()) {
+
+                List<Short> slots = new ArrayList<>();
+
+                MapleInventory inv = getInventory(type);
+
+                Iterator it = inv.getItems().entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry)it.next();
+                    slots.add((Short)pair.getKey());
+                }
+
+                items.put(type, slots);
+
+        }
     	
-    	BatchedScript updateBatch = new BatchedScript("UPDATE `inventory_items` SET `itemid`=?, `amount`=?, `owner`=?, `flag`=?, `expiration`=?, `unique_id`=?, `data`=? WHERE `id`=?");
-    	BatchedScript deleteBatch = new BatchedScript("DELETE FROM `inventory_items` WHERE `id`=?");
-		BatchedScript insertBatch = new BatchedScript("INSERT INTO `inventory_items` (`inventory_type`,`slot`,`player`,`itemid`,`amount`,`owner`,`flag`,`expiration`,`unique_id`, `data`) VALUES (?,?,?,?,?,?,?,?,?,?)");
-		
-    	for(QueryResult result : itemQueries) {
+        PreparedStatement dels = con.prepareStatement("DELETE FROM inventoryitems WHERE inventoryitemid=?");
+        PreparedStatement upds = con.prepareStatement("UPDATE inventoryitems SET type=?, characterid=?, itemid=?, inventorytype=?, "
+                                + "position=?, quantity=?, owner=?, petid=?, flag=?, expiration=?, giftFrom=? WHERE inventoryitemid=?");
+        PreparedStatement eqs = con.prepareStatement("UPDATE inventoryequipment SET upgradeslots=?, level=?, str=?, dex=?, "
+                                    + "`int`=?, luk=?, hp=?, mp=?, watk=?, matk=?, wdef=?, mdef=?, acc=?, avoid=?, hands=?, speed=?, "
+                                    + "jump=?, locked=?, vicious=?, itemlevel=?, itemexp=?, ringid=? WHERE inventoryitemid=?");
+        PreparedStatement pets = con.prepareStatement("UPDATE pets SET name=?, level=?, closeness=?, fullness=?, "
+                                        + "summoned=? WHERE petid=?");
+        PreparedStatement ieqs = con.prepareStatement("INSERT INTO inventoryequipment VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        PreparedStatement ipets = con.prepareStatement("INSERT INTO pets VALUES (DEFAULT, ?, ?, ?, ?, ?)");
+        
+    	while (rs.next()) {
     		
-    		InventoryType type = InventoryType.getById(result.get("inventory_type"));
+    		MapleInventoryType type = MapleInventoryType.getByType(rs.getByte("inventorytype"));
     		
-    		int slot = result.get("slot");
+    		short slot = rs.getShort("position");
     		
-    		Item thisItem = ItemFactory.getItem(result);
+    		Item thisItem = new Item(rs.getInt("itemid"), rs.getShort("position"), rs.getShort("quantity"), rs.getInt("petid"));
     		
-    		Item current = getInventory(type).getItem(slot);
+    		Item current = getInventory(type).getItem((short)slot);
     		
-    		items.get(type).remove((Integer) slot);
+    		items.get(type).remove((Object)slot);
     		
     		if(current == null) {//We already know it existed in the past since we got it back in the query
     			//Delete the item from database
-    			
-    			int id = result.get("id");
-    			
-    			deleteBatch.addBatch(id);
+                dels.setInt(1, rs.getInt("inventoryitemid"));
+    			dels.addBatch();
     			
     		}else if(!current.equals(thisItem)) {
     			//Update this item with the new data
+    			
+                Object[] data = null;
+                upds.setByte(1, (byte)1);
+                upds.setInt(2, this.id);
+                upds.setInt(3, current.getItemId());
+                upds.setByte(4, type.getType());
+                upds.setShort(5, (short)slot);
+                upds.setInt(6, current.getQuantity());
+                upds.setString(7, current.getOwner());
+                upds.setInt(8, current.getPetId());
+                upds.setByte(9, current.getFlag());
+                upds.setLong(10, current.getExpiration());
+                upds.setString(11, current.getGiftFrom());
+                upds.setInt(12, rs.getInt("inventoryitemid"));
+                upds.addBatch();
 
-    			int id = result.get("id");
-    			
-    			long expiration = Item.getExpiration(current);
-    			long uniqueId = Item.getUniqueId(current);
-    			
-    			String data = null;
+        		if(current instanceof Equip){
+                    Equip eq = (Equip) current;
+
+                    eqs.setByte(1, eq.getUpgradeSlots());
+                    eqs.setByte(2, eq.getLevel());
+                    eqs.setShort(3, eq.getStr());
+                    eqs.setShort(4, eq.getDex());
+                    eqs.setShort(5, eq.getInt());
+                    eqs.setShort(6, eq.getLuk());
+                    eqs.setShort(7, eq.getHp());
+                    eqs.setShort(8, eq.getMp());
+                    eqs.setShort(9, eq.getWatk());
+                    eqs.setShort(10, eq.getMatk());
+                    eqs.setShort(11, eq.getWdef());
+                    eqs.setShort(12, eq.getMdef());
+                    eqs.setShort(13, eq.getAcc());
+                    eqs.setShort(14, eq.getAvoid());
+                    eqs.setShort(15, eq.getHands());
+                    eqs.setShort(16, eq.getSpeed());
+                    eqs.setShort(17, eq.getJump());
+                    eqs.setByte(18, (byte)0);
+                    eqs.setShort(19, eq.getVicious());
+                    eqs.setByte(20, eq.getItemLevel());
+                    eqs.setInt(21, eq.getItemExp());
+                    eqs.setInt(22, eq.getRingId());
+                    eqs.setInt(23, rs.getInt("inventoryitemid"));
+                    eqs.addBatch();
+                }
         		
-        		if(current instanceof EquipItem){
-        			EquipItem eq = (EquipItem) current;
-        			
-        			data = eq.getStatInfo().serialize().toString();
+        		if(current instanceof MaplePet) {
+        			data = ((MaplePet) current).getDbValues();
+                    pets.setString(1, (String)data[1]);
+                    pets.setByte(2, (byte)data[2]);
+                    pets.setInt(3, (int)data[3]);
+                    pets.setInt(4, (int)data[4]);
+                    pets.setByte(5, (byte)data[5]);
+                    pets.addBatch();
         		}
-        		
-        		if(current instanceof PetItem){
-        			data = ((PetItem) current).createPetSnapshot().serialize();
-        		}
     			
-        		updateBatch.addBatch(current.getItemId(), current.getAmount(), current.getOwner(), current.getFlag(), expiration, uniqueId, new PossibleNullValue(data, java.sql.Types.VARCHAR), id);
-        		
     		}
     		
     	}
     	
     	//Handle all unhandled values here by inserting them
     	
-    	for(InventoryType type : items.keySet()) {
-    		List<Integer> slots = items.get(type);
+    	for(MapleInventoryType type : items.keySet()) {
+    		List<Short> slots = items.get(type);
     		
-    		for(int slot : slots) {
+    		for(short slot : slots) {
+                PreparedStatement ins = con.prepareStatement("INSERT INTO inventoryitems VALUES (DEFAULT, ?, ?, DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
     			
     			Item item = getInventory(type).getItem(slot);
     			
-    			long expiration = Item.getExpiration(item);
-    			long uniqueId = Item.getUniqueId(item);
-    			
-    			String data = null;
+    			Object[] data = null;
+                ins.setInt(1, 1);
+                ins.setInt(2, this.id);
+                ins.setInt(3, item.getItemId());
+                ins.setInt(4, type.getType());
+                ins.setShort(5, item.getPosition());
+                ins.setInt(6, item.getQuantity());
+                ins.setString(7, item.getOwner());
+                ins.setInt(8, item.getPetId());
+                ins.setInt(9, item.getFlag());
+                ins.setLong(10, item.getExpiration());
+                ins.setString(11, item.getGiftFrom());
+                int affectedRows = ins.executeUpdate();
+                if (affectedRows == 0) {
+                    System.out.println("Failed to insert item 1 " + item.getItemId());
+                }
+                ResultSet keys = ins.getGeneratedKeys();
+                int itemid = -1;
+                if (keys.next()) {
+                    itemid = keys.getInt(1);
+                }
+                else {
+                    System.out.println("Failed to insert item 2 " + item.getItemId());
+                }
         		
-        		if(item instanceof EquipItem){
-        			EquipItem eq = (EquipItem) item;
-        			
-        			data = eq.getStatInfo().serialize().toString();
+        		if(item instanceof Equip && itemid >= 0){
+                    Equip eq = (Equip) item;
+
+                    ieqs.setInt(1, itemid);
+                    ieqs.setByte(2, eq.getUpgradeSlots());
+                    ieqs.setByte(3, eq.getLevel());
+                    ieqs.setShort(4, eq.getStr());
+                    ieqs.setShort(5, eq.getDex());
+                    ieqs.setShort(6, eq.getInt());
+                    ieqs.setShort(7, eq.getLuk());
+                    ieqs.setShort(8, eq.getHp());
+                    ieqs.setShort(9, eq.getMp());
+                    ieqs.setShort(10, eq.getWatk());
+                    ieqs.setShort(11, eq.getMatk());
+                    ieqs.setShort(12, eq.getWdef());
+                    ieqs.setShort(13, eq.getMdef());
+                    ieqs.setShort(14, eq.getAcc());
+                    ieqs.setShort(15, eq.getAvoid());
+                    ieqs.setShort(16, eq.getHands());
+                    ieqs.setShort(17, eq.getSpeed());
+                    ieqs.setShort(18, eq.getJump());
+                    ieqs.setByte(19, (byte)0);
+                    ieqs.setShort(20, eq.getVicious());
+                    ieqs.setByte(21, eq.getItemLevel());
+                    ieqs.setInt(22, eq.getItemExp());
+                    ieqs.setInt(23, eq.getRingId());
+                    ieqs.addBatch();
+                }
+        		
+        		if(item instanceof MaplePet) {
+        			data = ((MaplePet) item).getDbValues();
+                    ipets.setString(1, (String)data[1]);
+                    ipets.setByte(2, (byte)data[2]);
+                    ipets.setInt(3, (int)data[3]);
+                    ipets.setInt(4, (int)data[4]);
+                    ipets.setByte(5, (byte)data[5]);
+                    ipets.setInt(6, (int)data[0]);
+                    ipets.addBatch();
         		}
-        		
-        		if(item instanceof PetItem){
-        			data = ((PetItem) item).createPetSnapshot().serialize();
-        		}
-    			
-        		insertBatch.addBatch(type.getId(), slot, getId(), item.getItemId(), item.getAmount(), item.getOwner(), item.getFlag(), expiration, uniqueId, new PossibleNullValue(data, java.sql.Types.VARCHAR));
-        		
     		}
     		
     	}
-    	
-    	MapleDatabase.getInstance().execute(deleteBatch, false);
-    	MapleDatabase.getInstance().execute(updateBatch, false);
-    	MapleDatabase.getInstance().execute(insertBatch, false);
+        
+        dels.executeBatch();
+        upds.executeBatch();
+        eqs.executeBatch();
+        pets.executeBatch();
+        ieqs.executeBatch();
+        ipets.executeBatch();
+
+        rs.close();
+        ps.close();
+        con.close();
 }
-    This should fix equip inventories being deleted*/
+
     public void addCrushRing(MapleRing r) {
         crushRings.add(r);
     }
@@ -6781,6 +6884,7 @@ public void saveInventory() throws SQLException {
             }
             ps.executeBatch();
             
+            /*
             List<Pair<Item, MapleInventoryType>> itemsWithType = new ArrayList<>();
             for (MapleInventory iv : inventory) {
                 for (Item item : iv.list()) {
@@ -6788,6 +6892,8 @@ public void saveInventory() throws SQLException {
                 }
             }
             ItemFactory.INVENTORY.saveItems(itemsWithType, id, con);
+            */
+            saveInventory();
 			
 			
             deleteWhereCharacterId(con, "DELETE FROM skills WHERE characterid = ?");
