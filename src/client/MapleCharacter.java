@@ -535,68 +535,64 @@ public void saveInventory() throws SQLException {
     		
     		if(current == null) {//We already know it existed in the past since we got it back in the query
     			//Delete the item from database
-    			
-                        dels.setInt(1, rs.getInt("inventoryitemid"));                        
+                dels.setInt(1, rs.getInt("inventoryitemid"));
     			dels.addBatch();
     			
     		}else if(!current.equals(thisItem)) {
     			//Update this item with the new data
     			
-                        Object[] data = null;                        
-                        upds.setByte(1, (byte)1);
-                        upds.setInt(2, this.id);
-                        upds.setInt(3, current.getItemId());
-                        upds.setByte(4, current.getInventoryType().getType());
-                        upds.setShort(5, (short)slot);
-                        upds.setInt(6, current.getQuantity());
-                        upds.setString(7, current.getOwner());
-                        upds.setInt(8, current.getPetId());
-                        upds.setByte(9, current.getFlag());
-                        upds.setLong(10, current.getExpiration());
-                        upds.setString(11, current.getGiftFrom());
-                        upds.setInt(12, rs.getInt("inventoryitemid"));
-                        upds.addBatch();
+                Object[] data = null;
+                upds.setByte(1, (byte)1);
+                upds.setInt(2, this.id);
+                upds.setInt(3, current.getItemId());
+                upds.setByte(4, type.getType());
+                upds.setShort(5, (short)slot);
+                upds.setInt(6, current.getQuantity());
+                upds.setString(7, current.getOwner());
+                upds.setInt(8, current.getPetId());
+                upds.setByte(9, current.getFlag());
+                upds.setLong(10, current.getExpiration());
+                upds.setString(11, current.getGiftFrom());
+                upds.setInt(12, rs.getInt("inventoryitemid"));
+                upds.addBatch();
 
         		if(current instanceof Equip){
-                            Equip eq = (Equip) current;
-                            
-                            eqs.setByte(1, eq.getUpgradeSlots());
-                            eqs.setByte(2, eq.getLevel());
-                            eqs.setShort(3, eq.getStr());
-                            eqs.setShort(4, eq.getDex());
-                            eqs.setShort(5, eq.getInt());
-                            eqs.setShort(6, eq.getLuk());
-                            eqs.setShort(7, eq.getHp());
-                            eqs.setShort(8, eq.getMp());
-                            eqs.setShort(9, eq.getWatk());
-                            eqs.setShort(10, eq.getMatk());
-                            eqs.setShort(11, eq.getWdef());
-                            eqs.setShort(12, eq.getMdef());
-                            eqs.setShort(13, eq.getAcc());
-                            eqs.setShort(14, eq.getAvoid());
-                            eqs.setShort(15, eq.getHands());
-                            eqs.setShort(16, eq.getSpeed());
-                            eqs.setShort(17, eq.getJump());
-                            eqs.setByte(18, (byte)0);
-                            eqs.setShort(19, eq.getVicious());
-                            eqs.setByte(20, eq.getItemLevel());
-                            eqs.setInt(21, eq.getItemExp());
-                            eqs.setInt(22, eq.getRingId());
-                            eqs.setInt(23, rs.getInt("inventoryitemid"));
-                            eqs.addBatch();
-                        }
+                    Equip eq = (Equip) current;
+
+                    eqs.setByte(1, eq.getUpgradeSlots());
+                    eqs.setByte(2, eq.getLevel());
+                    eqs.setShort(3, eq.getStr());
+                    eqs.setShort(4, eq.getDex());
+                    eqs.setShort(5, eq.getInt());
+                    eqs.setShort(6, eq.getLuk());
+                    eqs.setShort(7, eq.getHp());
+                    eqs.setShort(8, eq.getMp());
+                    eqs.setShort(9, eq.getWatk());
+                    eqs.setShort(10, eq.getMatk());
+                    eqs.setShort(11, eq.getWdef());
+                    eqs.setShort(12, eq.getMdef());
+                    eqs.setShort(13, eq.getAcc());
+                    eqs.setShort(14, eq.getAvoid());
+                    eqs.setShort(15, eq.getHands());
+                    eqs.setShort(16, eq.getSpeed());
+                    eqs.setShort(17, eq.getJump());
+                    eqs.setByte(18, (byte)0);
+                    eqs.setShort(19, eq.getVicious());
+                    eqs.setByte(20, eq.getItemLevel());
+                    eqs.setInt(21, eq.getItemExp());
+                    eqs.setInt(22, eq.getRingId());
+                    eqs.setInt(23, rs.getInt("inventoryitemid"));
+                    eqs.addBatch();
+                }
         		
-        		if(current instanceof MaplePet){
+        		if(current instanceof MaplePet) {
         			data = ((MaplePet) current).getDbValues();
-                                System.out.println(1);
-                                System.out.println(data.toString());
-                                pets.setString(1, (String)data[1]);
-                                pets.setByte(2, (byte)data[2]);
-                                pets.setInt(3, (int)data[3]);
-                                pets.setInt(4, (int)data[4]);
-                                pets.setByte(5, (byte)data[5]);
-                                pets.setInt(6, (int)data[0]);
-                                pets.addBatch();
+                    pets.setString(1, (String)data[1]);
+                    pets.setByte(2, (byte)data[2]);
+                    pets.setInt(3, (int)data[3]);
+                    pets.setInt(4, (int)data[4]);
+                    pets.setByte(5, (byte)data[5]);
+                    pets.addBatch();
         		}
     			
     		}
@@ -612,7 +608,6 @@ public void saveInventory() throws SQLException {
                 PreparedStatement ins = con.prepareStatement("INSERT INTO inventoryitems VALUES (DEFAULT, ?, ?, DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
     			
     			Item item = getInventory(type).getItem(slot);
-                System.out.println(item.toString());
     			
     			Object[] data = null;
                 ins.setInt(1, 1);
@@ -666,19 +661,17 @@ public void saveInventory() throws SQLException {
                     ieqs.setInt(22, eq.getItemExp());
                     ieqs.setInt(23, eq.getRingId());
                     ieqs.addBatch();
-                    System.out.println(ieqs);
                 }
         		
-        		if(item instanceof MaplePet){
+        		if(item instanceof MaplePet) {
         			data = ((MaplePet) item).getDbValues();
-                                System.out.println(data.toString());
-                                ipets.setString(1, (String)data[1]);
-                                ipets.setByte(2, (byte)data[2]);
-                                ipets.setInt(3, (int)data[3]);
-                                ipets.setInt(4, (int)data[4]);
-                                ipets.setByte(5, (byte)data[5]);
-                                ipets.setInt(6, (int)data[0]);
-                                ipets.addBatch();
+                    ipets.setString(1, (String)data[1]);
+                    ipets.setByte(2, (byte)data[2]);
+                    ipets.setInt(3, (int)data[3]);
+                    ipets.setInt(4, (int)data[4]);
+                    ipets.setByte(5, (byte)data[5]);
+                    ipets.setInt(6, (int)data[0]);
+                    ipets.addBatch();
         		}
     		}
     		
@@ -690,6 +683,10 @@ public void saveInventory() throws SQLException {
         pets.executeBatch();
         ieqs.executeBatch();
         ipets.executeBatch();
+
+        rs.close();
+        ps.close();
+        con.close();
 }
 
     public void addCrushRing(MapleRing r) {
