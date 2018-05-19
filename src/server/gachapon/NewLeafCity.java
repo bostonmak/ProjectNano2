@@ -59,7 +59,7 @@ public class NewLeafCity extends GachaponItems {
 	@Override
 	public int[] getRareItems() {
 		return new int[] {
-				2049100
+				1002518
 		};
 	}
 

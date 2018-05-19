@@ -313,6 +313,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     private int banishMap = -1;
     private int banishSp = -1;
     private long banishTime = 0;
+    private int rebirths = 0;
     
     private MapleCharacter() {
         useCS = false;
@@ -2214,6 +2215,60 @@ public void saveInventory() throws SQLException {
             }
         }, healInterval, healInterval);
     }
+
+    public int getRebirths() {
+        return this.rebirths;
+    }
+
+    public void setRebirths(int value) {
+        this.rebirths = value;
+    }
+
+    private void rebirth(MapleJob jobToRebirthInto) {
+        final int GOLDEN_MAPLE_LEAF_ID = 4001168;
+        final int NUMBER_OF_ITEMS_REQUIRED_TO_REBIRTH = 1;
+        final int REFUNDED_AP_FROM_REBIRTH = 1004;
+        final int STARTING_STAT_VALUE = 4;
+        int refundedAPMinusAPUsedForHPAndMP = this.getRemainingAp() + REFUNDED_AP_FROM_REBIRTH - this.getHpMpApUsed();
+        List<Pair<MapleStat, Integer>> rebirthStats = new ArrayList<>();
+        rebirthStats.add(new Pair<>(MapleStat.LEVEL, 1));
+        rebirthStats.add(new Pair<>(MapleStat.EXP, 0));
+        rebirthStats.add(new Pair<>(MapleStat.STR, STARTING_STAT_VALUE));
+        rebirthStats.add(new Pair<>(MapleStat.DEX, STARTING_STAT_VALUE));
+        rebirthStats.add(new Pair<>(MapleStat.INT, STARTING_STAT_VALUE));
+        rebirthStats.add(new Pair<>(MapleStat.LUK, STARTING_STAT_VALUE));
+        rebirthStats.add(new Pair<>(MapleStat.JOB, jobToRebirthInto.getId()));
+        rebirthStats.add(new Pair<>(MapleStat.AVAILABLEAP, refundedAPMinusAPUsedForHPAndMP));
+
+        MapleInventoryManipulator.removeById(
+            this.client,
+            ItemConstants.getInventoryType(GOLDEN_MAPLE_LEAF_ID),
+            GOLDEN_MAPLE_LEAF_ID,
+            NUMBER_OF_ITEMS_REQUIRED_TO_REBIRTH,
+            false,
+            false
+        );
+        this.setLevel(1);
+        this.setExp(0);
+        this.setStr(STARTING_STAT_VALUE);
+        this.setDex(STARTING_STAT_VALUE);
+        this.setLuk(STARTING_STAT_VALUE);
+        this.setInt(STARTING_STAT_VALUE);
+        this.setJob(jobToRebirthInto);
+        this.setRemainingAp(refundedAPMinusAPUsedForHPAndMP);
+        this.setRebirths(this.getRebirths() + 1);
+        this.announce(MaplePacketCreator.updatePlayerStats(rebirthStats, this));
+
+        final String REBIRTH_NOTICE_MESSAGE = "[Notice] " + this.getName() + " has just rebirthed! They have rebirthed " + this.getRebirths() + " time(s)!";
+        Server.getInstance().broadcastMessage(
+                this.getWorld(),
+                MaplePacketCreator.serverNotice(6, REBIRTH_NOTICE_MESSAGE)
+        );
+    }
+
+    public void rebirthToBeginner() { this.rebirth(MapleJob.BEGINNER); }
+    public void rebirthToNoblesse() { this.rebirth(MapleJob.NOBLESSE); }
+    public void rebirthToLegend() { this.rebirth(MapleJob.LEGEND); }
 
     public void disableDoorSpawn() {
         canDoor = false;
@@ -5646,6 +5701,7 @@ public void saveInventory() throws SQLException {
             ret.dojoPoints = rs.getInt("dojoPoints");
             ret.dojoStage = rs.getInt("lastDojoStage");
             ret.dataString = rs.getString("dataString");
+            ret.rebirths = rs.getInt("reborns");
             ret.mgc = new MapleGuildCharacter(ret);
             int buddyCapacity = rs.getInt("buddyCapacity");
             ret.buddylist = new BuddyList(buddyCapacity);
@@ -6648,9 +6704,22 @@ public void saveInventory() throws SQLException {
             con.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
             con.setAutoCommit(false);
             PreparedStatement ps;
-            ps = con.prepareStatement("UPDATE characters SET level = ?, fame = ?, str = ?, dex = ?, luk = ?, `int` = ?, exp = ?, gachaexp = ?, hp = ?, mp = ?, maxhp = ?, maxmp = ?, sp = ?, ap = ?, gm = ?, skincolor = ?, gender = ?, job = ?, hair = ?, face = ?, map = ?, meso = ?, hpMpUsed = ?, spawnpoint = ?, party = ?, buddyCapacity = ?, messengerid = ?, messengerposition = ?, mountlevel = ?, mountexp = ?, mounttiredness= ?, equipslots = ?, useslots = ?, setupslots = ?, etcslots = ?,  monsterbookcover = ?, vanquisherStage = ?, dojoPoints = ?, lastDojoStage = ?, finishedDojoTutorial = ?, vanquisherKills = ?, matchcardwins = ?, matchcardlosses = ?, matchcardties = ?, omokwins = ?, omoklosses = ?, omokties = ?, dataString = ?, fquest = ?, jailexpire = ? WHERE id = ?", Statement.RETURN_GENERATED_KEYS);
+            ps = con.prepareStatement(
+                "UPDATE characters " +
+                    "SET level = ?, fame = ?, str = ?, dex = ?, luk = ?, " +
+                        "`int` = ?, exp = ?, gachaexp = ?, hp = ?, mp = ?, " +
+                        "maxhp = ?, maxmp = ?, sp = ?, ap = ?, gm = ?, " +
+                        "skincolor = ?, gender = ?, job = ?, hair = ?, face = ?, " +
+                        "map = ?, meso = ?, hpMpUsed = ?, spawnpoint = ?, party = ?, " +
+                        "buddyCapacity = ?, messengerid = ?, messengerposition = ?, mountlevel = ?, mountexp = ?, " +
+                        "mounttiredness= ?, equipslots = ?, useslots = ?, setupslots = ?, etcslots = ?, " +
+                        "monsterbookcover = ?, vanquisherStage = ?, dojoPoints = ?, lastDojoStage = ?, finishedDojoTutorial = ?, " +
+                        "vanquisherKills = ?, matchcardwins = ?, matchcardlosses = ?, matchcardties = ?, omokwins = ?, " +
+                        "omoklosses = ?, omokties = ?, dataString = ?, fquest = ?, jailexpire = ?, " +
+                        "reborns = ? " +
+                    "WHERE id = ?", Statement.RETURN_GENERATED_KEYS);
             if (gmLevel < 1 && level > 199) {
-                ps.setInt(1, isCygnus() ? 120 : 200);
+                ps.setInt(1, isCygnus() ? 200 : 200);
             } else {
                 ps.setInt(1, level);
             }
@@ -6750,8 +6819,8 @@ public void saveInventory() throws SQLException {
             ps.setString(48, dataString);
             ps.setInt(49, quest_fame);
             ps.setLong(50, jailExpiration);
-			//ps.setInt(51, rewardpoints);
-            ps.setInt(51, id);
+            ps.setInt(51, this.getRebirths());
+            ps.setInt(52, id);
 
             int updateRows = ps.executeUpdate();
             if (updateRows < 1) {
@@ -8521,5 +8590,12 @@ public void saveInventory() throws SQLException {
     
     public void removeJailExpirationTime() {
         jailExpiration = 0;
+    }
+
+    public boolean isMaxLevel() {
+        if (this.level == GameConstants.getCharacterMaxLevel()) {
+            return true;
+        }
+        return false;
     }
 }

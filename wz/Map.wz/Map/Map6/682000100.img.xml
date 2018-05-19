@@ -5798,6 +5798,7 @@
       <int name="y" value="-313"/>
       <int name="tm" value="682010200"/>
       <string name="tn" value="out00"/>
+	  <string name="script" value="hhportal"/> 
     </imgdir>
     <imgdir name="8">
       <string name="pn" value="st00"/>

@@ -20,6 +20,7 @@
     <int name="boss" value="1"/>
     <string name="elemAttr" value="L3"/>
     <int name="chaseSpeed" value="10"/>
+
   </imgdir>
   <imgdir name="move">
     <canvas name="0" width="132" height="175">

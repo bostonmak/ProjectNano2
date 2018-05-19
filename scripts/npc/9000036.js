@@ -76,14 +76,18 @@ function action(mode, type, selection) {
             items = [];
             maxEqp = 0;
             
-            for (var x = 1132005; x < 1132017; maxEqp++, x++)
+            for (var x = 1132005; x < 1132017; maxEqp++, x++) //Belts
                 items[maxEqp] = x;
             
-            for (var x = 1142000; x < 1142102; maxEqp++, x++)
+            for (var x = 1142000; x < 1142076; maxEqp++, x++) // 1142077 and 2078, 2086-2099, 2101 dont work
                 items[maxEqp] = x;
             
-            for (var x = 1142107; x < 1142143; maxEqp++, x++)
-                items[maxEqp] = x; 
+            for (var x = 1142107; x < 1142143; maxEqp++, x++) // 1142121, 2123, 
+                items[maxEqp] = x;
+
+            for (var x = 1142124; x < 1142143; maxEqp++, x++) 
+                items[maxEqp] = x;
+            
             selStr += "\r\n#L" + i + "##bTry it!#b";
             
         }else if (selection == 4) { //ring refine
