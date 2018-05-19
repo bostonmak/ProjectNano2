@@ -2122,21 +2122,19 @@ public void saveInventory() throws SQLException {
     }
 
     private void rebirth(MapleJob jobToRebirthInto) {
-        final int GOLDEN_MAPLE_LEAF_ID = 4001168;
-        final int NUMBER_OF_ITEMS_REQUIRED_TO_REBIRTH = 1;
-        final int REFUNDED_AP_FROM_REBIRTH = 1004;
-        final int STARTING_STAT_VALUE = 4;
-        int refundedAPMinusAPUsedForHPAndMP = this.getRemainingAp() + REFUNDED_AP_FROM_REBIRTH - this.getHpMpApUsed();
+        this.setLevel(1);
+        this.setExp(0);
+        this.setJob(jobToRebirthInto);
+        this.setRebirths(this.getRebirths() + 1);
+
         List<Pair<MapleStat, Integer>> rebirthStats = new ArrayList<>();
         rebirthStats.add(new Pair<>(MapleStat.LEVEL, 1));
         rebirthStats.add(new Pair<>(MapleStat.EXP, 0));
-        rebirthStats.add(new Pair<>(MapleStat.STR, STARTING_STAT_VALUE));
-        rebirthStats.add(new Pair<>(MapleStat.DEX, STARTING_STAT_VALUE));
-        rebirthStats.add(new Pair<>(MapleStat.INT, STARTING_STAT_VALUE));
-        rebirthStats.add(new Pair<>(MapleStat.LUK, STARTING_STAT_VALUE));
         rebirthStats.add(new Pair<>(MapleStat.JOB, jobToRebirthInto.getId()));
-        rebirthStats.add(new Pair<>(MapleStat.AVAILABLEAP, refundedAPMinusAPUsedForHPAndMP));
+        this.announce(MaplePacketCreator.updatePlayerStats(rebirthStats, this));
 
+        final int GOLDEN_MAPLE_LEAF_ID = 4001168;
+        final int NUMBER_OF_ITEMS_REQUIRED_TO_REBIRTH = 1;
         MapleInventoryManipulator.removeById(
             this.client,
             ItemConstants.getInventoryType(GOLDEN_MAPLE_LEAF_ID),
@@ -2145,16 +2143,6 @@ public void saveInventory() throws SQLException {
             false,
             false
         );
-        this.setLevel(1);
-        this.setExp(0);
-        this.setStr(STARTING_STAT_VALUE);
-        this.setDex(STARTING_STAT_VALUE);
-        this.setLuk(STARTING_STAT_VALUE);
-        this.setInt(STARTING_STAT_VALUE);
-        this.setJob(jobToRebirthInto);
-        this.setRemainingAp(refundedAPMinusAPUsedForHPAndMP);
-        this.setRebirths(this.getRebirths() + 1);
-        this.announce(MaplePacketCreator.updatePlayerStats(rebirthStats, this));
 
         final String REBIRTH_NOTICE_MESSAGE = "[Notice] " + this.getName() + " has just rebirthed! They have rebirthed " + this.getRebirths() + " time(s)!";
         Server.getInstance().broadcastMessage(
