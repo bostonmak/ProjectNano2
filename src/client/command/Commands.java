@@ -324,6 +324,7 @@ public class Commands {
                 gotomaps.put("temple", 270000100);
                 gotomaps.put("neo", 240070000);
                 gotomaps.put("fm", 910000000);
+                gotomaps.put("fog", 105040306);
 	}
         
         private static void hardsetItemStats(Equip equip, short stat) {
