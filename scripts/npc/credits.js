@@ -11,7 +11,7 @@ var name_tree = [];
 var role_tree = [];
 var name_cursor, role_cursor;
 
-var servers = ["HeavenMS", "MapleSolaxia", "MoopleDEV", "MetroMS", "BubblesDEV", "ThePackII", "OdinMS", "Contributors"];
+var servers = ["ProjectNano", "MapleSolaxia", "MoopleDEV", "MetroMS", "BubblesDEV", "ThePackII", "OdinMS", "Contributors"];
 var servers_history = [];
 
 function addPerson(name, role) {
@@ -23,11 +23,15 @@ function setHistory(from, to) {
         servers_history.push([from, to]);
 }
 
-function writeServerStaff_HeavenMS() {
-        addPerson("Ronan", "Developer");
-        addPerson("Vcoc", "Freelance Developer");
+function writeServerStaff_ProjectNano() {
+        addPerson("LightRyuzaki", "Administrator");
+        addPerson("Bobo", "Administrator & Developer");
+		addPerson("Developer/LemonKid", "Administrator & Developer");
+        addPerson("Lee", "Game Master & Developer");
+		addPerson("Bunzy", "Game Master");
+
         
-        setHistory(2015, 2018);
+        setHistory(2018, 2019);
 }
 
 function writeServerStaff_MapleSolaxia() {

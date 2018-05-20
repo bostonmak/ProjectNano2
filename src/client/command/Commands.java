@@ -593,6 +593,7 @@ public class Commands {
 			}
 			break;
                     
+                    
 		case "ranks":
 			PreparedStatement ps = null;
 			ResultSet rs = null;
@@ -651,6 +652,81 @@ public class Commands {
 			} else {
 				player.dropMessage(5, "That map does not exist.");
 			}
+                                break;
+                    case "whatdropsfrom":
+			if (sub.length < 2) {
+				player.dropMessage(5, "Please do @whatdropsfrom <monster name>");
+                        break;
+			}
+			String monsterName = joinStringFrom(sub, 1);
+			String output = "";
+			int limit = 3;
+			Iterator<Pair<Integer, String>> listIterator = MapleMonsterInformationProvider.getMobsIDsFromName(monsterName).iterator();
+			for (int i = 0; i < limit; i++) {
+				if(listIterator.hasNext()) {
+					Pair<Integer, String> data = listIterator.next();
+					int mobId = data.getLeft();
+					String mobName = data.getRight();
+					output += mobName + " drops the following items:\r\n\r\n";
+					for (MonsterDropEntry drop : MapleMonsterInformationProvider.getInstance().retrieveDrop(mobId)){
+						try {
+							String name = MapleItemInformationProvider.getInstance().getName(drop.itemId);
+							if (name.equals("null") || drop.chance == 0){
+								continue;
+							}
+							float chance = 1000000 / drop.chance / player.getDropRate();
+							output += "- " + name + " (1/" + (int) chance + ")\r\n";
+						} catch (Exception ex){
+                                                        ex.printStackTrace();
+							continue;
+						}
+					}
+					output += "\r\n";
+				}
+			}
+			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, output, "00 00", (byte) 0));
+			break;
+                    
+		case "whodrops":
+			if (sub.length < 2) {
+				player.dropMessage(5, "Please do @whodrops <item name>");
+                        break;
+			}
+			String searchString = joinStringFrom(sub, 1);
+			output = "";
+			listIterator = MapleItemInformationProvider.getInstance().getItemDataByName(searchString).iterator();
+			if(listIterator.hasNext()) {
+				int count = 1;
+				while(listIterator.hasNext() && count <= 3) {
+					Pair<Integer, String> data = listIterator.next();
+					output += "#b" + data.getRight() + "#k is dropped by:\r\n";
+					try {
+                                                con = DatabaseConnection.getConnection();
+						ps = con.prepareStatement("SELECT dropperid FROM drop_data WHERE itemid = ? LIMIT 50");
+						ps.setInt(1, data.getLeft());
+						rs = ps.executeQuery();
+						while(rs.next()) {
+							String resultName = MapleMonsterInformationProvider.getMobNameFromID(rs.getInt("dropperid"));
+							if (resultName != null) {
+								output += resultName + ", ";
+							}
+						}
+						rs.close();
+						ps.close();
+                                                con.close();
+					} catch (Exception e) {
+						player.dropMessage(6, "There was a problem retrieving the required data. Please try again.");
+						e.printStackTrace();
+						break;
+					}
+					output += "\r\n\r\n";
+					count++;
+				}
+			} else {
+				player.dropMessage(5, "The item you searched for doesn't exist.");
+                        break;
+			}
+			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, output, "00 00", (byte) 0));
                                 break;
                         
                     
@@ -730,7 +806,7 @@ public class Commands {
 				}
 			} 
 			break;
-                    
+                    /*
                 case "whatdropsfrom":
 			if (sub.length < 2) {
 				player.dropMessage(5, "Please do @whatdropsfrom <monster name>");
@@ -806,7 +882,7 @@ public class Commands {
 			}
 			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, output, "00 00", (byte) 0));
                                 break;
-                    
+                    */
                 case "buffme":
                         //GM Skills : Haste(Super) - Holy Symbol - Bless - Hyper Body - Echo of Hero - maple warrior - sharp eyes
                         SkillFactory.getSkill(9101001).getEffect(SkillFactory.getSkill(9101001).getMaxLevel()).applyTo(player);
