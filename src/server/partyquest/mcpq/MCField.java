@@ -655,7 +655,7 @@ public class MCField {
                 return;
             }
             for (MapleCharacter c : field.red.getMembers()) {
-                if (c.getMap() != field.getMap(MCMaps.LOBBY)) {
+                if (c.getMap().getReturnMapId() != field.getMap(MCMaps.LOBBY).getReturnMapId()) {
                     this.field.deregister(true);
                     return;
                 }
@@ -693,12 +693,12 @@ public class MCField {
             }
             Collection<MapleCharacter> members = Collections.unmodifiableCollection(field.red.getMembers());
             for (MapleCharacter c : members) {
-                if (c.getMap() != field.getMap(MCMaps.BATTLEFIELD) &&
-                        c.getMap() != field.getMap(MCMaps.RESURRECT)) {
+                if (c.getMap().getReturnMapId() != field.getMap(MCMaps.BATTLEFIELD).getReturnMapId() &&
+                        c.getMap().getReturnMapId() != field.getMap(MCMaps.RESURRECT).getReturnMapId()) {
                     this.field.announce(MonsterCarnivalPacket.leaveCPQ(MCTeam.RED.code, c.getName()));
                     red.removePlayer(c); // TODO: fix concurrent modification
                 }
-                if (c.getMap() == field.getMap(MCMaps.BATTLEFIELD) && c.isDead()) {
+                if (c.getMap().getReturnMapId() == field.getMap(MCMaps.BATTLEFIELD).getReturnMapId() && c.isDead()) {
                     this.field.onPlayerRespawn(c);
                 }
             }
@@ -709,12 +709,12 @@ public class MCField {
             }
             members = Collections.unmodifiableCollection(field.blue.getMembers());
             for (MapleCharacter c : members) {
-                if (c.getMap() != field.getMap(MCMaps.BATTLEFIELD) &&
-                        c.getMap() != field.getMap(MCMaps.RESURRECT)) {
+                if (c.getMap().getReturnMapId() != field.getMap(MCMaps.BATTLEFIELD).getReturnMapId() &&
+                        c.getMap().getReturnMapId() != field.getMap(MCMaps.RESURRECT).getReturnMapId()) {
                     this.field.announce(MonsterCarnivalPacket.leaveCPQ(MCTeam.BLUE.code, c.getName()));
                     blue.removePlayer(c);
                 }
-                if (c.getMap() == field.getMap(MCMaps.BATTLEFIELD) && c.isDead()) {
+                if (c.getMap().getReturnMapId() == field.getMap(MCMaps.BATTLEFIELD).getReturnMapId() && c.isDead()) {
                     this.field.onPlayerRespawn(c);
                 }
             }

@@ -6,13 +6,13 @@
  */
 var DISABLED = false;
 
-var SavedLocationType = Packages.src.server.maps.SavedLocationType;
+var SavedLocationType = Packages.server.maps.SavedLocationType;
 
 // Relevant Monster Carnival classes
-var MonsterCarnival = Packages.src.server.partyquest.mcpq.MonsterCarnival;
-var MCTracker = Packages.src.server.partyquest.mcpq.MCTracker;
-var MCParty = Packages.src.server.partyquest.mcpq.MCParty;
-var MCField = Packages.src.server.partyquest.mcpq.MCField;
+var MonsterCarnival = Packages.server.partyquest.mcpq.MonsterCarnival;
+var MCTracker = Packages.server.partyquest.mcpq.MCTracker;
+var MCParty = Packages.server.partyquest.mcpq.MCParty;
+var MCField = Packages.server.partyquest.mcpq.MCField;
 
 // NPC variables
 var status = -1;

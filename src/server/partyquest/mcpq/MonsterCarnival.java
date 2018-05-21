@@ -160,6 +160,7 @@ public class MonsterCarnival {
     public static final int CP_LOSS_ON_DEATH = 10;
     public static final int TIME_PREBATTLE = 10;
     public static final int TIME_BATTLE = 600;
+
     public static final int TIME_LOBBYWAIT = 180;
 
     public static final int TAB_SPAWNS   = 0;
@@ -342,7 +343,7 @@ public class MonsterCarnival {
 
     // Miscellaneous
     public static final int MIN_LEVEL  = 30;
-    public static final int MAX_LEVEL  = 50;
+    public static final int MAX_LEVEL  = 200;
     public static final int NUM_FIELDS = 6;
 
     // Debug

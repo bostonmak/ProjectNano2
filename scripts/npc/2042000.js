@@ -5,11 +5,11 @@
  */
 
 // Relevant Monster Carnival classes
-var MonsterCarnival = server.partyquest.mcpq.MonsterCarnival;
-var MCTracker = server.partyquest.mcpq.MCTracker;
-var MCParty = server.partyquest.mcpq.MCParty;
-var MCField = server.partyquest.mcpq.MCField;
-var MCTeam = server.partyquest.mcpq.MCField.MCTeam;
+var MonsterCarnival = Packages.server.partyquest.mcpq.MonsterCarnival;
+var MCTracker = Packages.server.partyquest.mcpq.MCTracker;
+var MCParty = Packages.server.partyquest.mcpq.MCParty;
+var MCField = Packages.server.partyquest.mcpq.MCField;
+var MCTeam = Packages.server.partyquest.mcpq.MCField.MCTeam;
 
 // NPC variables
 var status = -1;
