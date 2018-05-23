@@ -206,7 +206,7 @@ function writeSolaxiaCommandsLv0() {    //Common
         comm_cursor = comm_lv0;
         desc_cursor = desc_lv0;
 
-        addCommand("commands", "");
+
         addCommand("droplimit", "");
         addCommand("time", "");
         addCommand("credits", "");
@@ -214,8 +214,9 @@ function writeSolaxiaCommandsLv0() {    //Common
         addCommand("dispose", "Use this when you get stuck");
 		addCommand("goto", "Warps you to the map of your choice");
 		addCommand("rebirth", "Requires Level 200 and 1 Golden Maple Leaf (Obtainable from Mia)");
-		addCommand("whodrops", "");
-		addCommand("whatdropsfrom", "");
+		addCommand("haste", "Lets you move faster");
+		addCommand("whodrops", "Shows who drops a specific item");
+		addCommand("whatdropsfrom", "shows what a mob drops");
         addCommand("equiplv", "Shows your Equipment Level");
         addCommand("showrates", "");
         addCommand("rates", "");
@@ -262,7 +263,7 @@ function action(mode, type, selection) {
                         status--;
 
                 if (status == 0) {
-                        var sendStr = "These are all the available player commands for you:\r\n\r\n#b";
+                        var sendStr = "These are all the available player commands that you can use:\r\n\r\n#b";
                         for(var i = 0; i <= cm.getPlayer().gmLevel(); i++) {
                             sendStr += "#L" + i + "#" + levels[i] + "#l\r\n";
                         }

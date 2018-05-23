@@ -2,7 +2,7 @@
 <imgdir name="9400582.img">
   <imgdir name="info">
     <int name="bodyAttack" value="1"/>
-    <int name="level" value="120"/>
+    <int name="level" value="140"/>
     <int name="maxHP" value="600000"/>
     <int name="maxMP" value="2000"/>
     <int name="speed" value="-20"/>

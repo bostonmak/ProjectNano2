@@ -36,12 +36,9 @@ importPackage(Packages.client);
 function init() {
 	
         if(em.getChannelServer().getId() == 1) { // Only run on channel 1.
-		// AEST
-		timer1 = em.scheduleAtTimestamp("start", 1428220800000);
-		timer2 = em.scheduleAtTimestamp("stop", 1428228000000);
-		// EDT
-		timer1 = em.scheduleAtTimestamp("start", 1428271200000);
-		timer2 = em.scheduleAtTimestamp("stop", 1428278400000);
+		// 13:00 - 19:00 PST
+		timer1 = em.scheduleAtTimestamp("start", 1526932800000);
+		timer2 = em.scheduleAtTimestamp("stop", 1526954400000);
 	}
         
 }
