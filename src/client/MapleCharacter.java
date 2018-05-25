@@ -46,6 +46,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Comparator;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tools.locks.MonitoredReentrantLock;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.ScheduledFuture;
@@ -314,6 +317,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     private int banishSp = -1;
     private long banishTime = 0;
     private int rebirths = 0;
+    private static Logger MapleLogger = LoggerFactory.getLogger(MapleCharacter.class);
     
     private MapleCharacter() {
         useCS = false;
@@ -6662,16 +6666,14 @@ public void saveInventory() throws SQLException {
         }
     }
 
+    private final String TASK_NAME = "saveToDB";
+    private final String TASK_SUCCESSFUL = "SUCCESS";
+    private final String TASK_FAILED = "FAILED";
+
     public void saveToDB() {
         if(ServerConstants.USE_AUTOSAVE) {
-            Runnable r = new Runnable() {
-                @Override
-                public void run() {
-                    saveToDB(true);
-                }
-            };
-            
-            Thread t = new Thread(r);  //spawns a new thread to deal with this
+            SaveToDBRunnable saveToDBRunnable = new SaveToDBRunnable(this);
+            Thread t = new Thread(saveToDBRunnable);  //spawns a new thread to deal with this
             t.start();
         } else {
             saveToDB(true);
@@ -6679,7 +6681,14 @@ public void saveInventory() throws SQLException {
     }
     
     public synchronized void saveToDB(boolean notAutosave) {
-        if(!loggedIn) return;
+        boolean taskSuccess = false;
+        long startTaskTime = System.currentTimeMillis();
+        MapleLogger.info("Task: {}, Character: {}, Status: {}",
+                TASK_NAME, this.getName(), "STARTING");
+
+        if(!loggedIn) {
+            return;
+        }
         
         Calendar c = Calendar.getInstance();
         
@@ -7006,7 +7015,7 @@ public void saveInventory() throws SQLException {
             ps.close();
 
             //ret.rewardpoints = rs.getInt("rewardpoints");
-                        
+            taskSuccess = true;
         } catch (SQLException | RuntimeException t) {
             FilePrinter.printError(FilePrinter.SAVE_CHAR, t, "Error saving " + name + " Level: " + level + " Job: " + job.getId());
             try {
@@ -7017,6 +7026,8 @@ public void saveInventory() throws SQLException {
         } catch (Exception e) {
             FilePrinter.printError(FilePrinter.SAVE_CHAR, e, "Error saving " + name + " Level: " + level + " Job: " + job.getId());
         } finally {
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    TASK_NAME, this.getName(), taskSuccess ? TASK_SUCCESSFUL : TASK_FAILED, System.currentTimeMillis() - startTaskTime);
             try {
                 con.setAutoCommit(true);
                 con.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
