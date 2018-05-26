@@ -6669,7 +6669,7 @@ public void saveInventory() throws SQLException {
     private final String TASK_NAME = "saveToDB";
     private final String TASK_SUCCESSFUL = "SUCCESS";
     private final String TASK_FAILED = "FAILED";
-    private final String TASK_IN_PROGROESS = "IN PROGRESS"
+    private final String TASK_IN_PROGROESS = "IN PROGRESS";
 
     public void saveToDB() {
         if(ServerConstants.USE_AUTOSAVE) {
