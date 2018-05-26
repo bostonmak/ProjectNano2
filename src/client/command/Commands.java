@@ -276,8 +276,8 @@ public class Commands {
 
 	static {
 		//gotomaps.put("gmmap", 180000000);
-		//gotomaps.put("southperry", 60000);
-		//gotomaps.put("amherst", 1000000);
+		gotomaps.put("southperry", 60000);
+		gotomaps.put("amherst", 1000000);
 		gotomaps.put("henesys", 100000000);
 		gotomaps.put("ellinia", 101000000);
 		gotomaps.put("perion", 102000000);
@@ -306,6 +306,7 @@ public class Commands {
 		gotomaps.put("mushmom", 100000005);
 		gotomaps.put("griffey", 240020101);
 		gotomaps.put("manon", 240020401);
+		gotomaps.put("LHC", 211060000);
 		gotomaps.put("horseman", 682000001);
 		gotomaps.put("balrog", 105090900);
 		gotomaps.put("zakum", 211042400);
@@ -315,7 +316,7 @@ public class Commands {
 		gotomaps.put("shrine", 800000000);
 		gotomaps.put("skelegon", 240040511);
 		gotomaps.put("hpq", 100000200);
-		gotomaps.put("ht", 240050400);
+		gotomaps.put("horntail", 240050400);
                 gotomaps.put("ariant", 260000000);
 		gotomaps.put("magatia", 261000000);
                 gotomaps.put("singapore", 540000000);
@@ -326,7 +327,7 @@ public class Commands {
                 gotomaps.put("fm", 910000000);
                 gotomaps.put("fog", 105040306);
                 gotomaps.put("mp3", 541000300);
-                gotomaps.put("ws", 600020300);
+                gotomaps.put("wolfspider", 600020300);
 	}
         
         private static void hardsetItemStats(Equip equip, short stat) {
