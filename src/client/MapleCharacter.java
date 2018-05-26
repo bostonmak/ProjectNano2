@@ -6669,6 +6669,7 @@ public void saveInventory() throws SQLException {
     private final String TASK_NAME = "saveToDB";
     private final String TASK_SUCCESSFUL = "SUCCESS";
     private final String TASK_FAILED = "FAILED";
+    private final String TASK_IN_PROGROESS = "IN PROGRESS"
 
     public void saveToDB() {
         if(ServerConstants.USE_AUTOSAVE) {
@@ -6823,6 +6824,9 @@ public void saveInventory() throws SQLException {
             if (updateRows < 1) {
                 throw new RuntimeException("Character not in database (" + id + ")");
             }
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Save Character", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - startTaskTime);
+            long lastTaskTime = System.currentTimeMillis();
             
             petLock.lock();
             try {
@@ -6850,6 +6854,10 @@ public void saveInventory() throws SQLException {
                     ps2.executeBatch();
                 }
             }
+
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Save Pets", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
             
             deleteWhereCharacterId(con, "DELETE FROM keymap WHERE characterid = ?");
             ps = con.prepareStatement("INSERT INTO keymap (characterid, `key`, `type`, `action`) VALUES (?, ?, ?, ?)");
@@ -6880,6 +6888,10 @@ public void saveInventory() throws SQLException {
                 }
             }
             ps.executeBatch();
+
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Save Key Bindings and Macros", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
             
             /*
             List<Pair<Item, MapleInventoryType>> itemsWithType = new ArrayList<>();
@@ -6891,7 +6903,10 @@ public void saveInventory() throws SQLException {
             ItemFactory.INVENTORY.saveItems(itemsWithType, id, con);
             */
             saveInventory();
-			
+
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Save Inventory", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
 			
             deleteWhereCharacterId(con, "DELETE FROM skills WHERE characterid = ?");
             ps = con.prepareStatement("INSERT INTO skills (characterid, skillid, skilllevel, masterlevel, expiration) VALUES (?, ?, ?, ?, ?)");
@@ -6904,6 +6919,10 @@ public void saveInventory() throws SQLException {
                 ps.addBatch();
             }
             ps.executeBatch();
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Save Skills", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
+
             deleteWhereCharacterId(con, "DELETE FROM savedlocations WHERE characterid = ?");
             ps = con.prepareStatement("INSERT INTO savedlocations (characterid, `locationtype`, `map`, `portal`) VALUES (?, ?, ?, ?)");
             ps.setInt(1, id);
@@ -6935,6 +6954,10 @@ public void saveInventory() throws SQLException {
                 }
             }
             ps.executeBatch();
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Save Locations", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
+
             deleteWhereCharacterId(con, "DELETE FROM buddies WHERE characterid = ? AND pending = 0");
             ps = con.prepareStatement("INSERT INTO buddies (characterid, `buddyid`, `pending`, `group`) VALUES (?, ?, 0, ?)");
             ps.setInt(1, id);
@@ -6946,6 +6969,10 @@ public void saveInventory() throws SQLException {
                 }
             }
             ps.executeBatch();
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Save Buddies", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
+
             deleteWhereCharacterId(con, "DELETE FROM area_info WHERE charid = ?");
             ps = con.prepareStatement("INSERT INTO area_info (id, charid, area, info) VALUES (DEFAULT, ?, ?, ?)");
             ps.setInt(1, id);
@@ -6955,8 +6982,11 @@ public void saveInventory() throws SQLException {
                 ps.addBatch();
             }
             ps.executeBatch();
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Save Area Info", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
+
             deleteWhereCharacterId(con, "DELETE FROM eventstats WHERE characterid = ?");
-            
             deleteQuestProgressWhereCharacterId(con, id);
             ps = con.prepareStatement("INSERT INTO queststatus (`queststatusid`, `characterid`, `quest`, `status`, `time`, `expires`, `forfeited`) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             PreparedStatement psf;
@@ -6992,6 +7022,10 @@ public void saveInventory() throws SQLException {
                 }
             }	
             psf.close();
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Save Quests", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
+
             ps = con.prepareStatement("UPDATE accounts SET gm = ?  WHERE id = ?");
                     ps.setInt(1, gmLevel > 1 ? 1 : 0);
                     ps.setInt(2, client.getAccID());
