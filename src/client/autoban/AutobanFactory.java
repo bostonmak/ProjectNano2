@@ -96,9 +96,9 @@ public enum AutobanFactory {
 	}
 	
 	public void autoban(MapleCharacter chr, String value) {
-            if(ServerConstants.USE_AUTOBAN == true) {
-		chr.autoban("Autobanned for (" + this.name() + ": " + value + ")");
+            //if(ServerConstants.USE_AUTOBAN == true) {
+		//chr.autoban("Autobanned for (" + this.name() + ": " + value + ")");
 		//chr.sendPolice("You will be disconnected for (" + this.name() + ": " + value + ")");
-            }
+            
 	}
 }

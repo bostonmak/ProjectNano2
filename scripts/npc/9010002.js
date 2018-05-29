@@ -29,7 +29,7 @@ function action(mode, type, selection) {
         else
             status--;
         if (status == 0) {
-            cm.sendSimple("Hello#b #h ##k, you currently have #b#c4001126# #v4001126#.#k \r\nWhat would you like to do?\r\n#k#L1# Trade 5 leaf for 5,000 NX#l\r\n\#L2# Trade 2 leaf for 1 random chair #l\r\n\#L3# Trade 1 leaf for 3 random Maple Weapons #l\r\n\#L4# Trade 10 leaf for 3 Swiss Cheese and Onyx Apples#l\r\n#L5#Trade 1 leaf for a 10 day Hired Merchant#l\r\n#L6#Trade 25 leaf for a #v4001168# (Required To Rebirth)#l");
+            cm.sendSimple("Hello#b #h ##k, you currently have #b#c4001126# #v4001126#.#k \r\nWhat would you like to do?\r\n#k#L1# Trade 5 leaf for 5,000 NX#l\r\n\#L2# Trade 2 leaf for 1 random chair #l\r\n\#L3# Trade 1 leaf for 3 random Maple Weapons #l\r\n\#L4# Trade 10 leaf for 3 Swiss Cheese and Onyx Apples#l\r\n#L5#Trade 1 leaf for a 10 day Hired Merchant#l\r\n#L6#Trade 25 leaf for a #v4001168# (Required To Rebirth)#l#l\r\n#L7#Trade 50 leaf for one #v4001017# #l");
         } else if (status == 1) {
             if (selection == 1) {
                 if(cm.haveItem(leaf, 1)) {
@@ -117,9 +117,9 @@ else if (selection == 6) {
 					var goldenleaf = 4001168;
 					if(!cm.getPlayer().getInventory(Packages.client.inventory.MapleInventoryType.EQUIP).isFull(2)){
 						cm.gainItem(goldenleaf, 1);
-						cm.gainItem(leaf, -10);
-						cm.sendOk("Here are your 3 cheeses and apples!");
-						cm.logLeaf("3 cheeses and apples");
+						cm.gainItem(leaf, -25);
+						cm.sendOk("Enjoy your Golden Maple Leaf");
+						cm.logLeaf("1 Golden Maple Leaf");
 					} else {
 						cm.sendOk("Please make sure you have enough space to hold these items!");
 					}
@@ -127,7 +127,24 @@ else if (selection == 6) {
                     cm.sendOk("Sorry, you don't have a maple leaf!");
 				}
                 cm.dispose();
-            }			else {
+            }	
+else if (selection == 7) {
+                if(cm.haveItem(leaf, 50)) {
+					var eyeoffire = 4001017;
+					if(!cm.getPlayer().getInventory(Packages.client.inventory.MapleInventoryType.EQUIP).isFull(2)){
+						cm.gainItem(eyeoffire, 1);
+						cm.gainItem(leaf, -50);
+						cm.sendOk("Here is your eye of fire!");
+						cm.logLeaf("1 Eye of Fire");
+					} else {
+						cm.sendOk("Please make sure you have enough space to hold these items!");
+					}
+                 } else {
+                    cm.sendOk("Sorry, you don't have a maple leaf!");
+				}
+                cm.dispose();
+            }			
+			else {
                 cm.sendOk("Come back later!");
 				cm.dispose();
 			}
