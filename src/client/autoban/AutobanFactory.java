@@ -37,7 +37,7 @@ public enum AutobanFactory {
 	MOB_COUNT,
 	GENERAL,
 	FIX_DAMAGE,
-	DAMAGE_HACK(15, 60 * 1000),
+	DAMAGE_HACK(15, 60 * 5000),
 	DISTANCE_HACK(10, 120 * 1000),
 	PORTAL_DISTANCE(5, 30000),
 	PACKET_EDIT,
@@ -96,9 +96,9 @@ public enum AutobanFactory {
 	}
 	
 	public void autoban(MapleCharacter chr, String value) {
-            //if(ServerConstants.USE_AUTOBAN == true) {
-		//chr.autoban("Autobanned for (" + this.name() + ": " + value + ")");
-		//chr.sendPolice("You will be disconnected for (" + this.name() + ": " + value + ")");
-            
+            if(ServerConstants.USE_AUTOBAN == true) {
+            //chr.autoban("Autobanned for (" + this.name() + ": " + value + ")");
+                chr.sendPolice("You will be disconnected for (" + this.name() + ": " + value + ")");
+            }
 	}
 }

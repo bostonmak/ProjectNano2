@@ -352,6 +352,9 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 	public void resetStats() {
 		getPlayer().resetStats();
 	}
+            public int getRebirths() {
+            return getPlayer().getRebirths();
+    }
         
         public void openShopNPC(int id) {
             MapleShopFactory.getInstance().getShop(id).sendShop(c);
