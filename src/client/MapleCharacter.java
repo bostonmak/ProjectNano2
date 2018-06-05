@@ -4270,7 +4270,7 @@ public void saveInventory() throws SQLException {
     }
 
     public int getMaxClassLevel() {
-        return isCygnus() ? 120 : 200;
+        return isCygnus() ? 200 : 200;
     }
     
     public int getMaxLevel() {
@@ -6446,7 +6446,7 @@ public void saveInventory() throws SQLException {
         List<Pair<MapleStat, Integer>> statup = new ArrayList<>(5);
         int tap = 0, tsp = 1;
         int tstr = 4, tdex = 4, tint = 4, tluk = 4;
-        int levelap = (isCygnus() ? 6 : 5);
+        int levelap = (isCygnus() ? 5 : 5);
         switch (job.getId()) {
             case 100:
             case 1100:
