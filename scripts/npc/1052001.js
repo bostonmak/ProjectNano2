@@ -88,7 +88,10 @@ function action(mode, type, selection) {
                     cm.changeJobById(400);
                     cm.gainItem(2070000, 500);
                     cm.gainItem(1472061, 1);
+                    if(cm.getRebirths() == 0)
+                    {
                     cm.resetStats();
+                    }
                 }
                 cm.sendNext("Alright, from here out, you are a part of us! You'll be living the life of a wanderer at ..., but just be patient as soon, you'll be living the high life. Alright, it ain't much, but I'll give you some of my abilities... HAAAHHH!!!");
             } else {

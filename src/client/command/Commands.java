@@ -306,7 +306,7 @@ public class Commands {
 		gotomaps.put("mushmom", 100000005);
 		gotomaps.put("griffey", 240020101);
 		gotomaps.put("manon", 240020401);
-		gotomaps.put("LHC", 211060000);
+		gotomaps.put("lhc", 211060000);
 		gotomaps.put("horseman", 682000001);
 		gotomaps.put("balrog", 105090900);
 		gotomaps.put("zakum", 211042400);
@@ -1236,8 +1236,8 @@ public class Commands {
                     break;
                     
                 case "warpto":
-                        if (sub.length < 3){
-				player.yellowMessage("Syntax: !warpto <playername> <mapid>");
+                        if (sub.length < 2){
+				player.yellowMessage("Syntax: !warpto <playername>");
 				break;
 			}
                     
@@ -2248,6 +2248,9 @@ public class Commands {
            
 		case "notice":
 			Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, "[Notice] " + joinStringFrom(sub, 1)));
+                    break;
+                    		case "say":
+			Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, "[" + c.getPlayer().getName() + "]" + joinStringFrom(sub, 1)));
                     break;
                     
 		case "rip":
