@@ -6858,19 +6858,50 @@ public void saveInventory() throws SQLException {
             MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Save Pets", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
-            
-            deleteWhereCharacterId(con, "DELETE FROM keymap WHERE characterid = ?");
+
+
+
+            PreparedStatement p = con.prepareStatement("SELECT * FROM keymap WHERE characterid=?", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            p.setInt(1, this.id);
+            ResultSet r = p.executeQuery();
+            HashMap<Integer, Integer> updates = new HashMap();
+            while (r.next()) {
+                Integer key = r.getInt("key");
+                Integer id = r.getInt("id");
+                updates.put(key, id);
+            }
             ps = con.prepareStatement("INSERT INTO keymap (characterid, `key`, `type`, `action`) VALUES (?, ?, ?, ?)");
+            PreparedStatement upd = con.prepareStatement("UPDATE keymap SET `type`=?, `action`=? WHERE id=?");
             ps.setInt(1, id);
             
             Set<Entry<Integer, MapleKeyBinding>> keybindingItems = Collections.unmodifiableSet(keymap.entrySet());
+            HashMap<Integer, Integer> keys = new HashMap();
             for (Entry<Integer, MapleKeyBinding> keybinding : keybindingItems) {
-                ps.setInt(2, keybinding.getKey());
-                ps.setInt(3, keybinding.getValue().getType());
-                ps.setInt(4, keybinding.getValue().getAction());
-                ps.addBatch();
+                if (updates.containsKey(keybinding.getKey())) {
+                    upd.setInt(1, keybinding.getValue().getType());
+                    upd.setInt(2, keybinding.getValue().getAction());
+                    upd.setInt(3, updates.get(keybinding.getKey()));
+                    upd.addBatch();
+                }
+                else {
+                    ps.setInt(2, keybinding.getKey());
+                    ps.setInt(3, keybinding.getValue().getType());
+                    ps.setInt(4, keybinding.getValue().getAction());
+                    ps.addBatch();
+                }
+                keys.put(keybinding.getKey(), 1);
             }
+            String query = "DELETE FROM keymap WHERE characterid = ? and `key` NOT IN (";
+            Iterator it = keys.entrySet().iterator();
+            while (it.hasNext()) {
+                String keystr = ((Map.Entry)it.next()).getKey().toString();
+                query += keystr + ",";
+            }
+            query = query.substring(0, query.length() - 1);
+            query += ")";
+            deleteWhereCharacterId(con, query);
             ps.executeBatch();
+            upd.executeBatch();
             
             deleteWhereCharacterId(con, "DELETE FROM skillmacros WHERE characterid = ?");
             ps = con.prepareStatement("INSERT INTO skillmacros (characterid, skill1, skill2, skill3, name, shout, position) VALUES (?, ?, ?, ?, ?, ?, ?)");
