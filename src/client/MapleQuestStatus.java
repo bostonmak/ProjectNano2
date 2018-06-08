@@ -60,8 +60,9 @@ public class MapleQuestStatus {
     }
     private short questID;
     private Status status;
-    private Map<Integer, String> progress = new LinkedHashMap<Integer, String>();
-    private List<Integer> medalProgress = new LinkedList<Integer>();
+    //private boolean updated;   //maybe this can be of use for someone?
+    private final Map<Integer, String> progress = new LinkedHashMap<Integer, String>();
+    private final List<Integer> medalProgress = new LinkedList<Integer>();
     private int npc;
     private long completionTime, expirationTime;
     private int forfeited = 0;
@@ -72,6 +73,7 @@ public class MapleQuestStatus {
         this.setStatus(status);
         this.completionTime = System.currentTimeMillis();
         this.expirationTime = 0;
+        //this.updated = true;
         if (status == Status.STARTED) 
             registerMobs();      
     }
@@ -82,6 +84,7 @@ public class MapleQuestStatus {
         this.setNpc(npc);
         this.completionTime = System.currentTimeMillis();
         this.expirationTime = 0;
+        //this.updated = true;
         if (status == Status.STARTED) {
             registerMobs();
         }
@@ -102,6 +105,20 @@ public class MapleQuestStatus {
     public final void setStatus(Status status) {
         this.status = status;
     }
+    
+    /*
+    public boolean wasUpdated() {
+        return updated;
+    }
+    
+    private void setUpdated() {
+        this.updated = true;
+    }
+    
+    public void resetUpdated() {
+        this.updated = false;
+    }
+    */
 
     public int getNpc() {
         return npc;
@@ -115,11 +132,13 @@ public class MapleQuestStatus {
         for (int i : MapleQuest.getInstance(questID).getRelevantMobs()) {
             progress.put(i, "000");
         }
+        //this.setUpdated();
     }
 
     public boolean addMedalMap(int mapid) {
         if (medalProgress.contains(mapid)) return false;
         medalProgress.add(mapid);
+        //this.setUpdated();
         return true;
     }
 
@@ -136,13 +155,15 @@ public class MapleQuestStatus {
             int current = Integer.parseInt(progress.get(id));
             String str = StringUtil.getLeftPaddedStr(Integer.toString(current + 1), '0', 3);
             progress.put(id, str);
+            //this.setUpdated();
             return true;
         }
         return false;
     }
 
     public void setProgress(int id, String pr) {
-        	progress.put(id, pr);
+        progress.put(id, pr);
+        //this.setUpdated();
     }
 
     public boolean madeProgress() {
@@ -202,6 +223,7 @@ public class MapleQuestStatus {
     
     public void setInfo(String newInfo) {
         progress.put(0, newInfo);
+        //this.setUpdated();
     }
 
     public void setForfeited(int forfeited) {
