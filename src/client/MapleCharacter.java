@@ -156,6 +156,8 @@ import constants.skills.Spearman;
 import constants.skills.SuperGM;
 import constants.skills.Swordsman;
 import constants.skills.ThunderBreaker;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.HashMap;
 import net.server.channel.handlers.PartyOperationHandler;
 import scripting.item.ItemScriptManager;
 import server.maps.MapleMapItem;
@@ -5876,10 +5878,34 @@ public void saveInventory() throws SQLException {
                 ps = con.prepareStatement("SELECT * FROM queststatus WHERE characterid = ?");
                 ps.setInt(1, charid);
                 rs = ps.executeQuery();
-                PreparedStatement psf;
-                try (PreparedStatement pse = con.prepareStatement("SELECT * FROM questprogress WHERE queststatusid = ?")) {
-                    psf = con.prepareStatement("SELECT mapid FROM medalmaps WHERE queststatusid = ?");
+               // PreparedStatement psf;
+               // try (PreparedStatement pse = con.prepareStatement("SELECT * FROM questprogress WHERE queststatusid = ?")) {
+                  //  psf = con.prepareStatement("SELECT mapid FROM medalmaps WHERE queststatusid = ?");
+                 PreparedStatement pse = con.prepareStatement("SELECT * FROM questprogress WHERE characterid = ?");
+                pse.setInt(1, charid);
+                ResultSet rsProgress = pse.executeQuery();
+                Map<Integer, ArrayList<SimpleEntry<Integer, String>>> progressMap = new HashMap<>();
+                while (rsProgress.next()) {
+                    int queststatusid = rsProgress.getInt("queststatusid");
+                    if(!progressMap.containsKey(queststatusid)){
+                        progressMap.put(queststatusid, new ArrayList());
+                    }
+                    progressMap.get(queststatusid).add(new SimpleEntry<>(rsProgress.getInt("progressid"), rsProgress.getString("progress")));
+                }
+                
+                PreparedStatement psf = con.prepareStatement("SELECT queststatusid,mapid FROM medalmaps WHERE characterid = ?");
+                psf.setInt(1, charid);
+                ResultSet medalmaps = psf.executeQuery();
+                Map<Integer, ArrayList<Integer>> medalsMap = new HashMap<>();
+                while (medalmaps.next()) {
+                    int queststatusid = medalmaps.getInt("queststatusid");
+                    if(!medalsMap.containsKey(queststatusid)){
+                        medalsMap.put(queststatusid, new ArrayList());
+                    }
+                    medalsMap.get(queststatusid).add(medalmaps.getInt("mapid"));
+                }
                     while (rs.next()) {
+                        int queststatusid = rs.getInt("queststatusid");
                         MapleQuest q = MapleQuest.getInstance(rs.getShort("quest"));
                         MapleQuestStatus status = new MapleQuestStatus(q, MapleQuestStatus.Status.getById(rs.getInt("status")));
                         long cTime = rs.getLong("time");
@@ -5894,22 +5920,28 @@ public void saveInventory() throws SQLException {
                         
                         status.setForfeited(rs.getInt("forfeited"));
                         ret.quests.put(q.getId(), status);
-                        pse.setInt(1, rs.getInt("queststatusid"));
-                        try (ResultSet rsProgress = pse.executeQuery()) {
-                            while (rsProgress.next()) {
-                                status.setProgress(rsProgress.getInt("progressid"), rsProgress.getString("progress"));
+                        //pse.setInt(1, rs.getInt("queststatusid"));
+                        //try (ResultSet rsProgress = pse.executeQuery()) {
+                          //  while (rsProgress.next()) {
+                            //    status.setProgress(rsProgress.getInt("progressid"), rsProgress.getString("progress"));
+                        if(progressMap.containsKey(queststatusid)){
+                            for(SimpleEntry<Integer, String> progress : progressMap.get(queststatusid)){
+                                status.setProgress(progress.getKey(), progress.getValue());
                             }
                         }
-                        psf.setInt(1, rs.getInt("queststatusid"));
-                        try (ResultSet medalmaps = psf.executeQuery()) {
-                            while (medalmaps.next()) {
-                                status.addMedalMap(medalmaps.getInt("mapid"));
+                       // psf.setInt(1, rs.getInt("queststatusid"));
+                        //try (ResultSet medalmaps = psf.executeQuery()) {
+                          //  while (medalmaps.next()) {
+                            //    status.addMedalMap(medalmaps.getInt("mapid"));
+                        if(medalsMap.containsKey(queststatusid)){
+                            for(Integer mapId : medalsMap.get(queststatusid)){
+                                status.addMedalMap(mapId);
                             }
                         }
                     }
                     rs.close();
                     ps.close();
-                }
+                
                 psf.close();
                 ps = con.prepareStatement("SELECT skillid,skilllevel,masterlevel,expiration FROM skills WHERE characterid = ?");
                 ps.setInt(1, charid);
@@ -7021,11 +7053,11 @@ public void saveInventory() throws SQLException {
             deleteQuestProgressWhereCharacterId(con, id);
             ps = con.prepareStatement("INSERT INTO queststatus (`queststatusid`, `characterid`, `quest`, `status`, `time`, `expires`, `forfeited`) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             PreparedStatement psf;
-            try (PreparedStatement pse = con.prepareStatement("INSERT INTO questprogress VALUES (DEFAULT, ?, ?, ?)")) {
-                psf = con.prepareStatement("INSERT INTO medalmaps VALUES (DEFAULT, ?, ?)");
+            try (PreparedStatement pse = con.prepareStatement("INSERT INTO questprogress VALUES (DEFAULT, ?, ?, ?, ?)")) {
+                psf = con.prepareStatement("INSERT INTO medalmaps VALUES (DEFAULT, ?, ?, ?)");
                 ps.setInt(1, id);
                 
-                synchronized (quests) {
+   /*             synchronized (quests) {
                     for (MapleQuestStatus q : quests.values()) {
                         ps.setInt(2, q.getQuest().getId());
                         ps.setInt(3, q.getStatus().getId());
@@ -7037,13 +7069,15 @@ public void saveInventory() throws SQLException {
                             rs.next();
                             for (int mob : q.getProgress().keySet()) {
                                 pse.setInt(1, rs.getInt(1));
-                                pse.setInt(2, mob);
-                                pse.setString(3, q.getProgress(mob));
+                                pse.setInt(2, characterid);
+                                pse.setInt(3, mob);
+                                pse.setString(4, q.getProgress(mob));
                                 pse.addBatch();
                             }
                             for (int i = 0; i < q.getMedalMaps().size(); i++) {
                                 psf.setInt(1, rs.getInt(1));
-                                psf.setInt(2, q.getMedalMaps().get(i));
+                                psf.setInt(2, characterid);
+                                psf.setInt(3, q.getMedalMaps().get(i));
                                 psf.addBatch();
                             }
                             pse.executeBatch();
@@ -7053,6 +7087,36 @@ public void saveInventory() throws SQLException {
                 }
             }	
             psf.close();
+           */                synchronized (quests) {
+                    for (MapleQuestStatus q : quests.values()) {
+                        ps.setInt(2, q.getQuest().getId());
+                        ps.setInt(3, q.getStatus().getId());
+                        ps.setInt(4, (int) (q.getCompletionTime() / 1000));
+                        ps.setLong(5, q.getExpirationTime());
+                        ps.setInt(6, q.getForfeited());
+                        ps.executeUpdate();
+                        try (ResultSet rs = ps.getGeneratedKeys()) {
+                            rs.next();
+                            for (int mob : q.getProgress().keySet()) {
+                                pse.setInt(1, id);
+                                pse.setInt(2, rs.getInt(1));
+                                pse.setInt(3, mob);
+                                pse.setString(4, q.getProgress(mob));
+                                pse.addBatch();
+                            }
+                            for (int i = 0; i < q.getMedalMaps().size(); i++) {
+                                psf.setInt(1, id);
+                                psf.setInt(2, rs.getInt(1));
+                                psf.setInt(3, q.getMedalMaps().get(i));
+                                psf.addBatch();
+                            }
+                            pse.executeBatch();
+                            psf.executeBatch();
+                        }
+                    }
+                }
+                
+            }
             MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Save Quests", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
