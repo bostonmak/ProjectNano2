@@ -22,6 +22,7 @@
 package client;
 
 import java.awt.Point;
+import java.lang.ref.WeakReference;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -206,12 +207,13 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     private int expRate = 1, mesoRate = 1, dropRate = 1, expCoupon = 1, mesoCoupon = 1, dropCoupon = 1;
     private int omokwins, omokties, omoklosses, matchcardwins, matchcardties, matchcardlosses;
     private int owlSearch;
-    private long lastfametime, lastUsedCashItem, lastHealed, lastMesoDrop = -1, jailExpiration = -1;
+    private long lastfametime, lastUsedCashItem, lastHealed, lastBuyback, lastDeathtime, lastMesoDrop = -1, jailExpiration = -1;
     private transient int localmaxhp, localmaxmp, localstr, localdex, localluk, localint_, magic, watk;
     private boolean hidden, canDoor = true, berserk, hasMerchant, whiteChat = false;
     private int linkedLevel = 0;
     private String linkedName = null;
     private boolean finishedDojoTutorial;
+    private boolean usedStorage = false;
     private String name;
     private String chalktext;
     private String dataString;
@@ -249,6 +251,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     private SavedLocation savedLocations[];
     private SkillMacro[] skillMacros = new SkillMacro[5];
     private List<Integer> lastmonthfameids;
+    private List<WeakReference<MapleMap>> lastVisitedMaps = new LinkedList<>();
     private final Map<Short, MapleQuestStatus> quests;
     private Set<MapleMonster> controlled = new LinkedHashSet<>();
     private Map<Integer, String> entered = new LinkedHashMap<>();
@@ -405,7 +408,6 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
         ret.getInventory(MapleInventoryType.SETUP).setSlotLimit(24);
         ret.getInventory(MapleInventoryType.ETC).setSlotLimit(24);
         
-        
         // Select a keybinding method
         int[] selectedKey;
         int[] selectedType;
@@ -436,6 +438,10 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
         }
 
         return ret;
+    }
+    
+    public boolean isLoggedinWorld() {
+        return this.isLoggedin() && !this.isAwayFromWorld();
     }
     
     public boolean isAwayFromWorld() {
@@ -691,11 +697,7 @@ public void saveInventory() throws SQLException {
         MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                 "PreparedStatements for new inventoryitems", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
         lastTaskTime = System.currentTimeMillis();
-        
-        dels.executeBatch();
-        MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                "dels.executeBatch()", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
-        lastTaskTime = System.currentTimeMillis();
+
         upds.executeBatch();
         MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                 "upds.executeBatch()", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
@@ -703,6 +705,10 @@ public void saveInventory() throws SQLException {
         eqs.executeBatch();
         MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                 "eqs.executeBatch()", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+        lastTaskTime = System.currentTimeMillis();
+        dels.executeBatch();
+        MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                "dels.executeBatch()", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
         lastTaskTime = System.currentTimeMillis();
         pets.executeBatch();
         MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
@@ -1246,6 +1252,7 @@ public void saveInventory() throws SQLException {
         if (newJob == null) {
             return;//the fuck you doing idiot!
         }
+        
         this.job = newJob;
         remainingSp[GameConstants.getSkillBook(newJob.getId())] += 1;
         if (GameConstants.hasSPTable(newJob)) {
@@ -1412,7 +1419,7 @@ public void saveInventory() throws SQLException {
         this.banishTime = 0;
     }
     
-    private void setBanishPlayerData(int banishMap, int banishSp, long banishTime) {
+    public void setBanishPlayerData(int banishMap, int banishSp, long banishTime) {
         this.banishMap = banishMap;
         this.banishSp = banishSp;
         this.banishTime = banishTime;
@@ -1622,10 +1629,6 @@ public void saveInventory() throws SQLException {
     public void changePage(int page) {
         this.currentPage = page;
     }
-    
-    
-    
-    
 
     public void changeSkillLevel(Skill skill, byte newLevel, int newMasterlevel, long expiration) {
         if (newLevel > -1) {
@@ -2130,24 +2133,19 @@ public void saveInventory() throws SQLException {
     }
     
     private static void deleteQuestProgressWhereCharacterId(Connection con, int cid) throws SQLException {
-        try (PreparedStatement ps = con.prepareStatement("SELECT queststatusid FROM queststatus WHERE characterid = ?")) {
+        try (PreparedStatement ps = con.prepareStatement("DELETE FROM medalmaps WHERE characterid = ?")) {
             ps.setInt(1, cid);
+            ps.executeUpdate();
+        }
 
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    int queststatusid = rs.getInt("queststatusid");
-
-                    try (PreparedStatement ps2 = con.prepareStatement("DELETE FROM medalmaps WHERE queststatusid = ?")) {
-                        ps2.setInt(1, queststatusid);
-                        ps2.executeUpdate();
-                    }
-
-                    try (PreparedStatement ps2 = con.prepareStatement("DELETE FROM questprogress WHERE queststatusid = ?")) {
-                        ps2.setInt(1, queststatusid);
-                        ps2.executeUpdate();
-                    }
-                }
-            }
+        try (PreparedStatement ps = con.prepareStatement("DELETE FROM questprogress WHERE characterid = ?")) {
+            ps.setInt(1, cid);
+            ps.executeUpdate();
+        }
+        
+        try (PreparedStatement ps = con.prepareStatement("DELETE FROM queststatus WHERE characterid = ?")) {
+            ps.setInt(1, cid);
+            ps.executeUpdate();
         }
     }
 
@@ -2754,7 +2752,7 @@ public void saveInventory() throws SQLException {
     public void gainExp(int gain, boolean show, boolean inChat, boolean white) {
         gainExp(gain, 0, show, inChat, white);
     }
-
+    
     public void gainExp(int gain, int party, boolean show, boolean inChat, boolean white) {
         if (hasDisease(MapleDisease.CURSE)) {
             gain *= 0.5;
@@ -2763,9 +2761,9 @@ public void saveInventory() throws SQLException {
 	
         if(gain < 0) gain = Integer.MAX_VALUE;   // integer overflow, heh.
         if(party < 0) party = Integer.MAX_VALUE;   // integer overflow, heh.
-        int equip = (int)Math.min((long)((gain / 10) * pendantExp), Integer.MAX_VALUE);
+        int equip = (int) Math.min((long)(gain / 10) * pendantExp, Integer.MAX_VALUE);
         
-        long total = (long)gain + equip + party;
+        long total = (long) gain + equip + party;
         gainExpInternal(total, equip, party, show, inChat, white);
     }
     
@@ -2784,11 +2782,11 @@ public void saveInventory() throws SQLException {
             long leftover = 0;
             long nextExp = exp.get() + total;
             
-            if (nextExp > (long)Integer.MAX_VALUE) {
+            if (nextExp > (long) Integer.MAX_VALUE) {
                 total = Integer.MAX_VALUE - exp.get();
                 leftover = nextExp - Integer.MAX_VALUE;
             }
-            updateSingleStat(MapleStat.EXP, exp.addAndGet((int)total));
+            updateSingleStat(MapleStat.EXP, exp.addAndGet((int) total));
             if (show && gain != 0) {
                 client.announce(MaplePacketCreator.getShowExpGain((int)Math.min(gain, Integer.MAX_VALUE), equip, party, inChat, white));
             }
@@ -3049,11 +3047,10 @@ public void saveInventory() throws SQLException {
         List<Pair<MapleBuffStat, Integer>> ret = new ArrayList<>();
         
         for(Entry<MapleBuffStat, MapleBuffStatValueHolder> bel : buffEffects.get(sourceid).entrySet()) {
-            Integer bsrcid = bel.getValue().effect.getBuffSourceId();
             MapleBuffStat mbs = bel.getKey();
-            
             MapleBuffStatValueHolder mbsvh = effects.get(bel.getKey());
-            if(mbsvh != null && mbsvh.effect.getBuffSourceId() == bsrcid) {
+            
+            if(mbsvh != null) {
                 ret.add(new Pair<>(mbs, mbsvh.value));
             } else {
                 ret.add(new Pair<>(mbs, 0));
@@ -3120,15 +3117,18 @@ public void saveInventory() throws SQLException {
     }
     
     private MapleBuffStatValueHolder fetchBestEffectFromItemEffectHolder(MapleBuffStat mbs) {
-        Integer max = Integer.MIN_VALUE;
+        Pair<Integer, Integer> max = new Pair<>(Integer.MIN_VALUE, 0);
         MapleBuffStatValueHolder mbsvh = null;
         for(Entry<Integer, Map<MapleBuffStat, MapleBuffStatValueHolder>> bpl: buffEffects.entrySet()) {
             MapleBuffStatValueHolder mbsvhi = bpl.getValue().get(mbs);
             if(mbsvhi != null) {
-                if(mbsvhi.value > max) {
-                    max = mbsvhi.value;
+                if(mbsvhi.value > max.left) {
+                    max = new Pair<>(mbsvhi.value, mbsvhi.effect.getStatups().size());
                     mbsvh = mbsvhi;
-                }    
+                } else if(mbsvhi.value == max.left && mbsvhi.effect.getStatups().size() > max.right) {
+                    max = new Pair<>(mbsvhi.value, mbsvhi.effect.getStatups().size());
+                    mbsvh = mbsvhi;
+                }
             }
         }
         
@@ -3159,6 +3159,11 @@ public void saveInventory() throws SQLException {
                 System.out.println();
             }
             System.out.println("-------------------");
+            
+            System.out.println("IN ACTION:");
+            for(Entry<MapleBuffStat, MapleBuffStatValueHolder> bpl : effects.entrySet()) {
+                System.out.println(bpl.getKey().name() + " -> " + MapleItemInformationProvider.getInstance().getName(bpl.getValue().effect.getSourceId()));
+            }
         } finally {
             chrLock.unlock();
             effLock.unlock();
@@ -3753,7 +3758,6 @@ public void saveInventory() throws SQLException {
             }
             
             addItemEffectHolder(sourceid, expirationtime, appliedStatups);
-            
             for (Entry<MapleBuffStat, MapleBuffStatValueHolder> statup : toDeploy.entrySet()) {
                 effects.put(statup.getKey(), statup.getValue());
             }
@@ -4042,7 +4046,11 @@ public void saveInventory() throws SQLException {
     public boolean getFinishedDojoTutorial() {
         return finishedDojoTutorial;
     }
-
+    
+    public void setUsedStorage() {
+        usedStorage = true;
+    }
+    
     public List<MapleRing> getFriendshipRings() {
         Collections.sort(friendshipRings);
         return friendshipRings;
@@ -4250,7 +4258,6 @@ public void saveInventory() throws SQLException {
     public int getLevel() {
         return level;
     }
-
 
     public int getLuk() {
         return luk;
@@ -4513,7 +4520,8 @@ public void saveInventory() throws SQLException {
         try {
             if(party != null) {
                 for(MaplePartyCharacter partyMembers: party.getMembers()) {
-                    if(partyMembers.getPlayer().getMap().hashCode() == thisMapHash) list.add(partyMembers.getPlayer());
+                    MapleCharacter chr = partyMembers.getPlayer();
+                    if(chr.getMap().hashCode() == thisMapHash && chr.isLoggedinWorld()) list.add(chr);
                 }
             }
         } finally {
@@ -4609,8 +4617,7 @@ public void saveInventory() throws SQLException {
         if(closeMerchant) {
             merchant.removeVisitor(this);
             this.setHiredMerchant(null);
-        }
-        else {
+        } else {
             if (merchant.isOwner(this)) {
                 merchant.setOpen(true);
             } else {
@@ -4792,16 +4799,19 @@ public void saveInventory() throws SQLException {
     public int[] getRemainingSps() {
         return remainingSp;
     }
-
-    public int getSavedLocation(String type) {
+    
+    public int peekSavedLocation(String type) {
         SavedLocation sl = savedLocations[SavedLocationType.fromString(type).ordinal()];
         if (sl == null) {
             return -1;
         }
-        int m = sl.getMapId();
-        if (!SavedLocationType.fromString(type).equals(SavedLocationType.WORLDTOUR)) {
-            clearSavedLocation(SavedLocationType.fromString(type));
-        }
+        return sl.getMapId();
+    }
+    
+    public int getSavedLocation(String type) {
+        int m = peekSavedLocation(type);
+        clearSavedLocation(SavedLocationType.fromString(type));
+        
         return m;
     }
 
@@ -5006,7 +5016,7 @@ public void saveInventory() throws SQLException {
             e.printStackTrace();
         }
     }
-
+    
     public void handleEnergyChargeGain() { // to get here energychargelevel has to be > 0
         Skill energycharge = isCygnus() ? SkillFactory.getSkill(ThunderBreaker.ENERGY_CHARGE) : SkillFactory.getSkill(Marauder.ENERGY_CHARGE);
         MapleStatEffect ceffect;
@@ -6492,8 +6502,10 @@ public void saveInventory() throws SQLException {
         try {
             if (party != null) {
                 int channel = client.getChannel();
+                int mapId = getMapId();
+                
                 for (MaplePartyCharacter partychar : party.getMembers()) {
-                    if (partychar.getMapId() == getMapId() && partychar.getChannel() == channel) {
+                    if (partychar.getMapId() == mapId && partychar.getChannel() == channel) {
                         MapleCharacter other = Server.getInstance().getWorld(world).getChannel(channel).getPlayerStorage().getCharacterByName(partychar.getName());
                         if (other != null) {
                             client.announce(MaplePacketCreator.updatePartyMemberHP(other.getId(), other.getHp(), other.getCurrentMaxHp()));
@@ -7100,6 +7112,8 @@ public void saveInventory() throws SQLException {
                 }
             }
             ps.executeBatch();
+            ps.close();
+            
             deleteWhereCharacterId(con, "DELETE FROM trocklocations WHERE characterid = ?");
             ps = con.prepareStatement("INSERT INTO trocklocations(characterid, mapid, vip) VALUES (?, ?, 0)");
             for (int i = 0; i < getTrockSize(); i++) {
@@ -7110,6 +7124,8 @@ public void saveInventory() throws SQLException {
                 }
             }
             ps.executeBatch();
+            ps.close();
+            
             ps = con.prepareStatement("INSERT INTO trocklocations(characterid, mapid, vip) VALUES (?, ?, 1)");
             for (int i = 0; i < getVipTrockSize(); i++) {
                 if (viptrockmaps.get(i) != 999999999) {
@@ -7159,37 +7175,7 @@ public void saveInventory() throws SQLException {
                 psf = con.prepareStatement("INSERT INTO medalmaps VALUES (DEFAULT, ?, ?, ?)");
                 ps.setInt(1, id);
                 
-   /*             synchronized (quests) {
-                    for (MapleQuestStatus q : quests.values()) {
-                        ps.setInt(2, q.getQuest().getId());
-                        ps.setInt(3, q.getStatus().getId());
-                        ps.setInt(4, (int) (q.getCompletionTime() / 1000));
-                        ps.setLong(5, q.getExpirationTime());
-                        ps.setInt(6, q.getForfeited());
-                        ps.executeUpdate();
-                        try (ResultSet rs = ps.getGeneratedKeys()) {
-                            rs.next();
-                            for (int mob : q.getProgress().keySet()) {
-                                pse.setInt(1, rs.getInt(1));
-                                pse.setInt(2, characterid);
-                                pse.setInt(3, mob);
-                                pse.setString(4, q.getProgress(mob));
-                                pse.addBatch();
-                            }
-                            for (int i = 0; i < q.getMedalMaps().size(); i++) {
-                                psf.setInt(1, rs.getInt(1));
-                                psf.setInt(2, characterid);
-                                psf.setInt(3, q.getMedalMaps().get(i));
-                                psf.addBatch();
-                            }
-                            pse.executeBatch();
-                            psf.executeBatch();
-                        }
-                    }
-                }
-            }	
-            psf.close();
-           */                synchronized (quests) {
+                synchronized (quests) {
                     for (MapleQuestStatus q : quests.values()) {
                         ps.setInt(2, q.getQuest().getId());
                         ps.setInt(3, q.getStatus().getId());
@@ -7500,6 +7486,23 @@ public void saveInventory() throws SQLException {
             return;
         }
         merchantmeso = set;
+    }
+    
+    public synchronized void withdrawMerchantMesos() {
+        int merchantMeso = this.getMerchantMeso();
+        if (merchantMeso > 0) {
+            int possible = Integer.MAX_VALUE - merchantMeso;
+            
+            if (possible > 0) {
+                if (possible < merchantMeso) {
+                    this.gainMeso(possible, false);
+                    this.setMerchantMeso(merchantMeso - possible);
+                } else {
+                    this.gainMeso(merchantMeso, false);
+                    this.setMerchantMeso(0);
+                }
+            }
+        }
     }
 
     public void setHiredMerchant(MapleHiredMerchant merchant) {
@@ -8077,8 +8080,10 @@ public void saveInventory() throws SQLException {
     private void updatePartyMemberHPInternal() {
         if (party != null) {
             int channel = client.getChannel();
+            int mapId = getMapId();
+            
             for (MaplePartyCharacter partychar : party.getMembers()) {
-                if (partychar.getMapId() == getMapId() && partychar.getChannel() == channel) {
+                if (partychar.getMapId() == mapId && partychar.getChannel() == channel) {
                     MapleCharacter other = Server.getInstance().getWorld(world).getChannel(channel).getPlayerStorage().getCharacterByName(partychar.getName());
                     if (other != null) {
                         other.client.announce(MaplePacketCreator.updatePartyMemberHP(getId(), this.hp, maxhp));
