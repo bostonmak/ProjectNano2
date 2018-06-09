@@ -491,7 +491,9 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     }
     
 public void saveInventory() throws SQLException {
-       
+        MapleLogger.info("Task: {}, Character: {}, Status: {}",
+                "Save Inventory", this.getName(), "STARTING");
+        lastTaskTime = System.currentTimeMillis();
         Connection con = DatabaseConnection.getConnection();
         PreparedStatement ps = con.prepareStatement("SELECT * FROM inventoryitems WHERE characterid=?", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
         ps.setInt(1, this.id);
@@ -501,17 +503,17 @@ public void saveInventory() throws SQLException {
 
         for(MapleInventoryType type : MapleInventoryType.values()) {
 
-                List<Short> slots = new ArrayList<>();
+            List<Short> slots = new ArrayList<>();
 
-                MapleInventory inv = getInventory(type);
+            MapleInventory inv = getInventory(type);
 
-                Iterator it = inv.getItems().entrySet().iterator();
-                while (it.hasNext()) {
-                    Map.Entry pair = (Map.Entry)it.next();
-                    slots.add((Short)pair.getKey());
-                }
+            Iterator it = inv.getItems().entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry)it.next();
+                slots.add((Short)pair.getKey());
+            }
 
-                items.put(type, slots);
+            items.put(type, slots);
 
         }
     	
@@ -538,12 +540,12 @@ public void saveInventory() throws SQLException {
     		
     		items.get(type).remove((Object)slot);
     		
-    		if(current == null) {//We already know it existed in the past since we got it back in the query
+    		if (current == null) {//We already know it existed in the past since we got it back in the query
     			//Delete the item from database
                 dels.setInt(1, rs.getInt("inventoryitemid"));
     			dels.addBatch();
     			
-    		}else if(!current.equals(thisItem)) {
+    		} else if(!current.equals(thisItem)) {
     			//Update this item with the new data
     			
                 Object[] data = null;
@@ -603,13 +605,16 @@ public void saveInventory() throws SQLException {
     		}
     		
     	}
+        MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                "PreparedStatements for existing inventoryitems", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+        lastTaskTime = System.currentTimeMillis();
     	
     	//Handle all unhandled values here by inserting them
     	
-    	for(MapleInventoryType type : items.keySet()) {
+    	for (MapleInventoryType type : items.keySet()) {
     		List<Short> slots = items.get(type);
     		
-    		for(short slot : slots) {
+    		for (short slot : slots) {
                 PreparedStatement ins = con.prepareStatement("INSERT INTO inventoryitems VALUES (DEFAULT, ?, ?, DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
     			
     			Item item = getInventory(type).getItem(slot);
@@ -639,7 +644,7 @@ public void saveInventory() throws SQLException {
                     System.out.println("Failed to insert item 2 " + item.getItemId());
                 }
         		
-        		if(item instanceof Equip && itemid >= 0){
+        		if (item instanceof Equip && itemid >= 0){
                     Equip eq = (Equip) item;
 
                     ieqs.setInt(1, itemid);
@@ -681,13 +686,34 @@ public void saveInventory() throws SQLException {
     		}
     		
     	}
+        MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                "PreparedStatements for new inventoryitems", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+        lastTaskTime = System.currentTimeMillis();
         
         dels.executeBatch();
+        MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                "dels.executeBatch()", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+        lastTaskTime = System.currentTimeMillis();
         upds.executeBatch();
+        MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                "upds.executeBatch()", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+        lastTaskTime = System.currentTimeMillis();
         eqs.executeBatch();
+        MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                "eqs.executeBatch()", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+        lastTaskTime = System.currentTimeMillis();
         pets.executeBatch();
+        MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                "pets.executeBatch()", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+        lastTaskTime = System.currentTimeMillis();
         ieqs.executeBatch();
+        MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                "ieqs.executeBatch()", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+        lastTaskTime = System.currentTimeMillis();
         ipets.executeBatch();
+        MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                "ipets.executeBatch()", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+        lastTaskTime = System.currentTimeMillis();
 
         rs.close();
         ps.close();
@@ -5621,6 +5647,9 @@ public void saveInventory() throws SQLException {
 
     public static MapleCharacter loadCharFromDB(int charid, MapleClient client, boolean channelserver) throws SQLException {
         try {
+            long startTaskTime = System.currentTimeMillis();
+            MapleLogger.info("Task: {}, CharacterId: {}, Status: {}",
+                    "loadCharFromDB", charid, "STARTING");
             MapleCharacter ret = new MapleCharacter();
             ret.client = client;
             ret.id = charid;
@@ -5701,6 +5730,11 @@ public void saveInventory() throws SQLException {
             ret.getInventory(MapleInventoryType.USE).setSlotLimit(rs.getByte("useslots"));
             ret.getInventory(MapleInventoryType.SETUP).setSlotLimit(rs.getByte("setupslots"));
             ret.getInventory(MapleInventoryType.ETC).setSlotLimit(rs.getByte("etcslots"));
+
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Load Character Data", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - startTaskTime);
+            long lastTaskTime = System.currentTimeMillis();
+
             //ret.rewardpoints = rs.getInt("rewardpoints");//needs to be moved to account load
             for (Pair<Item, MapleInventoryType> item : ItemFactory.INVENTORY.loadItems(ret.id, !channelserver)) {
                 ret.getInventory(item.getRight()).addFromDB(item.getLeft());
@@ -5729,6 +5763,10 @@ public void saveInventory() throws SQLException {
                     }
                 }
             }
+
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Load Inventory", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
+            long lastTaskTime = System.currentTimeMillis();
             
             NewYearCardRecord.loadPlayerNewYearCards(ret);
             
@@ -5756,8 +5794,13 @@ public void saveInventory() throws SQLException {
             }
             ps3.close();
             rs3.close();
+
             
             ret.commitExcludedItems();
+
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Load Pets", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
             
             if (channelserver) {
                 MapleMapFactory mapFactory = client.getChannelServer().getMapFactory();
@@ -5795,6 +5838,11 @@ public void saveInventory() throws SQLException {
             }
             rs.close();
             ps.close();
+
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Load Spawn and Party", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
+
             ps = con.prepareStatement("SELECT mapid,vip FROM trocklocations WHERE characterid = ? LIMIT 15");
             ps.setInt(1, charid);
             rs = ps.executeQuery();
@@ -5819,6 +5867,10 @@ public void saveInventory() throws SQLException {
             }
             rs.close();
             ps.close();
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Load TRocks", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
+
             ps = con.prepareStatement("SELECT name FROM accounts WHERE id = ?", Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, ret.accountid);
             rs = ps.executeQuery();
@@ -5837,7 +5889,10 @@ public void saveInventory() throws SQLException {
             }
             rs.close();
             ps.close();
-			
+
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Load Account Data", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
 			
             ps = con.prepareStatement("SELECT `area`,`info` FROM area_info WHERE charid = ?");
             ps.setInt(1, ret.id);
@@ -5847,6 +5902,10 @@ public void saveInventory() throws SQLException {
             }
             rs.close();
             ps.close();
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Load Area Info", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
+
             ps = con.prepareStatement("SELECT `name`,`info` FROM eventstats WHERE characterid = ?");
             ps.setInt(1, ret.id);
             rs = ps.executeQuery();
@@ -5859,6 +5918,10 @@ public void saveInventory() throws SQLException {
             }
             rs.close();
             ps.close();
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Load Event STats", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
+
             ret.cashshop = new CashShop(ret.accountid, ret.id, ret.getJobType());
             ret.autoban = new AutobanManager(ret);
             ret.marriageRing = null; //for now
@@ -5872,6 +5935,10 @@ public void saveInventory() throws SQLException {
             }
             rs.close();
             ps.close();
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Load Other Characters", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
+
             if (channelserver) {
                 ps = con.prepareStatement("SELECT * FROM queststatus WHERE characterid = ?");
                 ps.setInt(1, charid);
@@ -5911,6 +5978,10 @@ public void saveInventory() throws SQLException {
                     ps.close();
                 }
                 psf.close();
+                MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                        "Load Quests", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
+                lastTaskTime = System.currentTimeMillis();
+
                 ps = con.prepareStatement("SELECT skillid,skilllevel,masterlevel,expiration FROM skills WHERE characterid = ?");
                 ps.setInt(1, charid);
                 rs = ps.executeQuery();
@@ -5946,6 +6017,10 @@ public void saveInventory() throws SQLException {
                 }
                 rs.close();
                 ps.close();
+                MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                        "Load Skills", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
+                lastTaskTime = System.currentTimeMillis();
+
                 ps = con.prepareStatement("SELECT `key`,`type`,`action` FROM keymap WHERE characterid = ?");
                 ps.setInt(1, charid);
                 rs = ps.executeQuery();
@@ -5957,6 +6032,10 @@ public void saveInventory() throws SQLException {
                 }
                 rs.close();
                 ps.close();
+                MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                        "Load Keybindings", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
+                lastTaskTime = System.currentTimeMillis();
+
                 ps = con.prepareStatement("SELECT `locationtype`,`map`,`portal` FROM savedlocations WHERE characterid = ?");
                 ps.setInt(1, charid);
                 rs = ps.executeQuery();
@@ -5965,6 +6044,10 @@ public void saveInventory() throws SQLException {
                 }
                 rs.close();
                 ps.close();
+                MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                        "Load Saved Locations", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
+                lastTaskTime = System.currentTimeMillis();
+
                 ps = con.prepareStatement("SELECT `characterid_to`,`when` FROM famelog WHERE characterid = ? AND DATEDIFF(NOW(),`when`) < 30");
                 ps.setInt(1, charid);
                 rs = ps.executeQuery();
@@ -5976,8 +6059,20 @@ public void saveInventory() throws SQLException {
                 }
                 rs.close();
                 ps.close();
+                MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                        "Load Fame Time", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
+                lastTaskTime = System.currentTimeMillis();
+
                 ret.buddylist.loadFromDb(charid);
+                MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                        "Load Buddy List", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
+                lastTaskTime = System.currentTimeMillis();
+
                 ret.storage = MapleStorage.loadOrCreateFromDB(ret.accountid, ret.world);
+                MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                        "Load Storage", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
+                lastTaskTime = System.currentTimeMillis();
+
                 ret.recalcLocalStats();
                 //ret.resetBattleshipHp();
                 ret.silentEnforceMaxHpMp();
@@ -5992,15 +6087,22 @@ public void saveInventory() throws SQLException {
             ret.maplemount.setLevel(mountlevel);
             ret.maplemount.setTiredness(mounttiredness);
             ret.maplemount.setActive(false);
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Load Mounts", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
             
             con.close();
+
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "loadCharFromDB", ret.getName(), "SUCCESS", System.currentTimeMillis() - startTaskTime);
+
             return ret;
         } catch (SQLException | RuntimeException e) {
             e.printStackTrace();
         }
         return null;
     }
-    
+
     public void reloadQuestExpirations() {
         for(MapleQuestStatus mqs: quests.values()) {
             if(mqs.getExpirationTime() > 0) {
@@ -6703,19 +6805,19 @@ public void saveInventory() throws SQLException {
             con.setAutoCommit(false);
             PreparedStatement ps;
             ps = con.prepareStatement(
-                "UPDATE characters " +
-                    "SET level = ?, fame = ?, str = ?, dex = ?, luk = ?, " +
-                        "`int` = ?, exp = ?, gachaexp = ?, hp = ?, mp = ?, " +
-                        "maxhp = ?, maxmp = ?, sp = ?, ap = ?, gm = ?, " +
-                        "skincolor = ?, gender = ?, job = ?, hair = ?, face = ?, " +
-                        "map = ?, meso = ?, hpMpUsed = ?, spawnpoint = ?, party = ?, " +
-                        "buddyCapacity = ?, messengerid = ?, messengerposition = ?, mountlevel = ?, mountexp = ?, " +
-                        "mounttiredness= ?, equipslots = ?, useslots = ?, setupslots = ?, etcslots = ?, " +
-                        "monsterbookcover = ?, vanquisherStage = ?, dojoPoints = ?, lastDojoStage = ?, finishedDojoTutorial = ?, " +
-                        "vanquisherKills = ?, matchcardwins = ?, matchcardlosses = ?, matchcardties = ?, omokwins = ?, " +
-                        "omoklosses = ?, omokties = ?, dataString = ?, fquest = ?, jailexpire = ?, " +
-                        "reborns = ? " +
-                    "WHERE id = ?", Statement.RETURN_GENERATED_KEYS);
+            "UPDATE characters " +
+                "SET level = ?, fame = ?, str = ?, dex = ?, luk = ?, " +
+                    "`int` = ?, exp = ?, gachaexp = ?, hp = ?, mp = ?, " +
+                    "maxhp = ?, maxmp = ?, sp = ?, ap = ?, gm = ?, " +
+                    "skincolor = ?, gender = ?, job = ?, hair = ?, face = ?, " +
+                    "map = ?, meso = ?, hpMpUsed = ?, spawnpoint = ?, party = ?, " +
+                    "buddyCapacity = ?, messengerid = ?, messengerposition = ?, mountlevel = ?, mountexp = ?, " +
+                    "mounttiredness= ?, equipslots = ?, useslots = ?, setupslots = ?, etcslots = ?, " +
+                    "monsterbookcover = ?, vanquisherStage = ?, dojoPoints = ?, lastDojoStage = ?, finishedDojoTutorial = ?, " +
+                    "vanquisherKills = ?, matchcardwins = ?, matchcardlosses = ?, matchcardties = ?, omokwins = ?, " +
+                    "omoklosses = ?, omokties = ?, dataString = ?, fquest = ?, jailexpire = ?, " +
+                    "reborns = ? " +
+                "WHERE id = ?", Statement.RETURN_GENERATED_KEYS);
             if (gmLevel < 1 && level > 199) {
                 ps.setInt(1, isCygnus() ? 200 : 200);
             } else {
