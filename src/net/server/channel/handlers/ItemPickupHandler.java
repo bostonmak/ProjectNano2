@@ -42,7 +42,6 @@ public final class ItemPickupHandler extends AbstractMaplePacketHandler {
         int oid = slea.readInt();
         MapleCharacter chr = c.getPlayer();
         MapleMapObject ob = chr.getMap().getMapObject(oid);
-        if(ob == null) return;
         
         chr.pickupItem(ob);
     }

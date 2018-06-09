@@ -246,7 +246,6 @@ public class MapleMap {
     }
 
     public MapleMap getReturnMap() {
-        if(returnMapId == 999999999) return this;
         return Server.getInstance().getWorld(world).getChannel(channel).getMapFactory().getMap(returnMapId);
     }
 

@@ -1036,26 +1036,26 @@ public class MapleStatEffect {
         int seconds = localDuration / 1000;
         MapleMount givemount = null;
         if (isMonsterRiding()) {
-            int ridingMountId = 0;
+            int ridingLevel = 0;
             Item mount = applyfrom.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18);
             if (mount != null) {
-                ridingMountId = mount.getItemId();
+                ridingLevel = mount.getItemId();
             }
             if (sourceid == Corsair.BATTLE_SHIP) {
-                ridingMountId = 1932000;
+                ridingLevel = 1932000;
             } else if (sourceid == Beginner.SPACESHIP || sourceid == Noblesse.SPACESHIP) {
-                ridingMountId = 1932000 + applyto.getSkillLevel(sourceid);
+                ridingLevel = 1932000 + applyto.getSkillLevel(sourceid);
             } else if (sourceid == Beginner.YETI_MOUNT1 || sourceid == Noblesse.YETI_MOUNT1 || sourceid == Legend.YETI_MOUNT1) {
-                ridingMountId = 1932003;
+                ridingLevel = 1932003;
             } else if (sourceid == Beginner.YETI_MOUNT2 || sourceid == Noblesse.YETI_MOUNT2 || sourceid == Legend.YETI_MOUNT2) {
-                ridingMountId = 1932004;
+                ridingLevel = 1932004;
             } else if (sourceid == Beginner.WITCH_BROOMSTICK || sourceid == Noblesse.WITCH_BROOMSTICK || sourceid == Legend.WITCH_BROOMSTICK) {
-                ridingMountId = 1932005;
+                ridingLevel = 1932005;
             } else if (sourceid == Beginner.BALROG_MOUNT || sourceid == Noblesse.BALROG_MOUNT || sourceid == Legend.BALROG_MOUNT) {
-                ridingMountId = 1932010;
+                ridingLevel = 1932010;
             } else {
                 if (applyto.getMount() == null) {
-                    applyto.mount(ridingMountId, sourceid);
+                    applyto.mount(ridingLevel, sourceid);
                 }
                 
                 applyto.getClient().getWorldServer().registerMountHunger(applyto);
@@ -1076,7 +1076,7 @@ public class MapleStatEffect {
                 givemount = applyto.getMount();
             }
             localDuration = sourceid;
-            localsourceid = ridingMountId;
+            localsourceid = ridingLevel;
             localstatups = Collections.singletonList(new Pair<>(MapleBuffStat.MONSTER_RIDING, 0));
         } else if (isSkillMorph()) {
             localstatups = Collections.singletonList(new Pair<>(MapleBuffStat.MORPH, getMorph(applyto)));
