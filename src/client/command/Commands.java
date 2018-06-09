@@ -626,25 +626,25 @@ public class Commands {
 				}
 			}
 			break;
-                    case "haste":
-                        //GM Skills : Haste(Super) - Holy Symbol - Bless - Hyper Body - Echo of Hero - maple warrior - sharp eyes
-                        SkillFactory.getSkill(9101001).getEffect(SkillFactory.getSkill(9101001).getMaxLevel()).applyTo(player);
-                       // SkillFactory.getSkill(9101002).getEffect(SkillFactory.getSkill(9101002).getMaxLevel()).applyTo(player);
-                       // SkillFactory.getSkill(9101003).getEffect(SkillFactory.getSkill(9101003).getMaxLevel()).applyTo(player);
-                        //SkillFactory.getSkill(9101008).getEffect(SkillFactory.getSkill(9101008).getMaxLevel()).applyTo(player);
-                       // SkillFactory.getSkill(2321000).getEffect(SkillFactory.getSkill(2321000).getMaxLevel()).applyTo(player);
-                       // SkillFactory.getSkill(3121002).getEffect(SkillFactory.getSkill(3121002).getMaxLevel()).applyTo(player);
-                        //SkillFactory.getSkill(1005).getEffect(SkillFactory.getSkill(1005).getMaxLevel()).applyTo(player);
-                                break;
+		case "haste":
+			//GM Skills : Haste(Super) - Holy Symbol - Bless - Hyper Body - Echo of Hero - maple warrior - sharp eyes
+			SkillFactory.getSkill(9101001).getEffect(SkillFactory.getSkill(9101001).getMaxLevel()).applyTo(player);
+		   // SkillFactory.getSkill(9101002).getEffect(SkillFactory.getSkill(9101002).getMaxLevel()).applyTo(player);
+		   // SkillFactory.getSkill(9101003).getEffect(SkillFactory.getSkill(9101003).getMaxLevel()).applyTo(player);
+			//SkillFactory.getSkill(9101008).getEffect(SkillFactory.getSkill(9101008).getMaxLevel()).applyTo(player);
+		   // SkillFactory.getSkill(2321000).getEffect(SkillFactory.getSkill(2321000).getMaxLevel()).applyTo(player);
+		   // SkillFactory.getSkill(3121002).getEffect(SkillFactory.getSkill(3121002).getMaxLevel()).applyTo(player);
+			//SkillFactory.getSkill(1005).getEffect(SkillFactory.getSkill(1005).getMaxLevel()).applyTo(player);
+					break;
                     
-                    case "goto":
-                        if (sub.length < 2){
+		case "goto":
+			if (sub.length < 2){
 				player.yellowMessage("Syntax: @goto <map name>");
 				break;
 			}
                     
-			if (gotomaps.containsKey(sub[1])) {
-				MapleMap target = c.getChannelServer().getMapFactory().getMap(gotomaps.get(sub[1]));
+			if (gotomaps.containsKey(sub[1].toLowerCase())) {
+				MapleMap target = c.getChannelServer().getMapFactory().getMap(gotomaps.get(sub[1]sub[1].toLowerCase()));
 				MaplePortal targetPortal = target.getPortal(0);
 				if (player.getEventInstance() != null) {
 					player.getEventInstance().removePlayer(player);
