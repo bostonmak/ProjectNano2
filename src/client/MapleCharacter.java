@@ -495,7 +495,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
 public void saveInventory() throws SQLException {
         MapleLogger.info("Task: {}, Character: {}, Status: {}",
                 "Save Inventory", this.getName(), "STARTING");
-        lastTaskTime = System.currentTimeMillis();
+        long lastTaskTime = System.currentTimeMillis();
         Connection con = DatabaseConnection.getConnection();
         PreparedStatement ps = con.prepareStatement("SELECT * FROM inventoryitems WHERE characterid=?", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
         ps.setInt(1, this.id);
@@ -5768,7 +5768,7 @@ public void saveInventory() throws SQLException {
 
             MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Load Inventory", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
-            long lastTaskTime = System.currentTimeMillis();
+            lastTaskTime = System.currentTimeMillis();
             
             NewYearCardRecord.loadPlayerNewYearCards(ret);
             

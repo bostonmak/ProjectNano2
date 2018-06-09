@@ -644,7 +644,7 @@ public class Commands {
 			}
                     
 			if (gotomaps.containsKey(sub[1].toLowerCase())) {
-				MapleMap target = c.getChannelServer().getMapFactory().getMap(gotomaps.get(sub[1]sub[1].toLowerCase()));
+				MapleMap target = c.getChannelServer().getMapFactory().getMap(gotomaps.get(sub[1].toLowerCase()));
 				MaplePortal targetPortal = target.getPortal(0);
 				if (player.getEventInstance() != null) {
 					player.getEventInstance().removePlayer(player);
