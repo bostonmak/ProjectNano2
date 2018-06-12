@@ -33,10 +33,6 @@
         <int name="effectAfter" value="0"/>
       </imgdir>
     </imgdir>
-    <int name="HPgaugeHide" value="0"/>
-    <int name="hpTagBgcolor" value="5"/>
-    <int name="hpTagColor" value="1"/>
-  </imgdir>
   <imgdir name="stand">
     <canvas name="0" width="197" height="183">
       <vector name="origin" x="86" y="169"/>

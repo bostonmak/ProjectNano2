@@ -57,7 +57,7 @@ public class ServerConstants {
     public static final boolean USE_ITEM_SORT_BY_NAME = false;      //Item sorting based on name rather than id.
     public static final boolean USE_PARTY_SEARCH = false;
     public static final boolean USE_PARTY_FOR_STARTERS = true;      //Players level 10 or below can create/invite other players on the given level range.
-    public static final boolean USE_AUTOBAN = true;                //Commands the server to detect infractors automatically.
+    public static final boolean USE_AUTOBAN = false;                //Commands the server to detect infractors automatically.
     public static final boolean USE_AUTOSAVE = true;                //Enables server autosaving feature (saves characters to DB each 1 hour).
     public static final boolean USE_SERVER_AUTOASSIGNER = false;     //HeavenMS-builtin autoassigner, uses algorithm based on distributing AP accordingly with required secondary stat on equipments.
     public static final boolean USE_REFRESH_RANK_MOVE = true;
