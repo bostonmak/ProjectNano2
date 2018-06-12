@@ -26,6 +26,7 @@
         <int name="level" value="21"/>
         <int name="effectAfter" value="0"/>
       </imgdir>
+	  </imgdir>
       <imgdir name="1">
         <int name="skill" value="101"/>
         <int name="action" value="2"/>

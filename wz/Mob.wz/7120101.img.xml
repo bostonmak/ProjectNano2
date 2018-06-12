@@ -33,6 +33,7 @@
         <int name="effectAfter" value="0"/>
       </imgdir>
     </imgdir>
+	</imgdir>
   <imgdir name="stand">
     <canvas name="0" width="197" height="183">
       <vector name="origin" x="86" y="169"/>

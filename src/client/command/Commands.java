@@ -309,14 +309,14 @@ public class Commands {
 		gotomaps.put("lhc", 211060000);
 		gotomaps.put("horseman", 682000001);
 		gotomaps.put("balrog", 105090900);
-		gotomaps.put("zakum", 211042400);
+		gotomaps.put("zakum", 211042300);
 		gotomaps.put("papu", 220080001);
 		gotomaps.put("showa", 801000000);
 		gotomaps.put("guild", 200000301);
 		gotomaps.put("shrine", 800000000);
 		gotomaps.put("skelegon", 240040511);
 		gotomaps.put("hpq", 100000200);
-		gotomaps.put("horntail", 240050400);
+		gotomaps.put("horntail", 240040700);
                 gotomaps.put("ariant", 260000000);
 		gotomaps.put("magatia", 261000000);
                 gotomaps.put("singapore", 540000000);

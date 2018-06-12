@@ -1087,12 +1087,12 @@ public class MapleClient {
 		int points = 0;
 		try {
                         Connection con = DatabaseConnection.getConnection();
-			PreparedStatement ps = con.prepareStatement("SELECT `votes` FROM accounts WHERE id = ?");
+			PreparedStatement ps = con.prepareStatement("SELECT `rewardpoints` FROM accounts WHERE id = ?");
 			ps.setInt(1, accId);
 			ResultSet rs = ps.executeQuery();
 
 			if (rs.next()) {
-				points = rs.getInt("votes");
+				points = rs.getInt("rewardpoints");
 			}
 			ps.close();
 			rs.close();
@@ -1123,7 +1123,7 @@ public class MapleClient {
 	private void saveVotePoints() {
 		try {
 			Connection con = DatabaseConnection.getConnection();
-			try (PreparedStatement ps = con.prepareStatement("UPDATE accounts SET votes = ? WHERE id = ?")) {
+			try (PreparedStatement ps = con.prepareStatement("UPDATE accounts SET rewardpoints = ? WHERE id = ?")) {
 				ps.setInt(1, votePoints);
 				ps.setInt(2, accId);
 				ps.executeUpdate();

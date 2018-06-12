@@ -50,7 +50,7 @@ function setEventRewards(eim) {
 
         evLevel = 6;    //Rewards at event completion
         itemSet = [2040805, 2040915, 2040920, 2043002, 2043102, 2043202, 2044002, 2044102, 2044202, 2044302, 2044502, 2044602, 2044702, 2044802, 2043702, 2043802, 2044902];
-        itemQty = [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6;
+        itemQty = [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6];
         eim.setEventRewards(evLevel, itemSet, itemQty);
 
         evLevel = 5;    //Rewards at Rest Spot V
@@ -75,7 +75,7 @@ function setEventRewards(eim) {
         
         evLevel = 1;    //Rewards at Rest Spot I
         itemSet = [2040805, 2040915, 2040920, 2043002, 2043102, 2043202, 2044002, 2044102, 2044202, 2044302, 2044502, 2044602, 2044702, 2044802, 2043702, 2043802, 2044902];
-        itemQty = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
+        itemQty = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
         eim.setEventRewards(evLevel, itemSet, itemQty);
 }
 
