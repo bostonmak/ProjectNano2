@@ -45,10 +45,11 @@ function action(mode, type, selection) {
                         status--;
     
                 if(status == 0) {
-                        if (cm.isQuestCompleted(100004)) {
-                            cm.sendOk("You're truly a hero!");
-                            cm.dispose();
-                        } else if(cm.isQuestCompleted(100003)) {
+                        //if (cm.isQuestCompleted(100004)) {
+                          //  cm.sendOk("You're truly a hero!");
+                           // cm.dispose();
+                        //} else
+						if(cm.isQuestCompleted(100003)) {
                             cm.sendNext("Alright I'll let you in! Defeat the monsters inside, collect 30 Dark Marbles, then strike up a conversation with a colleague of mine inside. He'll give you #bThe Proof of a Hero#k, the proof that you've passed the test. Best of luck to you.");
                             status = 4;
                         } else if (cm.isQuestStarted(100003)) {
