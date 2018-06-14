@@ -5743,7 +5743,7 @@ public void saveInventory() throws SQLException {
             ret.getInventory(MapleInventoryType.SETUP).setSlotLimit(rs.getByte("setupslots"));
             ret.getInventory(MapleInventoryType.ETC).setSlotLimit(rs.getByte("etcslots"));
 
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Load Character Data", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - startTaskTime);
             long lastTaskTime = System.currentTimeMillis();
 
@@ -5776,7 +5776,7 @@ public void saveInventory() throws SQLException {
                 }
             }
 
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Load Inventory", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
             
@@ -5810,7 +5810,7 @@ public void saveInventory() throws SQLException {
             
             ret.commitExcludedItems();
 
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Load Pets", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
             
@@ -5851,7 +5851,7 @@ public void saveInventory() throws SQLException {
             rs.close();
             ps.close();
 
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Load Spawn and Party", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
@@ -5879,7 +5879,7 @@ public void saveInventory() throws SQLException {
             }
             rs.close();
             ps.close();
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Load TRocks", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
@@ -5902,7 +5902,7 @@ public void saveInventory() throws SQLException {
             rs.close();
             ps.close();
 
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Load Account Data", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 			
@@ -5914,7 +5914,7 @@ public void saveInventory() throws SQLException {
             }
             rs.close();
             ps.close();
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Load Area Info", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
@@ -5930,7 +5930,7 @@ public void saveInventory() throws SQLException {
             }
             rs.close();
             ps.close();
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Load Event STats", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
@@ -5947,7 +5947,7 @@ public void saveInventory() throws SQLException {
             }
             rs.close();
             ps.close();
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Load Other Characters", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
@@ -6020,7 +6020,7 @@ public void saveInventory() throws SQLException {
                     ps.close();
                 
                 psf.close();
-                MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                         "Load Quests", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
                 lastTaskTime = System.currentTimeMillis();
 
@@ -6059,7 +6059,7 @@ public void saveInventory() throws SQLException {
                 }
                 rs.close();
                 ps.close();
-                MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                         "Load Skills", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
                 lastTaskTime = System.currentTimeMillis();
 
@@ -6074,7 +6074,7 @@ public void saveInventory() throws SQLException {
                 }
                 rs.close();
                 ps.close();
-                MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                         "Load Keybindings", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
                 lastTaskTime = System.currentTimeMillis();
 
@@ -6086,7 +6086,7 @@ public void saveInventory() throws SQLException {
                 }
                 rs.close();
                 ps.close();
-                MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                         "Load Saved Locations", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
                 lastTaskTime = System.currentTimeMillis();
 
@@ -6101,17 +6101,17 @@ public void saveInventory() throws SQLException {
                 }
                 rs.close();
                 ps.close();
-                MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                         "Load Fame Time", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
                 lastTaskTime = System.currentTimeMillis();
 
                 ret.buddylist.loadFromDb(charid);
-                MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                         "Load Buddy List", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
                 lastTaskTime = System.currentTimeMillis();
 
                 ret.storage = MapleStorage.loadOrCreateFromDB(ret.accountid, ret.world);
-                MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                         "Load Storage", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
                 lastTaskTime = System.currentTimeMillis();
 
@@ -6129,7 +6129,7 @@ public void saveInventory() throws SQLException {
             ret.maplemount.setLevel(mountlevel);
             ret.maplemount.setTiredness(mounttiredness);
             ret.maplemount.setActive(false);
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Load Mounts", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
             
@@ -6970,7 +6970,7 @@ public void saveInventory() throws SQLException {
             if (updateRows < 1) {
                 throw new RuntimeException("Character not in database (" + id + ")");
             }
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Save Character", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - startTaskTime);
             long lastTaskTime = System.currentTimeMillis();
             
@@ -7001,7 +7001,7 @@ public void saveInventory() throws SQLException {
                 }
             }
 
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Save Pets", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
@@ -7066,7 +7066,7 @@ public void saveInventory() throws SQLException {
             }
             ps.executeBatch();
 
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Save Key Bindings and Macros", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
             
@@ -7081,7 +7081,7 @@ public void saveInventory() throws SQLException {
             */
             saveInventory();
 
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Save Inventory", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 			
@@ -7096,7 +7096,7 @@ public void saveInventory() throws SQLException {
                 ps.addBatch();
             }
             ps.executeBatch();
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Save Skills", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
@@ -7135,7 +7135,7 @@ public void saveInventory() throws SQLException {
                 }
             }
             ps.executeBatch();
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Save Locations", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
@@ -7150,7 +7150,7 @@ public void saveInventory() throws SQLException {
                 }
             }
             ps.executeBatch();
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Save Buddies", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
@@ -7163,7 +7163,7 @@ public void saveInventory() throws SQLException {
                 ps.addBatch();
             }
             ps.executeBatch();
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Save Area Info", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
@@ -7205,7 +7205,7 @@ public void saveInventory() throws SQLException {
                 }
                 
             }
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Save Quests", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
