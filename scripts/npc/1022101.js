@@ -5,24 +5,24 @@ function start() {
 function action(mode, type, selection) {
 		//cm.resetStats();
  // Double Swing
-		cm.teachSkill(21000000,0); // Combat Ability
+		cm.teachSkill(21000000,0, 0); // Combat Ability
  // Combat Step
-		cm.teachSkill(21001003,0); // Pole Arm Booster
+		cm.teachSkill(21001003,0, 0); // Pole Arm Booster
 		// Aran Second job
  // Triple Swing
-		cm.teachSkill(21100000,0); // Pole Arm Mastery
-		cm.teachSkill(21100002,0); // Final Charge
+		cm.teachSkill(21100000,0, 0); // Pole Arm Mastery
+		cm.teachSkill(21100002,0,0); // Final Charge
  // Body Pressure
-		cm.teachSkill(21100004,0); // Combo Smash
-		cm.teachSkill(21100005,0); // Combo Drain
+		cm.teachSkill(21100004,0,0); // Combo Smash
+		cm.teachSkill(21100005,0,0); // Combo Drain
 		// Aran Thief Job
-		cm.teachSkill(21110000,0); // Critical Combo
-		cm.teachSkill(21110002,0); // Full Swing
-		cm.teachSkill(21110003,0); // Final Toss
-		cm.teachSkill(21110004,0); // Fenir Phantom
-		cm.teachSkill(21111005,0); // Snow Charge
-		cm.teachSkill(21110006,0); // WhirlWind
-		cm.teachSkill(21111001,0); // Smart Knockback*/
+		cm.teachSkill(21110000,0,0); // Critical Combo
+		cm.teachSkill(21110002,0,0); // Full Swing
+		cm.teachSkill(21110003,0,0); // Final Toss
+		cm.teachSkill(21110004,0,0); // Fenir Phantom
+		cm.teachSkill(21111005,0,0); // Snow Charge
+		cm.teachSkill(21110006,0,0); // WhirlWind
+		cm.teachSkill(21111001,0,0); // Smart Knockback*/
 cm.dispose();
 	    }
 
@@ -276,7 +276,7 @@ function action(mode, type, selection) {
         }
     }
 }  
-		*/
+		
 		var status = 0; 
 var beauty = 0; 
 var haircolor = Array(); 
@@ -371,3 +371,4 @@ cm.dispose();
     cm.dispose(); 
     } 
 }
+*/
