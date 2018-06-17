@@ -103,6 +103,7 @@ import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import constants.ItemConstants;
 import constants.ServerConstants;
+
 import java.util.ArrayList;
 import server.life.SpawnPoint;
 import server.maps.FieldLimit;
@@ -274,7 +275,7 @@ public class Commands {
 	};
 
 	static {
-		gotomaps.put("gmmap", 180000000);
+		//gotomaps.put("gmmap", 180000000);
 		gotomaps.put("southperry", 60000);
 		gotomaps.put("amherst", 1000000);
 		gotomaps.put("henesys", 100000000);
@@ -288,7 +289,7 @@ public class Commands {
                 gotomaps.put("ereve", 130000000);
                 gotomaps.put("rien", 140000000);
 		gotomaps.put("orbis", 200000000);
-		gotomaps.put("happy", 209000000);
+		gotomaps.put("happytown", 209000000);
 		gotomaps.put("elnath", 211000000);
 		gotomaps.put("ludi", 220000000);
 		gotomaps.put("aqua", 230000000);
@@ -299,12 +300,13 @@ public class Commands {
 		gotomaps.put("korean", 222000000);
                 gotomaps.put("ellin", 300000000);
 		gotomaps.put("nlc", 600000000);
-		gotomaps.put("excavation", 990000000);
+		gotomaps.put("gpq", 101030104);
 		gotomaps.put("pianus", 230040420);
 		gotomaps.put("horntail", 240060200);
 		gotomaps.put("mushmom", 100000005);
 		gotomaps.put("griffey", 240020101);
 		gotomaps.put("manon", 240020401);
+		gotomaps.put("lhc", 211060000);
 		gotomaps.put("horseman", 682000001);
 		gotomaps.put("balrog", 105090900);
 		gotomaps.put("zakum", 211042300);
@@ -314,15 +316,18 @@ public class Commands {
 		gotomaps.put("shrine", 800000000);
 		gotomaps.put("skelegon", 240040511);
 		gotomaps.put("hpq", 100000200);
-		gotomaps.put("ht", 240050400);
+		gotomaps.put("horntail", 240040700);
                 gotomaps.put("ariant", 260000000);
 		gotomaps.put("magatia", 261000000);
                 gotomaps.put("singapore", 540000000);
-                gotomaps.put("keep", 610020006);
+                gotomaps.put("cwk", 610030000);
                 gotomaps.put("amoria", 680000000);
                 gotomaps.put("temple", 270000100);
                 gotomaps.put("neo", 240070000);
                 gotomaps.put("fm", 910000000);
+                gotomaps.put("fog", 105040306);
+                gotomaps.put("mp3", 541000300);
+                gotomaps.put("wolfspider", 600020300);
 	}
         
         private static void hardsetItemStats(Equip equip, short stat) {
@@ -369,8 +374,31 @@ public class Commands {
 		case "time":
 			DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 			dateFormat.setTimeZone(TimeZone.getTimeZone(ServerConstants.TIMEZONE));
-			player.yellowMessage("Solaxia Server Time: " + dateFormat.format(new Date()));
+			player.yellowMessage("ProjectNano Server Time: " + dateFormat.format(new Date()));
 			break;
+            case "rebirth":
+                c.getAbstractPlayerInteraction().openNpc(9201143, "rebirth");
+                break;
+
+                case "recharge":
+                        MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
+                        for (Item torecharge : c.getPlayer().getInventory(MapleInventoryType.USE).list()) {
+                                if (ItemConstants.isThrowingStar(torecharge.getItemId())){
+                                        torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
+                                        c.getPlayer().forceUpdateItem(torecharge);
+                                } else if (ItemConstants.isArrow(torecharge.getItemId())){
+                                        torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
+                                        c.getPlayer().forceUpdateItem(torecharge);
+                                } else if (ItemConstants.isBullet(torecharge.getItemId())){
+                                        torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
+                                        c.getPlayer().forceUpdateItem(torecharge);
+                                } //else if (ItemConstants.isConsumable(torecharge.getItemId())){
+                                  //      torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
+                                  //     c.getPlayer().forceUpdateItem(torecharge);
+                                //}
+                        }
+                        player.dropMessage(5, "Please remember to vote <3");
+                                break;
                 
                 case "credits":
 		case "staff":
@@ -425,7 +453,8 @@ public class Commands {
                     
                 case "equiplv":
                         player.showAllEquipFeatures();
-                        break;
+                        break;  
+                    
 
                 case "showrates":
                         String showMsg = "#eEXP RATE#n" + "\r\n";
@@ -500,7 +529,8 @@ public class Commands {
 			FilePrinter.printError("bug.txt", MapleCharacter.makeMapleReadable(player.getName()) + ": " + message + "\r\n");
 			player.dropMessage(5, "Your bug '" + message + "' was submitted successfully to our developers. Thank you!");
 			break;
-		/*
+
+		
                 case "points":
 			player.dropMessage(5, "You have " + c.getVotePoints() + " vote point(s).");
 			if (c.hasVotedAlready()) {
@@ -514,7 +544,7 @@ public class Commands {
 				player.yellowMessage("You are free to vote! Make sure to vote to gain a vote point!");
 			}
 			break;
-                */
+                
 		case "joinevent":
 			if(!FieldLimit.CANNOTMIGRATE.check(player.getMap().getFieldLimit())) {
 				MapleEvent event = c.getChannelServer().getEvent();
@@ -564,6 +594,7 @@ public class Commands {
 			}
 			break;
                     
+                    
 		case "ranks":
 			PreparedStatement ps = null;
 			ResultSet rs = null;
@@ -595,6 +626,110 @@ public class Commands {
 				}
 			}
 			break;
+		case "haste":
+			//GM Skills : Haste(Super) - Holy Symbol - Bless - Hyper Body - Echo of Hero - maple warrior - sharp eyes
+			SkillFactory.getSkill(9101001).getEffect(SkillFactory.getSkill(9101001).getMaxLevel()).applyTo(player);
+		   // SkillFactory.getSkill(9101002).getEffect(SkillFactory.getSkill(9101002).getMaxLevel()).applyTo(player);
+		   // SkillFactory.getSkill(9101003).getEffect(SkillFactory.getSkill(9101003).getMaxLevel()).applyTo(player);
+			//SkillFactory.getSkill(9101008).getEffect(SkillFactory.getSkill(9101008).getMaxLevel()).applyTo(player);
+		   // SkillFactory.getSkill(2321000).getEffect(SkillFactory.getSkill(2321000).getMaxLevel()).applyTo(player);
+		   // SkillFactory.getSkill(3121002).getEffect(SkillFactory.getSkill(3121002).getMaxLevel()).applyTo(player);
+			//SkillFactory.getSkill(1005).getEffect(SkillFactory.getSkill(1005).getMaxLevel()).applyTo(player);
+					break;
+                    
+		case "goto":
+			if (sub.length < 2){
+				player.yellowMessage("Syntax: @goto <map name>");
+				break;
+			}
+                    
+			if (gotomaps.containsKey(sub[1].toLowerCase())) {
+				MapleMap target = c.getChannelServer().getMapFactory().getMap(gotomaps.get(sub[1].toLowerCase()));
+				MaplePortal targetPortal = target.getPortal(0);
+				if (player.getEventInstance() != null) {
+					player.getEventInstance().removePlayer(player);
+				}
+				player.changeMap(target, targetPortal);
+			} else {
+				player.dropMessage(5, "That map does not exist.");
+			}
+                                break;
+                    case "whatdropsfrom":
+			if (sub.length < 2) {
+				player.dropMessage(5, "Please do @whatdropsfrom <monster name>");
+                        break;
+			}
+			String monsterName = joinStringFrom(sub, 1);
+			String output = "";
+			int limit = 3;
+			Iterator<Pair<Integer, String>> listIterator = MapleMonsterInformationProvider.getMobsIDsFromName(monsterName).iterator();
+			for (int i = 0; i < limit; i++) {
+				if(listIterator.hasNext()) {
+					Pair<Integer, String> data = listIterator.next();
+					int mobId = data.getLeft();
+					String mobName = data.getRight();
+					output += mobName + " drops the following items:\r\n\r\n";
+					for (MonsterDropEntry drop : MapleMonsterInformationProvider.getInstance().retrieveDrop(mobId)){
+						try {
+							String name = MapleItemInformationProvider.getInstance().getName(drop.itemId);
+							if (name.equals("null") || drop.chance == 0){
+								continue;
+							}
+							float chance = 1000000 / drop.chance / player.getDropRate();
+							output += "- " + name + " (1/" + (int) chance + ")\r\n";
+						} catch (Exception ex){
+                                                        ex.printStackTrace();
+							continue;
+						}
+					}
+					output += "\r\n";
+				}
+			}
+			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, output, "00 00", (byte) 0));
+			break;
+                    
+		case "whodrops":
+			if (sub.length < 2) {
+				player.dropMessage(5, "Please do @whodrops <item name>");
+                        break;
+			}
+			String searchString = joinStringFrom(sub, 1);
+			output = "";
+			listIterator = MapleItemInformationProvider.getInstance().getItemDataByName(searchString).iterator();
+			if(listIterator.hasNext()) {
+				int count = 1;
+				while(listIterator.hasNext() && count <= 3) {
+					Pair<Integer, String> data = listIterator.next();
+					output += "#b" + data.getRight() + "#k is dropped by:\r\n";
+					try {
+                                                con = DatabaseConnection.getConnection();
+						ps = con.prepareStatement("SELECT dropperid FROM drop_data WHERE itemid = ? LIMIT 50");
+						ps.setInt(1, data.getLeft());
+						rs = ps.executeQuery();
+						while(rs.next()) {
+							String resultName = MapleMonsterInformationProvider.getMobNameFromID(rs.getInt("dropperid"));
+							if (resultName != null) {
+								output += resultName + ", ";
+							}
+						}
+						rs.close();
+						ps.close();
+                                                con.close();
+					} catch (Exception e) {
+						player.dropMessage(6, "There was a problem retrieving the required data. Please try again.");
+						e.printStackTrace();
+						break;
+					}
+					output += "\r\n\r\n";
+					count++;
+				}
+			} else {
+				player.dropMessage(5, "The item you searched for doesn't exist.");
+                        break;
+			}
+			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, output, "00 00", (byte) 0));
+                                break;
+                        
                     
                 // stat autoassigning command credited to HeliosMS dev team
                 case "str":
@@ -607,7 +742,7 @@ public class Commands {
                         boolean luk = sub[0].equalsIgnoreCase("luk");
                         boolean dex = sub[0].equalsIgnoreCase("dex");
 
-                        if (amount > 0 && amount <= player.getRemainingAp() && amount <= 32763 || amount < 0 && amount >= -32763 && Math.abs(amount) + player.getRemainingAp() <= 32767) {
+                        if (amount > 0 && amount <= player.getRemainingAp() && amount <= 32763) {
                             if (str && amount + player.getStr() <= 32767 && amount + player.getStr() >= 4) {
                                 player.setStr(player.getStr() + amount);
                                 player.updateSingleStat(MapleStat.STR, player.getStr());
@@ -636,6 +771,7 @@ public class Commands {
                         }
                     
                         break;
+                    
                             
                 default:
                         return false;
@@ -671,7 +807,7 @@ public class Commands {
 				}
 			} 
 			break;
-                    
+                    /*
                 case "whatdropsfrom":
 			if (sub.length < 2) {
 				player.dropMessage(5, "Please do @whatdropsfrom <monster name>");
@@ -747,21 +883,19 @@ public class Commands {
 			}
 			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, output, "00 00", (byte) 0));
                                 break;
-                    
+                    */
                 case "buffme":
-                        //GM Skills : Haste(Super) - Holy Symbol - Bless - Hyper Body - Echo of Hero
-                        SkillFactory.getSkill(4101004).getEffect(SkillFactory.getSkill(4101004).getMaxLevel()).applyTo(player);
-                        SkillFactory.getSkill(2311003).getEffect(SkillFactory.getSkill(2311003).getMaxLevel()).applyTo(player);
-                        SkillFactory.getSkill(1301007).getEffect(SkillFactory.getSkill(1301007).getMaxLevel()).applyTo(player);
-                        SkillFactory.getSkill(2301004).getEffect(SkillFactory.getSkill(2301004).getMaxLevel()).applyTo(player);
-                        SkillFactory.getSkill(1005).getEffect(SkillFactory.getSkill(1005).getMaxLevel()).applyTo(player);
-                        player.setHp(player.getMaxHp());
-                        player.updateSingleStat(MapleStat.HP, player.getMaxHp());
-                        player.setMp(player.getMaxMp());
-                        player.updateSingleStat(MapleStat.MP, player.getMaxMp());
+                        //GM Skills : Haste(Super) - Holy Symbol - Bless - Hyper Body - Echo of Hero - maple warrior - sharp eyes
+                        SkillFactory.getSkill(9101001).getEffect(SkillFactory.getSkill(9101001).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(9101002).getEffect(SkillFactory.getSkill(9101002).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(9101003).getEffect(SkillFactory.getSkill(9101003).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(9101008).getEffect(SkillFactory.getSkill(9101008).getMaxLevel()).applyTo(player);
+                       // SkillFactory.getSkill(2321000).getEffect(SkillFactory.getSkill(2321000).getMaxLevel()).applyTo(player);
+                       // SkillFactory.getSkill(3121002).getEffect(SkillFactory.getSkill(3121002).getMaxLevel()).applyTo(player);
+                        //SkillFactory.getSkill(1005).getEffect(SkillFactory.getSkill(1005).getMaxLevel()).applyTo(player);
                                 break;
-                        
-                case "goto":
+                       
+                /*case "goto":
                         if (sub.length < 2){
 				player.yellowMessage("Syntax: @goto <map name>");
 				break;
@@ -778,8 +912,8 @@ public class Commands {
 				player.dropMessage(5, "That map does not exist.");
 			}
                                 break;
-								
-                case "recharge":
+			*/					
+             /*   case "recharge":
                         MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
                         for (Item torecharge : c.getPlayer().getInventory(MapleInventoryType.USE).list()) {
                                 if (ItemConstants.isThrowingStar(torecharge.getItemId())){
@@ -791,14 +925,14 @@ public class Commands {
                                 } else if (ItemConstants.isBullet(torecharge.getItemId())){
                                         torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
                                         c.getPlayer().forceUpdateItem(torecharge);
-                                } else if (ItemConstants.isConsumable(torecharge.getItemId())){
-                                        torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
-                                        c.getPlayer().forceUpdateItem(torecharge);
-                                }
+                                } //else if (ItemConstants.isConsumable(torecharge.getItemId())){
+                                  //      torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
+                                  //     c.getPlayer().forceUpdateItem(torecharge);
+                                //}
                         }
                         player.dropMessage(5, "USE Recharged.");
                                 break;
-		            
+		            */
                 default:
                         return false;
                 }
@@ -844,6 +978,7 @@ public class Commands {
                 case "unhide":
                         SkillFactory.getSkill(9101004).getEffect(SkillFactory.getSkill(9101004).getMaxLevel()).applyTo(player);
                     break;
+                    
                         
                 case "sp":
                         if (sub.length < 2){
@@ -904,6 +1039,17 @@ public class Commands {
                                 }
 			}
                     break;
+                    
+                case "buffme":
+                        //GM Skills : Haste(Super) - Holy Symbol - Bless - Hyper Body - Echo of Hero - maple warrior - sharp eyes
+                        SkillFactory.getSkill(9101001).getEffect(SkillFactory.getSkill(9101001).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(9101002).getEffect(SkillFactory.getSkill(9101002).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(9101003).getEffect(SkillFactory.getSkill(9101003).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(9101008).getEffect(SkillFactory.getSkill(9101008).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(2321000).getEffect(SkillFactory.getSkill(2321000).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(3121002).getEffect(SkillFactory.getSkill(3121002).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(1005).getEffect(SkillFactory.getSkill(1005).getMaxLevel()).applyTo(player);
+                                break; 
                     
                 case "empowerme":
 			final int[] array = {2311003, 2301004, 1301007, 4101004, 2001002, 1101007, 1005, 2301003, 5121009, 1111002, 4111001, 4111002, 4211003, 4211005, 1321000, 2321004, 3121002};
@@ -1090,8 +1236,8 @@ public class Commands {
                     break;
                     
                 case "warpto":
-                        if (sub.length < 3){
-				player.yellowMessage("Syntax: !warpto <playername> <mapid>");
+                        if (sub.length < 2){
+				player.yellowMessage("Syntax: !warpto <playername>");
 				break;
 			}
                     
@@ -1175,6 +1321,7 @@ public class Commands {
 				player.dropMessage(6, "Unknown player.");
 			}
                     break;
+                    
                     
                 case "reach":
                         if (sub.length < 2){
@@ -1384,10 +1531,18 @@ public class Commands {
                     break;
                     
                 case "resetskill":
+                        int totalSP = player.getRemainingSp();
 			for (MapleData skill_ : MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/" + "String.wz")).getData("Skill.img").getChildren()) {
 				try {
 					skill = SkillFactory.getSkill(Integer.parseInt(skill_.getName()));
-                                        player.changeSkillLevel(skill, (byte) 0, skill.getMaxLevel(), -1);
+                                        totalSP += player.getSkillLevel(skill);
+                                        if (skill.isFourthJob()) {
+                                            // reset 4th job skills max level to 10
+                                            player.changeSkillLevel(skill, (byte) 0, 10, -1);
+                                        }
+                                        else {
+                                            player.changeSkillLevel(skill, (byte) 0, skill.getMaxLevel(), -1);
+                                        }
 				} catch (NumberFormatException nfe) {
                                         nfe.printStackTrace();
 					break;
@@ -1404,7 +1559,9 @@ public class Commands {
                                 player.changeSkillLevel(skill, (byte) -1, -1, -1);
                         }
                         
-                        player.yellowMessage("Skills reseted.");
+                        player.setRemainingSp(totalSP);
+                        
+                        player.yellowMessage("Skills reset.");
                     break;
                     
                 case "mesos":
@@ -1922,6 +2079,37 @@ public class Commands {
 				player.yellowMessage("Syntax: !givevp <playername> <gainvotepoint>");
 				break;
 			}
+                        victim = cserv.getPlayerStorage().getCharacterByName(sub[1]);
+                        Connection con = null;
+                        try {
+                            con = DatabaseConnection.getConnection();
+                            con.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+                            con.setAutoCommit(false);
+                            PreparedStatement ps;
+                            ps = con.prepareStatement("UPDATE accounts SET rewardpoints = ?  WHERE id = ?");
+                            ps.setInt(1, Integer.parseInt(sub[2]));
+                            ps.setInt(2, victim.getClient().getAccID());
+                            ps.executeUpdate();
+                            ps.close();
+                        }
+                        catch (SQLException | RuntimeException t) {
+                            FilePrinter.printError(FilePrinter.SAVE_CHAR, t, "Error saving " + sub[1]);
+                            try {
+                                con.rollback();
+                            } catch (SQLException se) {
+                                FilePrinter.printError(FilePrinter.SAVE_CHAR, se, "Error trying to rollback " + sub[1]);
+                            }
+                        } catch (Exception e) {
+                            FilePrinter.printError(FilePrinter.SAVE_CHAR, e, "Error saving " + sub[1]);
+                        } finally {
+                            try {
+                                con.setAutoCommit(true);
+                                con.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+                                con.close();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                         
                         victim = cserv.getPlayerStorage().getCharacterByName(sub[1]);
                         if(victim != null) {
@@ -2061,6 +2249,9 @@ public class Commands {
 		case "notice":
 			Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, "[Notice] " + joinStringFrom(sub, 1)));
                     break;
+                    		case "say":
+			Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, "[" + c.getPlayer().getName() + "]" + joinStringFrom(sub, 1)));
+                    break;
                     
 		case "rip":
 			Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, "[RIP]: " + joinStringFrom(sub, 1)));
@@ -2164,7 +2355,7 @@ public class Commands {
 				//Ban ip
 				PreparedStatement ps = null;
 				try {
-					Connection con = DatabaseConnection.getConnection();
+					con = DatabaseConnection.getConnection();
 					if (ip.matches("/[0-9]{1,3}\\..*")) {
 						ps = con.prepareStatement("INSERT INTO ipbans VALUES (DEFAULT, ?, ?)");
 						ps.setString(1, ip);
@@ -2201,6 +2392,7 @@ public class Commands {
 				c.announce(MaplePacketCreator.getGMEffect(6, (byte) 1));
 			}
                     break;
+  
                     
                 case "unban":
                         if (sub.length < 2){
@@ -2209,7 +2401,7 @@ public class Commands {
 			}
                     
 			try {
-                                Connection con = DatabaseConnection.getConnection();
+                                con = DatabaseConnection.getConnection();
                                 int aid = MapleCharacter.getAccountIdByName(sub[1]);
                                 
                                 PreparedStatement p = con.prepareStatement("UPDATE accounts SET banned = -1 WHERE id = " + aid);
@@ -2666,6 +2858,91 @@ public class Commands {
                         player.dropMessage(6, st);
                         
                         break;
+                    case "pmob":
+                {
+                    int npcId = Integer.parseInt(sub[1]);
+                    int mobTime = Integer.parseInt(sub[2]);
+                    int xpos = player.getPosition().x;
+                    int ypos = player.getPosition().y;
+                    int fh = player.getMap().getFootholds().findBelow(player.getPosition()).getId();
+                    if (sub[2] == null) {
+                        mobTime = 0;
+                    }
+                    MapleMonster mob = MapleLifeFactory.getMonster(npcId);
+                    if (mob != null && !mob.getName().equals("MISSINGNO")) {
+                        mob.setPosition(player.getPosition());
+                        mob.setCy(ypos);
+                        mob.setRx0(xpos + 50);
+                        mob.setRx1(xpos - 50);
+                        mob.setFh(fh);
+                        try {
+                            Connection con = DatabaseConnection.getConnection();
+                            PreparedStatement ps = con.prepareStatement("INSERT INTO spawns ( idd, f, fh, cy, rx0, rx1, type, x, y, mid, mobtime ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
+                            ps.setInt(1, npcId);
+                            ps.setInt(2, 0);
+                            ps.setInt(3, fh);
+                            ps.setInt(4, ypos);
+                            ps.setInt(5, xpos + 50);
+                            ps.setInt(6, xpos - 50);
+                            ps.setString(7, "m");
+                            ps.setInt(8, xpos);
+                            ps.setInt(9, ypos);
+                            ps.setInt(10, player.getMapId());
+                            ps.setInt(11, mobTime);
+                            ps.executeUpdate();
+                        } catch (SQLException e) {
+                            player.dropMessage("Failed to save MOB to the database");
+                        }
+                        player.getMap().addMonsterSpawn(mob, mobTime, 0);
+                    } else {
+                        player.dropMessage("You have entered an invalid Mob-Id");
+                    }
+                    break;
+                }
+                    case "pnpc":
+        {
+            int npcId = Integer.parseInt(sub[1]);
+            MapleNPC npc = MapleLifeFactory.getNPC(npcId);
+            int xpos = player.getPosition().x;
+            int ypos = player.getPosition().y;
+            int fh = player.getMap().getFootholds().findBelow(player.getPosition()).getId();
+            if (npc != null && !npc.getName().equals("MISSINGNO"))
+            {
+                npc.setPosition(player.getPosition());
+                npc.setCy(ypos);
+                npc.setRx0(xpos + 50);
+                npc.setRx1(xpos - 50);
+                npc.setFh(fh);
+                //npc.setCustom(true);
+                try {
+                    Connection con = DatabaseConnection.getConnection();
+                    PreparedStatement ps = con.prepareStatement("INSERT INTO spawns ( idd, f, fh, cy, rx0, rx1, type, x, y, mid ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
+                    ps.setInt(1, npcId);
+                    ps.setInt(2, 0);
+                    ps.setInt(3, fh);
+                    ps.setInt(4, ypos);
+                    ps.setInt(5, xpos + 50);
+                    ps.setInt(6, xpos - 50);
+                    ps.setString(7, "n");
+                    ps.setInt(8, xpos);
+                    ps.setInt(9, ypos);
+                    ps.setInt(10, player.getMapId());
+                    ps.executeUpdate();
+                }
+                catch (SQLException e)
+                {
+                    player.dropMessage("Failed to save NPC to the database");
+                }
+                player.getMap().addMapObject(npc);
+                player.getMap().broadcastMessage(MaplePacketCreator.spawnNPC(npc));
+            }
+            else
+            {
+                player.dropMessage("You have entered an invalid Npc-Id");
+            }
+        }
+                
+                       
                         
                 case "debugtimer":
 			TimerManager tMan = TimerManager.getInstance();

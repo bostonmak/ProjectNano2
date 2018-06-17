@@ -299,6 +299,8 @@ public class AbstractPlayerInteraction {
 	}
         
         private MapleQuestStatus.Status getQuestStat(int id) {
+            System.out.println(MapleQuest.getInstance(id).toString());
+            System.out.println(c.getPlayer().getQuest(MapleQuest.getInstance(id)).toString());
                 return c.getPlayer().getQuest(MapleQuest.getInstance(id)).getStatus();
         }
         
@@ -317,6 +319,7 @@ public class AbstractPlayerInteraction {
         
 	public boolean isQuestStarted(int quest) {
 		try {
+                    System.out.println(quest);
 			return getQuestStat(quest) == MapleQuestStatus.Status.STARTED;
 		} catch (NullPointerException e) {
                         e.printStackTrace();

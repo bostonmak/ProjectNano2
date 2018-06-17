@@ -1,3 +1,9 @@
+# Gradle 
+.gradletasknamecache
+.gradle/
+build/
+bin/
+
 /logs/**
 .idea/
 
@@ -72,3 +78,4 @@
 /tools/MapleSkillMakerReagentIndexer/nbproject/
 
 /out
+sql/ProjectNano_backup_6518 20180605 1237.sql

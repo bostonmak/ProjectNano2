@@ -32,10 +32,7 @@
         <int name="level" value="18"/>
         <int name="effectAfter" value="0"/>
       </imgdir>
-    </imgdir>
-    <int name="HPgaugeHide" value="1"/>
-    <int name="hpTagBgcolor" value="5"/>
-    <int name="hpTagColor" value="1"/>
+  </imgdir>
   </imgdir>
   <imgdir name="stand">
     <canvas name="0" width="197" height="183">

@@ -84,7 +84,11 @@ function action(mode, type, selection) {
                     cm.gainItem(1492000, 1);
                     cm.gainItem(1482000, 1);
                     cm.gainItem(2330000, 1000);
-                    cm.resetStats();
+                    if(cm.getRebirths() == 0)
+                    {
+                        cm.resetStats();
+                    }
+                    
                 }
                 cm.sendNext("Alright, from here out, you are a part of us! You'll be living the life of a wanderer at ..., but just be patient as soon, you'll be living the high life. Alright, it ain't much, but I'll give you some of my abilities... HAAAHHH!!!");
             } else {

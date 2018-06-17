@@ -1,4 +1,4 @@
-#EXECUTE THIS FIRST, THEN NEXT SQL: 'db_drops.sql'
+﻿#EXECUTE THIS FIRST, THEN NEXT SQL: 'db_drops.sql'
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -16508,6 +16508,7 @@ CREATE TABLE IF NOT EXISTS `questactions` (
 
 CREATE TABLE IF NOT EXISTS `questprogress` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `characterid` int(10) unsigned NOT NULL DEFAULT '0',
   `queststatusid` int(10) unsigned NOT NULL DEFAULT '0',
   `progressid` int(11) NOT NULL DEFAULT '0',
   `progress` varchar(15) CHARACTER SET latin1 COLLATE latin1_german1_ci NOT NULL DEFAULT '',

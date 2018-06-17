@@ -103,7 +103,7 @@ function writeSolaxiaCommandsLv3() {    //GM
         desc_cursor = desc_lv3;
 
         addCommand("debuff", "");
-        addCommand("fly", "");
+        addCommand("fly", "Not sure how this works?");
         addCommand("spawn", "");
         addCommand("mutemap", "");
         addCommand("checkdmg", "");
@@ -206,27 +206,31 @@ function writeSolaxiaCommandsLv0() {    //Common
         comm_cursor = comm_lv0;
         desc_cursor = desc_lv0;
 
-        addCommand("commands", "");
+
         addCommand("droplimit", "");
         addCommand("time", "");
         addCommand("credits", "");
         addCommand("uptime", "");
-        addCommand("gacha", "");
-        addCommand("dispose", "");
-        addCommand("equiplv", "");
+        addCommand("dispose", "Use this when you get stuck");
+		addCommand("goto", "Warps you to the map of your choice");
+		addCommand("rebirth", "Requires Level 200 and 1 Golden Maple Leaf (Obtainable from Mia)");
+		addCommand("haste", "Lets you move faster");
+		addCommand("whodrops", "Shows who drops a specific item");
+		addCommand("whatdropsfrom", "shows what a mob drops");
+        addCommand("equiplv", "Shows your Equipment Level");
         addCommand("showrates", "");
         addCommand("rates", "");
-        addCommand("online", "");
-        addCommand("gm", "");
+        addCommand("online", "Shows all online players");
+        addCommand("gm", "message's an online GM");
         addCommand("reportbug", "");
 	//addCommand("points", "");
-        addCommand("joinevent", "");
+        addCommand("joinevent", "Warps to GM Event");
         addCommand("leaveevent", "");
         addCommand("ranks", "");
-        addCommand("str", "");
-        addCommand("dex", "");
-        addCommand("int", "");
-        addCommand("luk", "");
+        addCommand("str", "Assigns a number of AP");
+        addCommand("dex", "Assigns a number of AP");
+        addCommand("int", "Assigns a number of AP");
+        addCommand("luk", "Assigns a number of AP");
 }
 
 function writeSolaxiaCommands() {
@@ -259,7 +263,7 @@ function action(mode, type, selection) {
                         status--;
 
                 if (status == 0) {
-                        var sendStr = "There are all available commands for you:\r\n\r\n#b";
+                        var sendStr = "These are all the available player commands that you can use:\r\n\r\n#b";
                         for(var i = 0; i <= cm.getPlayer().gmLevel(); i++) {
                             sendStr += "#L" + i + "#" + levels[i] + "#l\r\n";
                         }

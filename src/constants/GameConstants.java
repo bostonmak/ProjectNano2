@@ -10,6 +10,13 @@ import server.maps.FieldLimit;
  * @author Ronan
  */
 public class GameConstants {
+    private static final int BEGINNER_MAX_LEVEL = 10;
+    private static final int FIRST_JOB_MAX_LEVEL = 30;
+    private static final int SECOND_JOB_MAX_LEVEL = 70;
+    private static final int THIRD_JOB_MAX_LEVEL = 120;
+    private static final int FOURTH_JOB_MAX_LEVEL = 200;
+    private static final int CHARACTER_MAX_LEVEL = 200;
+
     public static final int[] OWL_DATA = new int[]{1082002, 2070005, 2070006, 1022047, 1102041, 2044705, 2340000, 2040017, 1092030, 2040804};
     
     // Ronan's rates upgrade system
@@ -79,20 +86,24 @@ public class GameConstants {
         
         switch(jobBranch) {
             case 0:
-                return 10;   // beginner
+                return BEGINNER_MAX_LEVEL;   // beginner
                 
             case 1:
-                return 30;   // 1st job
+                return FIRST_JOB_MAX_LEVEL;   // 1st job
                 
             case 2:
-                return 70;   // 2nd job
+                return SECOND_JOB_MAX_LEVEL;   // 2nd job
                 
             case 3:
-                return 120;   // 3rd job
+                return THIRD_JOB_MAX_LEVEL;   // 3rd job
                 
             default:
-                return (job.getId() / 1000 == 1) ? 120 : 200;   // 4th job: cygnus is 120, rest is 200
+                return FOURTH_JOB_MAX_LEVEL;   // 4th job: cygnus default is 120. changing to 200 along to align with other classes.
         }
+    }
+
+    public static int getCharacterMaxLevel() {
+        return CHARACTER_MAX_LEVEL;
     }
     
     public static int getHiddenSkill(final int skill) {

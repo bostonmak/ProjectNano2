@@ -1096,7 +1096,12 @@ public class MapleItemInformationProvider {
                 return null;
             }
             MapleData spec = item.getChildByPath("spec");
-            ret = MapleStatEffect.loadItemEffectFromData(spec, itemId);
+            if (spec == null) {
+                ret = null;
+            }
+            else {
+                ret = MapleStatEffect.loadItemEffectFromData(spec, itemId);
+            }
             itemEffects.put(Integer.valueOf(itemId), ret);
         }
         return ret;
@@ -1403,6 +1408,9 @@ public class MapleItemInformationProvider {
     }
 
     public boolean isCash(int itemId) {
+        if (getEquipStats(itemId) == null) {
+            return false;
+        }
         return itemId / 1000000 == 5 || getEquipStats(itemId).get("cash") == 1;
     }
     

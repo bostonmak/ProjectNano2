@@ -156,6 +156,10 @@ public class MaplePet extends Item {
             return -1;
         }
     }
+    
+    public Object[] getDbValues() {
+        return new Object[]{getUniqueId(),getName(),getLevel(),getCloseness(),getFullness(),isSummoned() ? 1 : 0};
+    }
 
     public String getName() {
         return name;

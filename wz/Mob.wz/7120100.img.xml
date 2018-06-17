@@ -26,17 +26,14 @@
         <int name="level" value="21"/>
         <int name="effectAfter" value="0"/>
       </imgdir>
+	  </imgdir>
       <imgdir name="1">
         <int name="skill" value="101"/>
         <int name="action" value="2"/>
         <int name="level" value="17"/>
         <int name="effectAfter" value="0"/>
       </imgdir>
-    </imgdir>
-    <int name="HPgaugeHide" value="1"/>
-    <int name="hpTagBgcolor" value="5"/>
-    <int name="hpTagColor" value="1"/>
-  </imgdir>
+	  </imgdir>
   <imgdir name="stand">
     <canvas name="0" width="197" height="183">
       <vector name="origin" x="86" y="169"/>

@@ -96,28 +96,32 @@ public final class PetAutoPotHandler extends AbstractMaplePacketHandler {
             maxMp = maxHpMp.right;
             
             incHp = stat.getHp();
-            if(incHp <= 0 && hasHpGain) incHp = (short)((maxHp * stat.getHpRate()) / 100.0);
+            if(incHp <= 0 && hasHpGain) incHp = (short)((maxHp * stat.getHpRate()));
             
             incMp = stat.getMp();
-            if(incMp <= 0 && hasMpGain) incMp = (short)((maxMp * stat.getMpRate()) / 100.0);
+            if(incMp <= 0 && hasMpGain) incMp = (short)((maxMp * stat.getMpRate()));
             
             curHp = chr.getHp();
             curMp = chr.getMp();
             
             //System.out.println("\n-------------------\n");
             while(true) {
-                do {
+                while(shouldReusePot(chr) && toUse.getQuantity() > 0) {
                     MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, slot, (short) 1, false);
                     stat.applyTo(chr);
                     
                     curHp += incHp;
                     curMp += incMp;
+                    if (curHp > maxHp) curHp = maxHp;
+                    if (curMp > maxMp) curMp = maxMp;
 
                     //System.out.println();
-                    //System.out.println("hp: " + hasHpGain + " player hp " + curHp + " maxhp " + maxHp);
-                    //System.out.println("mp: " + hasMpGain + " player mp " + curMp + " maxmp " + maxMp);
+                    //System.out.println("hp: " + hasHpGain + " player hp " + curHp + " maxhp " + maxHp + " inchp " + incHp);
+                    //System.out.println("mp: " + hasMpGain + " player mp " + curMp + " maxmp " + maxMp + " incmp " + incMp);
+                    //System.out.println(maxHp);
+                    //System.out.println(stat.getMpRate());
                     //System.out.println("redo? " + (shouldReusePot(chr) && toUse.getQuantity() > 0));
-                } while(shouldReusePot(chr) && toUse.getQuantity() > 0);
+                }
 
                 if(toUse.getQuantity() == 0 && shouldReusePot(chr)) {
                     // depleted out the current slot, fetch for more

@@ -354,6 +354,9 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 	public void resetStats() {
 		getPlayer().resetStats();
 	}
+            public int getRebirths() {
+            return getPlayer().getRebirths();
+    }
         
         public void openShopNPC(int id) {
             MapleShopFactory.getInstance().getShop(id).sendShop(c);
@@ -373,7 +376,13 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 			}
 		}
 	}
-
+public void teachSkill(int skillId, byte newLevel, int newMaxLevel) {
+    /*if(skill.getMaxLevel()=30)
+    {
+        getPlayer().changeSkillLevel(SkillFactory.getSkill(skillId), newLevel, 10, -1);
+    }*/
+    getPlayer().changeSkillLevel(SkillFactory.getSkill(skillId), newLevel, newMaxLevel, -1);
+}
 	public void doGachapon() {
 		int[] maps = {100000000, 101000000, 102000000, 103000000, 105040300, 800000000, 809000101, 809000201, 600000000, 120000000};
 
@@ -391,6 +400,13 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 			Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.gachaponMessage(itemGained, map, getPlayer()));
 		}
 	}
+         public int getrewardpoints(){
+        return getPlayer().getrewardpoints();
+    }
+
+    public void gainrewardpoints(int gain){
+        getPlayer().gainrewardpoints(gain);
+    }
         
         public void upgradeAlliance() {
                 MapleAlliance alliance = Server.getInstance().getAlliance(c.getPlayer().getGuild().getAllianceId());

@@ -106,12 +106,14 @@ public class MapleClient {
 	private byte gender = -1;
 	private boolean disconnecting = false;
 	private final Lock lock = new MonitoredReentrantLock(MonitoredLockType.CLIENT, true);
+        private final Lock encoderLock = new MonitoredReentrantLock(MonitoredLockType.CLIENT, true);
+        private static final Lock loginLock = new MonitoredReentrantLock(MonitoredLockType.CLIENT, true);
 	private int votePoints;
 	private int voteTime = -1;
 	private long lastNpcClick;
 	private long sessionId;
 
-	public MapleClient(MapleAESOFB send, MapleAESOFB receive, IoSession session) {
+        public MapleClient(MapleAESOFB send, MapleAESOFB receive, IoSession session) {
 		this.send = send;
 		this.receive = receive;
 		this.session = session;
@@ -420,13 +422,17 @@ public class MapleClient {
 	}
 
 	public int finishLogin() {
-		synchronized (MapleClient.class) {
-			if (getLoginState() > LOGIN_NOTLOGGEDIN) { // 0 = LOGIN_NOTLOGGEDIN, 1= LOGIN_SERVER_TRANSITION, 2 = LOGIN_LOGGEDIN
-				loggedIn = false;
-				return 7;
-			}
-			updateLoginState(LOGIN_LOGGEDIN);
-		}
+                loginLock.lock();
+                try {
+                    if (getLoginState() > LOGIN_NOTLOGGEDIN) { // 0 = LOGIN_NOTLOGGEDIN, 1= LOGIN_SERVER_TRANSITION, 2 = LOGIN_LOGGEDIN
+                        loggedIn = false;
+                        return 7;
+                    }
+                    updateLoginState(LOGIN_LOGGEDIN);
+                } finally {
+                    loginLock.unlock();
+                }
+            
 		return 0;
 	}
 
@@ -731,7 +737,7 @@ public class MapleClient {
 	public int getLoginState() {  // 0 = LOGIN_NOTLOGGEDIN, 1= LOGIN_SERVER_TRANSITION, 2 = LOGIN_LOGGEDIN
 		try {
 			Connection con = DatabaseConnection.getConnection();
-			PreparedStatement ps = con.prepareStatement("SELECT loggedin, lastlogin, UNIX_TIMESTAMP(birthday) as birthday FROM accounts WHERE id = ?");
+			PreparedStatement ps = con.prepareStatement("SELECT loggedin, lastlogin, birthday FROM accounts WHERE id = ?");
 			ps.setInt(1, getAccID());
 			ResultSet rs = ps.executeQuery();
 			if (!rs.next()) {
@@ -739,11 +745,12 @@ public class MapleClient {
 				ps.close();
 				throw new RuntimeException("getLoginState - MapleClient");
 			}
+                        
 			birthday = Calendar.getInstance();
-			long blubb = rs.getLong("birthday");
-			if (blubb > 0) {
-				birthday.setTimeInMillis(blubb * 1000);
-			}
+                        try {
+                            birthday.setTime(rs.getDate("birthday"));
+                        } catch(SQLException e) {}
+			
 			int state = rs.getInt("loggedin");
 			if (state == LOGIN_SERVER_TRANSITION) {
                                 // Arnah's note: lastlogin is a date-type, in case of login and game servers being of different timezones this becomes broken
@@ -778,7 +785,7 @@ public class MapleClient {
 	}
 
 	public boolean checkBirthDate(Calendar date) {
-		return date.get(Calendar.YEAR) == birthday.get(Calendar.YEAR) && date.get(Calendar.MONTH) == birthday.get(Calendar.MONTH) && date.get(Calendar.DAY_OF_MONTH) == birthday.get(Calendar.DAY_OF_MONTH);
+                return date.get(Calendar.YEAR) == birthday.get(Calendar.YEAR) && date.get(Calendar.MONTH) == birthday.get(Calendar.MONTH) && date.get(Calendar.DAY_OF_MONTH) == birthday.get(Calendar.DAY_OF_MONTH);
 	}
 
 	private void removePlayer() {
@@ -909,10 +916,9 @@ public class MapleClient {
 			} catch (final Exception e) {
 				FilePrinter.printError(FilePrinter.ACCOUNT_STUCK, e);
 			} finally {
-				getChannelServer().removePlayer(player);
-                                
                                 if (!this.serverTransition) {
 					worlda.removePlayer(player);
+                                        //getChannelServer().removePlayer(player); already being done
                                         
                                         player.saveCooldowns();
                                         player.saveToDB(true);
@@ -920,10 +926,11 @@ public class MapleClient {
 						player.empty(false);
 					}
 					player.logOff();
-				}
-                                else {
-                                    player.saveCooldowns();
-                                    player.saveToDB();
+				} else {
+                                        getChannelServer().removePlayer(player);
+
+                                        player.saveCooldowns();
+                                        player.saveToDB();
                                 }
                                 player = null;
 			}
@@ -1080,12 +1087,12 @@ public class MapleClient {
 		int points = 0;
 		try {
                         Connection con = DatabaseConnection.getConnection();
-			PreparedStatement ps = con.prepareStatement("SELECT `votes` FROM accounts WHERE id = ?");
+			PreparedStatement ps = con.prepareStatement("SELECT `rewardpoints` FROM accounts WHERE id = ?");
 			ps.setInt(1, accId);
 			ResultSet rs = ps.executeQuery();
 
 			if (rs.next()) {
-				points = rs.getInt("votes");
+				points = rs.getInt("rewardpoints");
 			}
 			ps.close();
 			rs.close();
@@ -1116,7 +1123,7 @@ public class MapleClient {
 	private void saveVotePoints() {
 		try {
 			Connection con = DatabaseConnection.getConnection();
-			try (PreparedStatement ps = con.prepareStatement("UPDATE accounts SET votes = ? WHERE id = ?")) {
+			try (PreparedStatement ps = con.prepareStatement("UPDATE accounts SET rewardpoints = ? WHERE id = ?")) {
 				ps.setInt(1, votePoints);
 				ps.setInt(2, accId);
 				ps.executeUpdate();
@@ -1134,6 +1141,14 @@ public class MapleClient {
         
         public void unlockClient() {
                 lock.unlock();
+	}
+        
+        public void lockEncoder() {
+                encoderLock.lock();
+	}
+        
+        public void unlockEncoder() {
+                encoderLock.unlock();
 	}
 
 	private static class CharNameAndId {
@@ -1162,7 +1177,7 @@ public class MapleClient {
 		return characterSlots;
 	}
 
-	public boolean gainCharacterSlot() {
+	public synchronized boolean gainCharacterSlot() {
 		if (characterSlots < 15) {
 			Connection con = null;
 			try {
@@ -1255,8 +1270,8 @@ public class MapleClient {
                 }
 	}
         
-	public synchronized void announce(final byte[] packet) {//MINA CORE IS A FUCKING BITCH AND I HATE IT <3
-		session.write(packet);
+        public synchronized void announce(final byte[] packet) {//MINA CORE IS A FUCKING BITCH AND I HATE IT <3
+                session.write(packet);
 	}
 
         public void announceHint(String msg, int length) {

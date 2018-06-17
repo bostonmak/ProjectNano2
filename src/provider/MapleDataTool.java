@@ -93,10 +93,16 @@ public class MapleDataTool {
     }
 
     public static int getInt(String path, MapleData data, int def) {
+        if (data == null) {
+            return def;
+        }
         return getInt(data.getChildByPath(path), def);
     }
 
     public static int getIntConvert(String path, MapleData data, int def) {
+        if (data == null) {
+            return def;
+        }
         MapleData d = data.getChildByPath(path);
         if (d == null) {
             return def;

@@ -27,9 +27,6 @@
         <int name="effectAfter" value="900"/>
       </imgdir>
     </imgdir>
-    <int name="HPgaugeHide" value="1"/>
-    <int name="hpTagBgcolor" value="5"/>
-    <int name="hpTagColor" value="1"/>
   </imgdir>
   <imgdir name="move">
     <canvas name="0" width="287" height="259">
