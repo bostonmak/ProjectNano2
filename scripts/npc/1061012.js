@@ -6,7 +6,10 @@
 
 function start() {
     if (cm.getQuestStatus(6108) == 1) {
-	var ret = checkJob();
+	cm.sendYesNo("Would you like to learn concentrate? This quest is currently being fixed.");
+	cm.teachSkill(3121008, 0, 10);
+	
+	/*var ret = checkJob();
 	if (ret == -1) {
 	    cm.sendOk("Please form a party and talk to me again.");
 	} else if (ret == 0) {
@@ -27,9 +30,11 @@ function start() {
                 }
 	    }
 	}
+	*/
     }
     else {
         cm.sendOk("You're not allowed to enter the other world with unknown reason.");
+
     }
     
     cm.dispose();

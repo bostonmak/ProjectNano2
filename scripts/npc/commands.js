@@ -223,7 +223,7 @@ function writeSolaxiaCommandsLv0() {    //Common
         addCommand("online", "Shows all online players");
         addCommand("gm", "message's an online GM");
         addCommand("reportbug", "");
-	//addCommand("points", "");
+	    addCommand("points", "displays how many vote points you have");
         addCommand("joinevent", "Warps to GM Event");
         addCommand("leaveevent", "");
         addCommand("ranks", "");
