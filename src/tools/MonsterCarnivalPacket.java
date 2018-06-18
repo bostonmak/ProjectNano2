@@ -9,7 +9,7 @@ public class MonsterCarnivalPacket {
     public static byte[] startCPQ(MapleCharacter chr) {
         MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
         mplew.writeShort(SendOpcode.MONSTER_CARNIVAL_START.getValue());
-        mplew.write(chr.getTeam()); //team
+        mplew.write(chr.getMCPQTeam().code); //team
         mplew.writeShort(chr.getAvailableCP()); //Available CP
         mplew.writeShort(chr.getTotalCP()); //Total Obtained CP
         mplew.writeShort(chr.getMCPQField().getRed().getAvailableCP()); //Available CP of the team

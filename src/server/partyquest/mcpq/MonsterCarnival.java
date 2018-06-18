@@ -159,7 +159,7 @@ public class MonsterCarnival {
     // Game Constants
     public static final int CP_LOSS_ON_DEATH = 10;
     public static final int TIME_PREBATTLE = 10;
-    public static final int TIME_BATTLE = 600;
+    public static final int TIME_BATTLE = 100;
 
     public static final int TIME_LOBBYWAIT = 180;
 

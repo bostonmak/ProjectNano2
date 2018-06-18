@@ -1127,10 +1127,11 @@ public class MapleMap {
         monster.setHpZero();
         removeMapObject(monster);
         
-        if (monster.getCP() > 0 && chr.getCarnival() != null) {
-            chr.getCarnivalParty().addCP(chr, monster.getCP());
-            chr.announce(MaplePacketCreator.updateCP(chr.getCP(), chr.getObtainedCP()));
-            broadcastMessage(MaplePacketCreator.updatePartyCP(chr.getCarnivalParty()));
+        if (monster.getCP() > 0 && chr.getMCPQField() != null && chr.getMCPQParty() != null) {
+            chr.getMCPQParty().gainCP(monster.getCP());
+            chr.gainCP(monster.getCP());
+            chr.announce(MaplePacketCreator.updateCP(chr.getCP(), chr.getTotalCP()));
+            broadcastMessage(MaplePacketCreator.updatePartyCP(chr.getMCPQParty()));
             //they drop items too ):
         }
         if (monster.getId() >= 8800003 && monster.getId() <= 8800010) {
