@@ -25,6 +25,8 @@ import client.MapleClient;
 import client.inventory.Item;
 import java.awt.Point;
 import java.util.concurrent.locks.Lock;
+
+import constants.ServerConstants;
 import tools.locks.MonitoredReentrantLock;
 import tools.MaplePacketCreator;
 import tools.locks.MonitoredLockType;
@@ -96,9 +98,17 @@ public class MapleMapItem extends AbstractMapleMapObject {
     public final int getOwnerId() {
 	return character_ownerid;
     }
+
+    public final boolean isFFADrop() {
+        return type == 2 || type == 3 || hasExpiredOwnershipTime();
+    }
+
+    public final boolean hasExpiredOwnershipTime() {
+        return System.currentTimeMillis() - dropTime >= ServerConstants.ITEM_LOOT_DELAY;
+    }
     
     public final boolean canBePickedBy(MapleCharacter chr) {
-        if (character_ownerid <= 0) return true;
+        if (character_ownerid <= 0 || isFFADrop()) return true;
         
         if (party_ownerid == -1) {
             if (chr.getId() == character_ownerid) {
@@ -116,7 +126,7 @@ public class MapleMapItem extends AbstractMapleMapObject {
             }
         }
         
-        return System.currentTimeMillis() - dropTime >= 15 * 1000;
+        return hasExpiredOwnershipTime();
     }
     
     public final MapleClient getOwnerClient() {

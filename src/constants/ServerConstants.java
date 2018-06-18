@@ -108,6 +108,7 @@ public class ServerConstants {
     public static final int LOCK_MONITOR_TIME = 30 * 1000;      //Waiting time for a lock to be released. If it reach timed out, a critical server deadlock has made present.
     public static final int ITEM_EXPIRE_CHECK = 10 * 1000;      //Interval between item expiring tasks on maps, which checks and makes disappear expired items.
     public static final int ITEM_LIMIT_ON_MAP = 100;            //Max number of items allowed on a map.
+    public static final int ITEM_LOOT_DELAY = 0 * 1000;
     
     //Some Gameplay Enhancing Configurations
     //Scroll Configuration
