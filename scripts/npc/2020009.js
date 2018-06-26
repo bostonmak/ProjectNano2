@@ -25,8 +25,17 @@ var job;
 var sel;
 actionx = {"Mental" : false, "Physical" : false};
 
+function isMage(jobId) {
+    if (parseInt(jobId / 100) == 2) { //explorer
+        return true;
+    } else if (parseInt(jobId / 100) == 12) { //blazewiz
+        return true;
+    }
+    return false;
+}
+
 function start() {
-    if (!(cm.getPlayer().getLevel() >= 70 && parseInt(cm.getJobId() / 100) == 2)){
+    if (!(cm.getPlayer().getLevel() >= 70 && isMage(cm.getJobId()))){
 	    cm.sendNext("Hi there.");
 		cm.dispose();
 		return;

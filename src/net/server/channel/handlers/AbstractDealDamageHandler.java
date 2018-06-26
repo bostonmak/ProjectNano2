@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.AbstractMaplePacketHandler;
-import server.MapleItemInformationProvider;
+//import server.MapleItemInformationProvider;
 import server.MapleStatEffect;
 import server.TimerManager;
 import server.life.Element;
@@ -43,7 +43,7 @@ import server.maps.MapleMap;
 import server.maps.MapleMapItem;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
-import server.partyquest.Pyramid;
+//import server.partyquest.Pyramid;
 import tools.MaplePacketCreator;
 import tools.Pair;
 import tools.Randomizer;
@@ -55,13 +55,13 @@ import client.MapleStat;
 import client.Skill;
 import client.SkillFactory;
 import client.autoban.AutobanFactory;
-import client.inventory.Equip;
-import client.inventory.Item;
-import client.inventory.MapleInventoryType;
+//import client.inventory.Equip;
+//import client.inventory.Item;
+//import client.inventory.MapleInventoryType;
 import client.status.MonsterStatus;
 import client.status.MonsterStatusEffect;
 import constants.GameConstants;
-import constants.ItemConstants;
+//import constants.ItemConstants;
 import constants.ServerConstants;
 import constants.skills.Aran;
 import constants.skills.Assassin;
@@ -460,10 +460,16 @@ public abstract class AbstractDealDamageHandler extends AbstractMaplePacketHandl
                             }
                         }
                     }
-                    if (totDamageToOneMonster > 0 && attackEffect != null && attackEffect.getMonsterStati().size() > 0) {
-                        if (attackEffect.makeChanceResult()) {
-                            monster.applyStatus(player, new MonsterStatusEffect(attackEffect.getMonsterStati(), theSkill, null, false), attackEffect.isPoison(), attackEffect.getDuration());
-                        }
+                  //  if (totDamageToOneMonster > 0 && attackEffect != null && attackEffect.getMonsterStati().size() > 0) {
+                       // if (attackEffect.makeChanceResult()) {
+                        //    monster.applyStatus(player, new MonsterStatusEffect(attackEffect.getMonsterStati(), theSkill, null, false), attackEffect.isPoison(), attackEffect.getDuration());
+                     if (totDamageToOneMonster > 0 && attackEffect != null) {
+                        Map<MonsterStatus, Integer> attackEffectStati = attackEffect.getMonsterStati();
+                        if(!attackEffectStati.isEmpty()) {
+                            if (attackEffect.makeChanceResult()) {
+                                monster.applyStatus(player, new MonsterStatusEffect(attackEffectStati, theSkill, null, false), attackEffect.isPoison(), attackEffect.getDuration());
+                            }   
+                }
                     }                 
                     if (attack.isHH && !monster.isBoss()) {
                         map.damageMonster(player, monster, monster.getHp() - 1);

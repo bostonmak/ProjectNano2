@@ -276,6 +276,7 @@ public class Commands {
 
 	static {
 		//gotomaps.put("gmmap", 180000000);
+                gotomaps.put("home", 209080100);
 		gotomaps.put("southperry", 60000);
 		gotomaps.put("amherst", 1000000);
 		gotomaps.put("henesys", 100000000);
@@ -358,7 +359,7 @@ public class Commands {
                 case "help":
 		case "commands":
                 case "playercommands":
-                        c.getAbstractPlayerInteraction().openNpc(9201143, "commands");
+                        c.getAbstractPlayerInteraction().openNpc(9209101, "commands");
                         break;
                 
                 case "droplimit":

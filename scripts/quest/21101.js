@@ -45,7 +45,10 @@ function start(mode, type, selection) {
             qm.gainItem(1142129, true);
             
             qm.changeJobById(2100);
-            qm.resetStats();
+            if(qm.getRebirths() == 0)
+                    {
+                    qm.resetStats();
+                    }
             
             //qm.teachSkill(21000000, 0, 10, -1);   //learned later...
             //qm.teachSkill(21001003, 0, 20, -1);   //learned later...

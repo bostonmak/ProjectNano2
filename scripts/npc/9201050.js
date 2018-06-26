@@ -100,7 +100,7 @@ function action(mode, type, selection) {
                     status -= 2;
                     break;
                 case 10:
-                    if (cm.getLevel() >= minlevel) {
+                    if (cm.getLevel() >= minlevel(21) {
                         cm.sendNext("No problem. I'll give you something nice if you answer them correctly!");
                         cm.startQuest(4900);
                     }

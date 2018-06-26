@@ -144,7 +144,7 @@ function monsterValue(eim, mobId) {
 
 function playerUnregistered(eim, player) {
     if(eim.isEventCleared()) {
-        em.completeQuest(player, 100200, 2030010);
+        em.completeQuest(player, 100201, 2030010);
     }
 }
 
@@ -180,6 +180,7 @@ function monsterKilled(mob, eim) {
         eim.setIntProperty("defeatedBoss", 1);
         eim.showClearEffect(mob.getMap().getId());
         eim.clearPQ();
+		em.completeQuest(player, 100201, 2030010);
         
         mob.getMap().broadcastZakumVictory();
     }

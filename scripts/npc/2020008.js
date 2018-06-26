@@ -26,9 +26,12 @@ var sel;
 actionx = {"Mental" : false, "Physical" : false};
 
 function isWarriorOrAran(jobId) {
-    if (parseInt(jobId / 100) == 1) {
+    if (parseInt(jobId / 100) == 1) { //explorer
         return true;
-    } else if (parseInt(jobId / 100) == 21) {
+    } else if (parseInt(jobId / 100) == 21) { //aran
+        return true;
+    }
+	else if (parseInt(jobId / 100) == 11) { //cygnus
         return true;
     }
     return false;

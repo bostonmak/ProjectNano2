@@ -25,8 +25,17 @@ var job;
 var sel;
 actionx = {"Mental" : false, "Physical" : false};
 
+function isPirate(jobId) {
+    if (parseInt(jobId / 100) == 5) { //explorer
+        return true;
+    } else if (parseInt(jobId / 100) == 15) { //Pirate
+        return true;
+    }
+    return false;
+}
+
 function start() {
-    if (!(cm.getPlayer().getLevel() >= 70 && parseInt(cm.getJobId() / 100) == 5)){
+     if (!(cm.getPlayer().getLevel() >= 70 && isPirate(cm.getJobId()))){
         cm.sendNext("Hi there.");
         cm.dispose();
         return;

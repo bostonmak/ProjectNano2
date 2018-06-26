@@ -22,25 +22,28 @@
 package net.server.channel.handlers;
 
 import client.*;
-import client.inventory.Equip;
-import client.inventory.Item;
+//import client.inventory.Equip;
+//import client.inventory.Item;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+//import java.sql.Connection;
+//import java.sql.PreparedStatement;
+//import java.sql.ResultSet;
+//import java.sql.SQLException;
+//import java.util.ArrayList;
+//import java.util.List;
 
-import constants.ServerConstants;
+//import constants.ServerConstants;
 import net.AbstractMaplePacketHandler;
-import net.server.Server;
-import server.MTSItemInfo;
-import server.maps.MapleMiniDungeonInfo;
-import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
+//import net.server.Server;
+//import server.MTSItemInfo;
+//import server.MaplePortal;
+//import server.maps.MapleMap;
+//import server.maps.MapleMiniDungeonInfo;
+//import tools.DatabaseConnection;
+//import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
+/*
 public final class EnterMTSHandler extends AbstractMaplePacketHandler {
     @Override
     public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
@@ -240,4 +243,15 @@ public final class EnterMTSHandler extends AbstractMaplePacketHandler {
         }
         return items;
     }
+}
+*/
+public class EnterMTSHandler extends AbstractMaplePacketHandler {
+    @Override
+       public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+             if ((c.getPlayer().getMapId() != 209080100)){
+				c.getPlayer().changeMap(209080100, 0);
+                                
+              
+       }
+}
 }

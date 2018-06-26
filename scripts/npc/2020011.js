@@ -24,9 +24,17 @@ status = -1;
 var job;
 var sel;
 actionx = {"Mental" : false, "Physical" : false};
+function isThief(jobId) {
+    if (parseInt(jobId / 100) == 4) { //explorer
+        return true;
+    } else if (parseInt(jobId / 100) == 14) { //NightWalker
+        return true;
+    }
+    return false;
+}
 
 function start() {
-    if (!(cm.getPlayer().getLevel() >= 70 && parseInt(cm.getJobId() / 100) == 4)){
+     if (!(cm.getPlayer().getLevel() >= 70 && isThief(cm.getJobId()))){
         cm.sendNext("Hi there.");
         cm.dispose();
         return;

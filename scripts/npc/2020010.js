@@ -27,8 +27,17 @@ var job;
 var sel;
 actionx = {"Mental" : false, "Physical" : false};
 
+function isArcher(jobId) {
+    if (parseInt(jobId / 100) == 3) { //explorer
+        return true;
+    } else if (parseInt(jobId / 100) == 13) { //windarcher
+        return true;
+    }
+    return false;
+}
+
 function start() {
-    if (!(cm.getPlayer().getLevel() >= 70 && parseInt(cm.getJobId() / 100) == 3)){
+     if (!(cm.getPlayer().getLevel() >= 70 && isArcher(cm.getJobId()))){
 	    cm.sendNext("Hi there.");
 		cm.dispose();
 		return;

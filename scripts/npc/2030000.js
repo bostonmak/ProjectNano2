@@ -35,6 +35,7 @@ function start() {
     cm.sendNext("Hey, you look like you want to go farther and deeper past this place. Over there, though, you'll find yourself surrounded by aggressive, dangerous monsters, so even if you feel that you're ready to go, please be careful. Long ago, a few brave men from our town went in wanting to eliminate anyone threatening the town, but never came back out...");
 }
 
+
 function action(mode, type, selection) {
     if (mode == -1)
         cm.dispose();

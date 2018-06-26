@@ -66,6 +66,7 @@ function action(mode, type, selection) {
                         cm.dispose();
                     } else if (selection === 1) {
                         cm.getPlayer().rebirthToNoblesse();
+						cm.warp(130030000, 0);
                         cm.dispose();
                     } else if (selection === 2) {
                         cm.getPlayer().rebirthToLegend();
