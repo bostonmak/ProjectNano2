@@ -2694,10 +2694,30 @@ public void saveInventory() throws SQLException {
                                 }
                             }
                         }
-                        for (Item item : toberemove) {
-                            MapleInventoryManipulator.removeFromSlot(client, inv.getType(), item.getPosition(), item.getQuantity(), true);
+                        //for (Item item : toberemove) {
+                          //  MapleInventoryManipulator.removeFromSlot(client, inv.getType(), item.getPosition(), item.getQuantity(), true);
+                        if(!toberemove.isEmpty()) {
+                            for (Item item : toberemove) {
+                                MapleInventoryManipulator.removeFromSlot(client, inv.getType(), item.getPosition(), item.getQuantity(), true);
+                            }
+
+                            MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
+                            for (Item item : toberemove) {
+                                List<Integer> toadd = new ArrayList<>();
+                                Pair<Integer, String> replace = ii.getReplaceOnExpire(item.getItemId());
+                                if (replace.left > 0) {
+                                    toadd.add(replace.left);
+                                    if (replace.right != null)
+                                        dropMessage(replace.right);
+                                }
+                                for (Integer itemid : toadd) {
+                                    MapleInventoryManipulator.addById(client, itemid, (short) 1);
+                                }
+                            }
+
+                            toberemove.clear();
                         }
-                        toberemove.clear();
+                       // toberemove.clear();
                         
                         if(deletedCoupon) {
                             updateCouponRates();
@@ -6817,7 +6837,7 @@ public void saveInventory() throws SQLException {
     private final String TASK_FAILED = "FAILED";
     private final String TASK_IN_PROGROESS = "IN PROGRESS";
 
-    public void saveToDB() {
+    /*public void saveToDB() {
         if(ServerConstants.USE_AUTOSAVE) {
             SaveToDBRunnable saveToDBRunnable = new SaveToDBRunnable(this);
             Thread t = new Thread(saveToDBRunnable);  //spawns a new thread to deal with this
@@ -6842,6 +6862,42 @@ public void saveInventory() throws SQLException {
         if(notAutosave) FilePrinter.print(FilePrinter.SAVING_CHARACTER, "Attempting to save " + name + " at " + c.getTime().toString());
         else FilePrinter.print(FilePrinter.AUTOSAVING_CHARACTER, "Attempting to autosave " + name + " at " + c.getTime().toString());
         
+        Connection con = null;
+        try {
+            con = DatabaseConnection.getConnection();
+    */
+    public void saveToDB() {
+        if(ServerConstants.USE_AUTOSAVE) {
+            
+            Runnable r = new Runnable() {
+                
+                @Override
+                public void run() {
+                    saveToDB(true);
+                    
+                }
+            };
+
+            Thread t = new Thread(r);  //spawns a new thread to deal with this
+            t.start();
+        } else {
+            saveToDB(true);
+        }
+    }
+
+    //ItemFactory saveItems and monsterbook.saveCards are the most time consuming here.
+    public synchronized void saveToDB(boolean notAutosave) {
+        boolean taskSuccess = false;
+        long startTaskTime = System.currentTimeMillis();
+        MapleLogger.info("Task: {}, Character: {}, Status: {}",
+                TASK_NAME, this.getName(), "STARTING");
+        if(!loggedIn) return;
+
+        Calendar c = Calendar.getInstance();
+
+        if(notAutosave) FilePrinter.print(FilePrinter.SAVING_CHARACTER, "Attempting to save " + name + " at " + c.getTime().toString());
+        else FilePrinter.print(FilePrinter.AUTOSAVING_CHARACTER, "Attempting to autosave " + name + " at " + c.getTime().toString());
+
         Connection con = null;
         try {
             con = DatabaseConnection.getConnection();
@@ -6970,6 +7026,7 @@ public void saveInventory() throws SQLException {
             if (updateRows < 1) {
                 throw new RuntimeException("Character not in database (" + id + ")");
             }
+            
             MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Save Character", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - startTaskTime);
             long lastTaskTime = System.currentTimeMillis();

@@ -206,7 +206,7 @@ function writeSolaxiaCommandsLv0() {    //Common
         comm_cursor = comm_lv0;
         desc_cursor = desc_lv0;
 
-
+		addCommand("goto home", "Trade button also works to be transported to the projectnano homebase");
         addCommand("droplimit", "");
         addCommand("time", "");
         addCommand("credits", "");
