@@ -2258,7 +2258,6 @@ public void saveInventory() throws SQLException {
         this.setLevel(1);
         this.setExp(0);
         this.setJob(jobToRebirthInto);
-        this.setRebirths(this.getRebirths() + 1);
 
         List<Pair<MapleStat, Integer>> rebirthStats = new ArrayList<>();
         rebirthStats.add(new Pair<>(MapleStat.LEVEL, 1));
@@ -2267,15 +2266,15 @@ public void saveInventory() throws SQLException {
         this.announce(MaplePacketCreator.updatePlayerStats(rebirthStats, this));
 
         final int GOLDEN_MAPLE_LEAF_ID = 4001168;
-        final int NUMBER_OF_ITEMS_REQUIRED_TO_REBIRTH = 1;
         MapleInventoryManipulator.removeById(
             this.client,
             ItemConstants.getInventoryType(GOLDEN_MAPLE_LEAF_ID),
             GOLDEN_MAPLE_LEAF_ID,
-            NUMBER_OF_ITEMS_REQUIRED_TO_REBIRTH,
+            this.getNumberOfItemsRequiredToRebirth(),
             false,
             false
         );
+        this.setRebirths(this.getRebirths() + 1);
 
         final String REBIRTH_NOTICE_MESSAGE = "[Notice] " + this.getName() + " has just rebirthed! They have rebirthed " + this.getRebirths() + " time(s)!";
         Server.getInstance().broadcastMessage(
@@ -2287,6 +2286,10 @@ public void saveInventory() throws SQLException {
     public void rebirthToBeginner() { this.rebirth(MapleJob.BEGINNER); }
     public void rebirthToNoblesse() { this.rebirth(MapleJob.NOBLESSE); }
     public void rebirthToLegend() { this.rebirth(MapleJob.LEGEND); }
+
+    public int getNumberOfItemsRequiredToRebirth() {
+        return this.getRebirths() + 1;
+    }
 
     public void disableDoorSpawn() {
         canDoor = false;

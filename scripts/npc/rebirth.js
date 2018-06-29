@@ -26,7 +26,6 @@ function writeJobSelections() {
 
 var status;
 var GOLDEN_MAPLE_LEAF_ID = 4001168;
-var NUMBER_OF_ITEMS_REQUIRED_TO_REBIRTH = 1;
 var NAME_OF_ITEM_REQUIRED_TO_REBIRTH = "Golden Maple Leaf";
 
 function start() {
@@ -60,7 +59,10 @@ function action(mode, type, selection) {
             cm.sendSimple(sendStr);
         } else if (status === 1) {
             if (cm.getPlayer().isMaxLevel()) {
-                if (cm.getPlayer().haveItemWithId(GOLDEN_MAPLE_LEAF_ID, false)) {
+                if (
+                    cm.getPlayer().haveItemWithId(GOLDEN_MAPLE_LEAF_ID, false) &&
+                    cm.getPlayer().getItemQuantity(GOLDEN_MAPLE_LEAF_ID, false) >= cm.getPlayer().getNumberOfItemsRequiredToRebirth()
+                ) {
                     if (selection === 0) {
                         cm.getPlayer().rebirthToBeginner();
                         cm.dispose();
@@ -73,7 +75,7 @@ function action(mode, type, selection) {
                         cm.dispose();
                     }
                 } else {
-                    cm.sendOk("You cannot rebirth. You are missing " + NUMBER_OF_ITEMS_REQUIRED_TO_REBIRTH + " " + NAME_OF_ITEM_REQUIRED_TO_REBIRTH + ".")
+                    cm.sendOk("You cannot rebirth. You are missing " + cm.getPlayer().getNumberOfItemsRequiredToRebirth() + " " + NAME_OF_ITEM_REQUIRED_TO_REBIRTH + ".")
                 }
             } else {
                 cm.sendOk("You cannot rebirth. You do not meet the level requirement to rebirth.");
