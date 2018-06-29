@@ -10,12 +10,23 @@ import server.maps.FieldLimit;
  * @author Ronan
  */
 public class GameConstants {
+    private static GameConstants gameConstants = new GameConstants();
+
+    private GameConstants() { }
+
+    public static GameConstants getInstance() {
+        return gameConstants;
+    }
+
     private static final int BEGINNER_MAX_LEVEL = 10;
     private static final int FIRST_JOB_MAX_LEVEL = 30;
     private static final int SECOND_JOB_MAX_LEVEL = 70;
     private static final int THIRD_JOB_MAX_LEVEL = 120;
     private static final int FOURTH_JOB_MAX_LEVEL = 200;
     private static final int CHARACTER_MAX_LEVEL = 200;
+
+    private static final int ITEM_ID_USED_FOR_REBIRTH = 4001168;
+    private static final String ITEM_NAME_USED_FOR_REBIRTH = "Golden Maple Leaf";
 
     public static final int[] OWL_DATA = new int[]{1082002, 2070005, 2070006, 1022047, 1102041, 2044705, 2340000, 2040017, 1092030, 2040804};
     
@@ -262,5 +273,13 @@ public class GameConstants {
             default:
                 return i + sufixes[i % 10];
         }
+    }
+
+    public static int getItemIdUsedForRebirth() {
+        return ITEM_ID_USED_FOR_REBIRTH;
+    }
+
+    public static String getItemNameUsedForRebirth() {
+        return ITEM_NAME_USED_FOR_REBIRTH;
     }
 }

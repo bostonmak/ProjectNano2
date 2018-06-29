@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import constants.GameConstants;
 import net.server.Server;
 import net.server.channel.Channel;
 import net.server.guild.MapleGuild;
@@ -946,4 +947,8 @@ public class AbstractPlayerInteraction {
         public boolean startDungeonInstance(int dungeonid) {
                 return c.getChannelServer().addMiniDungeon(dungeonid);
         }
+
+	public GameConstants getGameConstantsInstance() {
+		return GameConstants.getInstance();
+	}
 }

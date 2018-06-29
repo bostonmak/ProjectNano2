@@ -2265,11 +2265,10 @@ public void saveInventory() throws SQLException {
         rebirthStats.add(new Pair<>(MapleStat.JOB, jobToRebirthInto.getId()));
         this.announce(MaplePacketCreator.updatePlayerStats(rebirthStats, this));
 
-        final int GOLDEN_MAPLE_LEAF_ID = 4001168;
         MapleInventoryManipulator.removeById(
             this.client,
-            ItemConstants.getInventoryType(GOLDEN_MAPLE_LEAF_ID),
-            GOLDEN_MAPLE_LEAF_ID,
+            ItemConstants.getInventoryType(GameConstants.getItemIdUsedForRebirth()),
+            GameConstants.getItemIdUsedForRebirth(),
             this.getNumberOfItemsRequiredToRebirth(),
             false,
             false
