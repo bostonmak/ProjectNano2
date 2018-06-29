@@ -329,6 +329,8 @@ public class Commands {
                 gotomaps.put("fog", 105040306);
                 gotomaps.put("mp3", 541000300);
                 gotomaps.put("wolfspider", 600020300);
+                gotomaps.put("ulu", 541020000);
+                gotomaps.put("castle", 800040000);
 	}
         
         private static void hardsetItemStats(Equip equip, short stat) {
@@ -1351,89 +1353,7 @@ public class Commands {
 			player.setHpMp(30000);
                     break;
                     
-                case "item":
-                case "drop":
-                        if (sub.length < 2){
-				player.yellowMessage("Syntax: !item <itemid> <quantity>");
-				break;
-			}
-                        
-			int itemId = Integer.parseInt(sub[1]);
-                        MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-                        
-                        if(ii.getName(itemId) == null) {
-                                player.yellowMessage("Item id '" + sub[1] + "' does not exist.");
-                                break;
-                        }
-                        
-                        short quantity = 1;
-                        if(sub.length >= 3) quantity = Short.parseShort(sub[2]);
-			
-                        if (ServerConstants.BLOCK_GENERATE_CASH_ITEM && ii.isCash(itemId)) {
-                                player.yellowMessage("You cannot create a cash item with this command.");
-                                break;
-                        }
-                        
-                        if (ItemConstants.isPet(itemId)) {
-                                if (sub.length >= 3){   // thanks to istreety & TacoBell
-                                        quantity = 1;
-                                        long days = Math.max(1, Integer.parseInt(sub[2]));
-                                        long expiration = System.currentTimeMillis() + (days * 24 * 60 * 60 * 1000);
-                                        int petid = MaplePet.createPet(itemId);
-                                        
-                                        if(sub[0].equals("item")) {
-                                                MapleInventoryManipulator.addById(c, itemId, quantity, player.getName(), petid, expiration);
-                                        } else {
-                                                Item toDrop = new Item(itemId, (short) 0, quantity, petid);
-                                                toDrop.setExpiration(expiration);
-                                                
-                                                toDrop.setOwner("");
-                                                if(player.gmLevel() < 3) {
-                                                        byte b = toDrop.getFlag();
-                                                        b |= ItemConstants.ACCOUNT_SHARING;
-                                                        b |= ItemConstants.UNTRADEABLE;
-
-                                                        toDrop.setFlag(b);
-                                                }
-
-                                                c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), toDrop, c.getPlayer().getPosition(), true, true);
-                                        }
-                                        
-                                        break;
-                                } else {
-                                        player.yellowMessage("Pet Syntax: !item <itemid> <expiration>");
-                                        break;        
-                                }
-                        }
-                        
-			if (sub[0].equals("item")) {
-				byte flag = 0;
-                                if(player.gmLevel() < 3) {
-                                        flag |= ItemConstants.ACCOUNT_SHARING;
-                                        flag |= ItemConstants.UNTRADEABLE;
-                                }
-                                
-                                MapleInventoryManipulator.addById(c, itemId, quantity, player.getName(), -1, flag, -1);
-			} else {
-				Item toDrop;
-				if (ItemConstants.getInventoryType(itemId) == MapleInventoryType.EQUIP) {
-					toDrop = ii.getEquipById(itemId);
-				} else {
-					toDrop = new Item(itemId, (short) 0, quantity);
-				}
-                                
-                                toDrop.setOwner(player.getName());
-                                if(player.gmLevel() < 3) {
-                                    byte b = toDrop.getFlag();
-                                    b |= ItemConstants.ACCOUNT_SHARING;
-                                    b |= ItemConstants.UNTRADEABLE;
-                                    
-                                    toDrop.setFlag(b);
-                                }
-                                
-				c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), toDrop, c.getPlayer().getPosition(), true, true);
-			}
-                    break; 
+                 
                     
                 case "level":
                         if (sub.length < 2){
@@ -1570,62 +1490,7 @@ public class Commands {
                                 player.gainMeso(Integer.parseInt(sub[1]), true);
                         }
                     break;
-                    
-                case "search":
-                        if (sub.length < 3){
-				player.yellowMessage("Syntax: !search <type> <name>");
-				break;
-			}
-                    
-			StringBuilder sb = new StringBuilder();
-			
-                        String search = joinStringFrom(sub, 2);
-                        long start = System.currentTimeMillis();//for the lulz
-                        MapleData data = null;
-                        MapleDataProvider dataProvider = MapleDataProviderFactory.getDataProvider(new File("wz/String.wz"));
-                        if (!sub[1].equalsIgnoreCase("ITEM")) {
-                                if (sub[1].equalsIgnoreCase("NPC")) {
-                                        data = dataProvider.getData("Npc.img");
-                                } else if (sub[1].equalsIgnoreCase("MOB") || sub[1].equalsIgnoreCase("MONSTER")) {
-                                        data = dataProvider.getData("Mob.img");
-                                } else if (sub[1].equalsIgnoreCase("SKILL")) {
-                                        data = dataProvider.getData("Skill.img");
-                                /*} else if (sub[1].equalsIgnoreCase("MAP")) {
-                                        TODO
-                                */
-                                } else {
-                                        sb.append("#bInvalid search.\r\nSyntax: '!search [type] [name]', where [type] is NPC, ITEM, MOB, or SKILL.");
-                                }
-                                if (data != null) {
-                                        String name;
-                                        for (MapleData searchData : data.getChildren()) {
-                                                name = MapleDataTool.getString(searchData.getChildByPath("name"), "NO-NAME");
-                                                if (name.toLowerCase().contains(search.toLowerCase())) {
-                                                        sb.append("#b").append(Integer.parseInt(searchData.getName())).append("#k - #r").append(name).append("\r\n");
-                                                }
-                                        }
-                                }
-                        } else {
-                                for (Pair<Integer, String> itemPair : MapleItemInformationProvider.getInstance().getAllItems()) {
-                                        if (sb.length() < 32654) {//ohlol
-                                                if (itemPair.getRight().toLowerCase().contains(search.toLowerCase())) {
-                                                        //#v").append(id).append("# #k- 
-                                                        sb.append("#b").append(itemPair.getLeft()).append("#k - #r").append(itemPair.getRight()).append("\r\n");
-                                                }
-                                        } else {
-                                                sb.append("#bCouldn't load all items, there are too many results.\r\n");
-                                                break;
-                                        }
-                                }
-                        }
-                        if (sb.length() == 0) {
-                                sb.append("#bNo ").append(sub[1].toLowerCase()).append("s found.\r\n");
-                        }
-                        sb.append("\r\n#kLoaded within ").append((double) (System.currentTimeMillis() - start) / 1000).append(" seconds.");//because I can, and it's free
-			
-			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, sb.toString(), "00 00", (byte) 0));
-                    break;
-                    
+        
                 case "jail":
                         if (sub.length < 2) {
 				player.yellowMessage("Syntax: !jail <playername> [<minutes>]");
@@ -1803,7 +1668,146 @@ public class Commands {
                         }
                 break;
                     
-                case "fly":
+                case "item":
+                case "drop":
+                        if (sub.length < 2){
+				player.yellowMessage("Syntax: !item <itemid> <quantity>");
+				break;
+			}
+                        
+			int itemId = Integer.parseInt(sub[1]);
+                        MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
+                        
+                        if(ii.getName(itemId) == null) {
+                                player.yellowMessage("Item id '" + sub[1] + "' does not exist.");
+                                break;
+                        }
+                        
+                        short quantity = 1;
+                        if(sub.length >= 3) quantity = Short.parseShort(sub[2]);
+			
+                        if (ServerConstants.BLOCK_GENERATE_CASH_ITEM && ii.isCash(itemId)) {
+                                player.yellowMessage("You cannot create a cash item with this command.");
+                                break;
+                        }
+                        
+                        if (ItemConstants.isPet(itemId)) {
+                                if (sub.length >= 3){   // thanks to istreety & TacoBell
+                                        quantity = 1;
+                                        long days = Math.max(1, Integer.parseInt(sub[2]));
+                                        long expiration = System.currentTimeMillis() + (days * 24 * 60 * 60 * 1000);
+                                        int petid = MaplePet.createPet(itemId);
+                                        
+                                        if(sub[0].equals("item")) {
+                                                MapleInventoryManipulator.addById(c, itemId, quantity, player.getName(), petid, expiration);
+                                        } else {
+                                                Item toDrop = new Item(itemId, (short) 0, quantity, petid);
+                                                toDrop.setExpiration(expiration);
+                                                
+                                                toDrop.setOwner("");
+                                                if(player.gmLevel() < 3) {
+                                                        byte b = toDrop.getFlag();
+                                                        b |= ItemConstants.ACCOUNT_SHARING;
+                                                        b |= ItemConstants.UNTRADEABLE;
+
+                                                        toDrop.setFlag(b);
+                                                }
+
+                                                c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), toDrop, c.getPlayer().getPosition(), true, true);
+                                        }
+                                        
+                                        break;
+                                } else {
+                                        player.yellowMessage("Pet Syntax: !item <itemid> <expiration>");
+                                        break;        
+                                }
+                        }
+                        
+			if (sub[0].equals("item")) {
+				byte flag = 0;
+                                if(player.gmLevel() < 3) {
+                                        flag |= ItemConstants.ACCOUNT_SHARING;
+                                        flag |= ItemConstants.UNTRADEABLE;
+                                }
+                                
+                                MapleInventoryManipulator.addById(c, itemId, quantity, player.getName(), -1, flag, -1);
+			} else {
+				Item toDrop;
+				if (ItemConstants.getInventoryType(itemId) == MapleInventoryType.EQUIP) {
+					toDrop = ii.getEquipById(itemId);
+				} else {
+					toDrop = new Item(itemId, (short) 0, quantity);
+				}
+                                
+                                toDrop.setOwner(player.getName());
+                                if(player.gmLevel() < 3) {
+                                    byte b = toDrop.getFlag();
+                                    b |= ItemConstants.ACCOUNT_SHARING;
+                                    b |= ItemConstants.UNTRADEABLE;
+                                    
+                                    toDrop.setFlag(b);
+                                }
+                                
+				c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), toDrop, c.getPlayer().getPosition(), true, true);
+			}
+                    break;
+                    
+                    case "search":
+                        if (sub.length < 3){
+				player.yellowMessage("Syntax: !search <type> <name>");
+				break;
+			}
+                    
+			StringBuilder sb = new StringBuilder();
+			
+                        String search = joinStringFrom(sub, 2);
+                        long start = System.currentTimeMillis();//for the lulz
+                        MapleData data = null;
+                        MapleDataProvider dataProvider = MapleDataProviderFactory.getDataProvider(new File("wz/String.wz"));
+                        if (!sub[1].equalsIgnoreCase("ITEM")) {
+                                if (sub[1].equalsIgnoreCase("NPC")) {
+                                        data = dataProvider.getData("Npc.img");
+                                } else if (sub[1].equalsIgnoreCase("MOB") || sub[1].equalsIgnoreCase("MONSTER")) {
+                                        data = dataProvider.getData("Mob.img");
+                                } else if (sub[1].equalsIgnoreCase("SKILL")) {
+                                        data = dataProvider.getData("Skill.img");
+                                /*} else if (sub[1].equalsIgnoreCase("MAP")) {
+                                        TODO
+                                */
+                                } else {
+                                        sb.append("#bInvalid search.\r\nSyntax: '!search [type] [name]', where [type] is NPC, ITEM, MOB, or SKILL.");
+                                }
+                                if (data != null) {
+                                        String name;
+                                        for (MapleData searchData : data.getChildren()) {
+                                                name = MapleDataTool.getString(searchData.getChildByPath("name"), "NO-NAME");
+                                                if (name.toLowerCase().contains(search.toLowerCase())) {
+                                                        sb.append("#b").append(Integer.parseInt(searchData.getName())).append("#k - #r").append(name).append("\r\n");
+                                                }
+                                        }
+                                }
+                        } else {
+                                for (Pair<Integer, String> itemPair : MapleItemInformationProvider.getInstance().getAllItems()) {
+                                        if (sb.length() < 32654) {//ohlol
+                                                if (itemPair.getRight().toLowerCase().contains(search.toLowerCase())) {
+                                                        //#v").append(id).append("# #k- 
+                                                        sb.append("#b").append(itemPair.getLeft()).append("#k - #r").append(itemPair.getRight()).append("\r\n");
+                                                }
+                                        } else {
+                                                sb.append("#bCouldn't load all items, there are too many results.\r\n");
+                                                break;
+                                        }
+                                }
+                        }
+                        if (sb.length() == 0) {
+                                sb.append("#bNo ").append(sub[1].toLowerCase()).append("s found.\r\n");
+                        }
+                        sb.append("\r\n#kLoaded within ").append((double) (System.currentTimeMillis() - start) / 1000).append(" seconds.");//because I can, and it's free
+			
+			c.announce(MaplePacketCreator.getNPCTalk(9010000, (byte) 0, sb.toString(), "00 00", (byte) 0));
+                    break;
+                    
+                /*case "fly":
                         if (sub.length < 2) {
 				player.yellowMessage("Syntax: !fly <on/off>");
 				break;
@@ -1826,6 +1830,7 @@ public class Commands {
                         
                         player.dropMessage(6, sendStr);
                 break;
+                    */
                     
 		case "spawn":
                         if (sub.length < 2) {
@@ -2484,7 +2489,7 @@ public class Commands {
 				player.getMap().broadcastMessage(MaplePacketCreator.spawnNPC(npc));
 			}
 			break;
-                    
+                /*    
                 case "face":
                         if (sub.length < 2){
 				player.yellowMessage("Syntax: !face [<playername>] <faceid>");
@@ -2493,7 +2498,7 @@ public class Commands {
                     
                         try {
                                 if (sub.length == 2) {
-                                        int itemId = Integer.parseInt(sub[1]);
+                                       // int itemId = Integer.parseInt(sub[1]);
                                         if(!(itemId >= 20000 && itemId < 22000) || MapleItemInformationProvider.getInstance().getName(itemId) == null) {
                                                 player.yellowMessage("Face id '" + sub[1] + "' does not exist.");
                                                 break;
@@ -2503,7 +2508,7 @@ public class Commands {
                                         player.updateSingleStat(MapleStat.FACE, itemId);
                                         player.equipChanged();
                                 } else {
-                                        int itemId = Integer.parseInt(sub[2]);
+                                       // int itemId = Integer.parseInt(sub[2]);
                                         if(!(itemId >= 20000 && itemId < 22000) || MapleItemInformationProvider.getInstance().getName(itemId) == null) {
                                                 player.yellowMessage("Face id '" + sub[2] + "' does not exist.");
                                                 break;
@@ -2521,8 +2526,8 @@ public class Commands {
                         } catch(Exception e) {}
                         
 			break;
-                    
-                case "hair":
+                    */
+               /* case "hair":
                         if (sub.length < 2){
 				player.yellowMessage("Syntax: !hair [<playername>] <hairid>");
 				break;
@@ -2557,7 +2562,7 @@ public class Commands {
                                 }
                         } catch(Exception e) {}
 			break;
-                    
+                    */
                 default:
                         return false;
                 }
