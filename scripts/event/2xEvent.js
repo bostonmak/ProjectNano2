@@ -57,11 +57,13 @@ function cancelSchedule() {
 function start() {
    var world = Packages.net.server.Server.getInstance().getWorld(em.getChannelServer().getWorld());
    world.setExpRate(16);
-   world.broadcastPacket(Packages.tools.MaplePacketCreator.serverNotice(6, "The Bunny Onslaught Survival Scanner (BOSS) has detected an Easter Bunny onslaught soon! The GM team has activated the Emergency XP Pool (EXP) that doubles experience gained for the next two hours!"));
+   world.setDropRate(6);
+   world.broadcastPacket(Packages.tools.MaplePacketCreator.serverNotice(6, "[Event] Double Exp & Double Drop event has started!  "));
 }
 
 function stop() {
    var world = Packages.net.server.Server.getInstance().getWorld(em.getChannelServer().getWorld());
    world.setExpRate(8);
-   world.broadcastPacket(Packages.tools.MaplePacketCreator.serverNotice(6, "Unfortunately the Emergency XP Pool (EXP) has run out of juice for now and needs to recharge causing the EXP rate to go back to normal."));
+   world.setDropRate(3);
+   world.broadcastPacket(Packages.tools.MaplePacketCreator.serverNotice(6, "[Event] The Event has ended. "));
 }

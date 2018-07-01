@@ -137,7 +137,7 @@ public class ServerConstants {
     public static final boolean USE_EQUIPMNT_LVLUP_SLOTS = true;//Equips can upgrade slots at level up.
     public static final boolean USE_EQUIPMNT_LVLUP_POWER = true;//Enable more powerful stat upgrades at equip level up.
     public static final boolean USE_SPIKES_AVOID_BANISH = true; //Shoes equipped with spikes prevents mobs from banishing wearer.
-    public static final int MAX_EQUIPMNT_LVLUP_STAT_UP = 7; //Max stat upgrade an equipment can have on a levelup.
+    public static final int MAX_EQUIPMNT_LVLUP_STAT_UP = 3; //Max stat upgrade an equipment can have on a levelup.
     public static final int MAX_EQUIPMNT_STAT = 32767;          //Max stat on an equipment by leveling up.
     public static final int USE_EQUIPMNT_LVLUP = 5;             //All equips lvlup at max level of N, set 1 to disable.
     

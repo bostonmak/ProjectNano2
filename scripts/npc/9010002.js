@@ -29,7 +29,7 @@ function action(mode, type, selection) {
         else
             status--;
         if (status == 0) {
-            cm.sendSimple("Hello#b #h ##k, you currently have #b#c4001126# #v4001126#.#k \r\nWhat would you like to do?\r\n#k#L1# Buy 5,000 NX for 5mil#l\r\n\#L2# Buy 1 random chair for 5 Maple Leaves#l\r\n\#L3# Trade 1 leaf for 3 random Maple Weapons #l\r\n#L4#Trade 1 leaf for a 10 day Hired Merchant#l\r\n#L5#Trade 25 leaf for a #v4001168# (Required To Rebirth)#l#l\r\n#L6#Trade 50 leaf for one #v4001017# #l#l\r\n#L7#Trade 10 leaf for one #v1472063# for use in the Happyville raid! #l");
+            cm.sendSimple("Hello#b #h ##k, you currently have #b#c4001126# #v4001126#.#k \r\nWhat would you like to do?\r\n#k#L1# Buy 5,000 NX for 5mil#l\r\n\#L2# Buy 1 random chair for 5 Maple Leaves#l\r\n\#L3# Trade 1 leaf for 3 random Maple Weapons #l\r\n#L4#Trade 1 leaf for a 10 day Hired Merchant#l\r\n#L5#Trade 50 leaf for a #v4001168# (Required To Rebirth)#l#l\r\n#L6#Trade 50 leaf for one #v4001017# #l#l\r\n#L7#Trade 10 leaf for one #v1472063# for use in the Happyville raid! #l");
         } else if (status == 1) {
             if (selection == 1) {
                 if(cm.getMeso() >= 5000000) {
@@ -97,11 +97,11 @@ function action(mode, type, selection) {
 				cm.dispose();
 			}
 else if (selection == 5) {
-                if(cm.haveItem(leaf, 25)) {
-					var goldenleaf = 4001168;
+                if(cm.haveItem(leaf, 50)) {
+					var goldenleaf = 4000313;
 					if(!cm.getPlayer().getInventory(Packages.client.inventory.MapleInventoryType.EQUIP).isFull(2)){
 						cm.gainItem(goldenleaf, 1);
-						cm.gainItem(leaf, -25);
+						cm.gainItem(leaf, -50);
 						cm.sendOk("Enjoy your Golden Maple Leaf");
 						cm.logLeaf("1 Golden Maple Leaf");
 					} else {
