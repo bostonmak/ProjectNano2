@@ -331,6 +331,7 @@ public class Commands {
                 gotomaps.put("wolfspider", 600020300);
                 gotomaps.put("ulu", 541020000);
                 gotomaps.put("castle", 800040000);
+                gotomaps.put("fob", 130030000);
 	}
         
         private static void hardsetItemStats(Equip equip, short stat) {
@@ -381,6 +382,10 @@ public class Commands {
 			break;
             case "rebirth":
                 c.getAbstractPlayerInteraction().openNpc(9201143, "rebirth");
+                break;
+                
+                case "storage":
+                c.getAbstractPlayerInteraction().openNpc(1012009, "storage");
                 break;
 
                 case "recharge":

@@ -24,7 +24,7 @@
 	2x EXP Event Script
 -- Author --------------------------------------------------------------------------------------
 	Twdtwd
-**/
+
 
 var timer1;
 var timer2;
@@ -67,3 +67,4 @@ function stop() {
    world.setDropRate(3);
    world.broadcastPacket(Packages.tools.MaplePacketCreator.serverNotice(6, "[Event] The Event has ended. "));
 }
+**/
