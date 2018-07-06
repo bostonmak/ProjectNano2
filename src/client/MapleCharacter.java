@@ -567,7 +567,7 @@ public void saveInventory() throws SQLException {
                     deleteFromInventoryItemsTableQuery.setInt(1, allCharacterItemsResult.getInt("inventoryitemid"));
                     deleteFromInventoryItemsTableQuery.addBatch();
 
-                } else if (!current.equals(thisItem)) {
+                } else if (current.isTheSame(thisItem)) {
                     //Update this item with the new data
 
                     Object[] data = null;
@@ -735,6 +735,7 @@ public void saveInventory() throws SQLException {
             MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "ipets.executeBatch()", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
+            con.commit();
             taskSuccess = true;
         } catch (SQLException e) {
             MapleLogger.info("ERROR: Exception caught while saving character, " + this.getName(), e);
