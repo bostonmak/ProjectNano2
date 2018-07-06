@@ -158,7 +158,7 @@ import constants.skills.SuperGM;
 import constants.skills.Swordsman;
 import constants.skills.ThunderBreaker;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.HashMap;
+
 import net.server.channel.handlers.PartyOperationHandler;
 import scripting.item.ItemScriptManager;
 import server.maps.MapleMapItem;
@@ -501,231 +501,263 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
 public void saveInventory() throws SQLException {
         MapleLogger.info("Task: {}, Character: {}, Status: {}",
                 "Save Inventory", this.getName(), "STARTING");
+        boolean taskSuccess = false;
         long lastTaskTime = System.currentTimeMillis();
-        Connection con = DatabaseConnection.getConnection();
-        PreparedStatement ps = con.prepareStatement("SELECT * FROM inventoryitems WHERE characterid=?", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-        ps.setInt(1, this.id);
-        ResultSet rs = ps.executeQuery();
+        Connection con = null;
+        PreparedStatement allCharacterItemsQuery = null;
+        ResultSet allCharacterItemsResult = null;
+        PreparedStatement deleteFromInventoryItemsTableQuery = null;
+        PreparedStatement updateInventoryItemsTableQuery = null;
+        PreparedStatement updateInventoryEquipmentTableQuery = null;
+        PreparedStatement updatePetsTableQuery = null;
+        PreparedStatement insertIntoInventoryEquipmentTableQuery = null;
+        PreparedStatement insertIntoPetsTableQuery = null;
+        PreparedStatement insertIntoInventoryItemsTableQuery = null;
+        ResultSet inventoryItemsTableGeneratedKeysResult = null;
+        try {
+            con = DatabaseConnection.getConnection();
+            con.setAutoCommit(false);
+            allCharacterItemsQuery = con.prepareStatement("SELECT * FROM inventoryitems WHERE characterid=?", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            allCharacterItemsQuery.setInt(1, this.id);
+            allCharacterItemsResult = allCharacterItemsQuery.executeQuery();
 
-        Map<MapleInventoryType, List<Short>> items = new HashMap<>();//This will contain all the items we have, after we deal with one, we remove it to signify it has been handled
+            Map<MapleInventoryType, List<Short>> items = new HashMap<>();//This will contain all the items we have, after we deal with one, we remove it to signify it has been handled
 
-        for(MapleInventoryType type : MapleInventoryType.values()) {
+            for (MapleInventoryType type : MapleInventoryType.values()) {
 
-            List<Short> slots = new ArrayList<>();
+                List<Short> slots = new ArrayList<>();
 
-            MapleInventory inv = getInventory(type);
+                MapleInventory inv = getInventory(type);
 
-            Iterator it = inv.getItems().entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry)it.next();
-                slots.add((Short)pair.getKey());
+                Iterator it = inv.getItems().entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry) it.next();
+                    slots.add((Short) pair.getKey());
+                }
+
+                items.put(type, slots);
+
             }
 
-            items.put(type, slots);
+            deleteFromInventoryItemsTableQuery = con.prepareStatement("DELETE FROM inventoryitems WHERE inventoryitemid=?");
+            updateInventoryItemsTableQuery = con.prepareStatement("UPDATE inventoryitems SET type=?, characterid=?, itemid=?, inventorytype=?, "
+                    + "position=?, quantity=?, owner=?, petid=?, flag=?, expiration=?, giftFrom=? WHERE inventoryitemid=?");
+            updateInventoryEquipmentTableQuery = con.prepareStatement("UPDATE inventoryequipment SET upgradeslots=?, level=?, str=?, dex=?, "
+                    + "`int`=?, luk=?, hp=?, mp=?, watk=?, matk=?, wdef=?, mdef=?, acc=?, avoid=?, hands=?, speed=?, "
+                    + "jump=?, locked=?, vicious=?, itemlevel=?, itemexp=?, ringid=? WHERE inventoryitemid=?");
+            updatePetsTableQuery = con.prepareStatement("UPDATE pets SET name=?, level=?, closeness=?, fullness=?, "
+                    + "summoned=? WHERE petid=?");
+            insertIntoInventoryEquipmentTableQuery = con.prepareStatement("INSERT INTO inventoryequipment VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            insertIntoPetsTableQuery = con.prepareStatement("INSERT INTO pets VALUES (DEFAULT, ?, ?, ?, ?, ?)");
 
+            while (allCharacterItemsResult.next()) {
+
+                MapleInventoryType type = MapleInventoryType.getByType(allCharacterItemsResult.getByte("inventorytype"));
+
+                short slot = allCharacterItemsResult.getShort("position");
+
+                Item thisItem = new Item(allCharacterItemsResult.getInt("itemid"), allCharacterItemsResult.getShort("position"), allCharacterItemsResult.getShort("quantity"), allCharacterItemsResult.getInt("petid"));
+
+                Item current = getInventory(type).getItem((short) slot);
+
+                items.get(type).remove((Object) slot);
+
+                if (current == null) {//We already know it existed in the past since we got it back in the query
+                    //Delete the item from database
+                    deleteFromInventoryItemsTableQuery.setInt(1, allCharacterItemsResult.getInt("inventoryitemid"));
+                    deleteFromInventoryItemsTableQuery.addBatch();
+
+                } else if (current.isTheSame(thisItem)) {
+                    //Update this item with the new data
+
+                    Object[] data = null;
+                    updateInventoryItemsTableQuery.setByte(1, (byte) 1);
+                    updateInventoryItemsTableQuery.setInt(2, this.id);
+                    updateInventoryItemsTableQuery.setInt(3, current.getItemId());
+                    updateInventoryItemsTableQuery.setByte(4, type.getType());
+                    updateInventoryItemsTableQuery.setShort(5, (short) slot);
+                    updateInventoryItemsTableQuery.setInt(6, current.getQuantity());
+                    updateInventoryItemsTableQuery.setString(7, current.getOwner());
+                    updateInventoryItemsTableQuery.setInt(8, current.getPetId());
+                    updateInventoryItemsTableQuery.setByte(9, current.getFlag());
+                    updateInventoryItemsTableQuery.setLong(10, current.getExpiration());
+                    updateInventoryItemsTableQuery.setString(11, current.getGiftFrom());
+                    updateInventoryItemsTableQuery.setInt(12, allCharacterItemsResult.getInt("inventoryitemid"));
+                    updateInventoryItemsTableQuery.addBatch();
+
+                    if (current instanceof Equip) {
+                        Equip eq = (Equip) current;
+
+                        updateInventoryEquipmentTableQuery.setByte(1, eq.getUpgradeSlots());
+                        updateInventoryEquipmentTableQuery.setByte(2, eq.getLevel());
+                        updateInventoryEquipmentTableQuery.setShort(3, eq.getStr());
+                        updateInventoryEquipmentTableQuery.setShort(4, eq.getDex());
+                        updateInventoryEquipmentTableQuery.setShort(5, eq.getInt());
+                        updateInventoryEquipmentTableQuery.setShort(6, eq.getLuk());
+                        updateInventoryEquipmentTableQuery.setShort(7, eq.getHp());
+                        updateInventoryEquipmentTableQuery.setShort(8, eq.getMp());
+                        updateInventoryEquipmentTableQuery.setShort(9, eq.getWatk());
+                        updateInventoryEquipmentTableQuery.setShort(10, eq.getMatk());
+                        updateInventoryEquipmentTableQuery.setShort(11, eq.getWdef());
+                        updateInventoryEquipmentTableQuery.setShort(12, eq.getMdef());
+                        updateInventoryEquipmentTableQuery.setShort(13, eq.getAcc());
+                        updateInventoryEquipmentTableQuery.setShort(14, eq.getAvoid());
+                        updateInventoryEquipmentTableQuery.setShort(15, eq.getHands());
+                        updateInventoryEquipmentTableQuery.setShort(16, eq.getSpeed());
+                        updateInventoryEquipmentTableQuery.setShort(17, eq.getJump());
+                        updateInventoryEquipmentTableQuery.setByte(18, (byte) 0);
+                        updateInventoryEquipmentTableQuery.setShort(19, eq.getVicious());
+                        updateInventoryEquipmentTableQuery.setByte(20, eq.getItemLevel());
+                        updateInventoryEquipmentTableQuery.setInt(21, eq.getItemExp());
+                        updateInventoryEquipmentTableQuery.setInt(22, eq.getRingId());
+                        updateInventoryEquipmentTableQuery.setInt(23, allCharacterItemsResult.getInt("inventoryitemid"));
+                        updateInventoryEquipmentTableQuery.addBatch();
+                    }
+
+                    if (current instanceof MaplePet) {
+                        data = ((MaplePet) current).getDbValues();
+                        updatePetsTableQuery.setString(1, (String) data[1]);
+                        updatePetsTableQuery.setByte(2, (byte) data[2]);
+                        updatePetsTableQuery.setInt(3, (int) data[3]);
+                        updatePetsTableQuery.setInt(4, (int) data[4]);
+                        updatePetsTableQuery.setByte(5, (byte) data[5]);
+                        updatePetsTableQuery.addBatch();
+                    }
+
+                }
+
+            }
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Creating PreparedStatements batch for existing inventoryitems", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
+
+            //Handle all unhandled values here by inserting them
+
+            for (MapleInventoryType type : items.keySet()) {
+                List<Short> slots = items.get(type);
+
+                for (short slot : slots) {
+                    insertIntoInventoryItemsTableQuery = con.prepareStatement("INSERT INTO inventoryitems VALUES (DEFAULT, ?, ?, DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+
+                    Item item = getInventory(type).getItem(slot);
+
+                    Object[] data = null;
+                    insertIntoInventoryItemsTableQuery.setInt(1, 1);
+                    insertIntoInventoryItemsTableQuery.setInt(2, this.id);
+                    insertIntoInventoryItemsTableQuery.setInt(3, item.getItemId());
+                    insertIntoInventoryItemsTableQuery.setInt(4, type.getType());
+                    insertIntoInventoryItemsTableQuery.setShort(5, item.getPosition());
+                    insertIntoInventoryItemsTableQuery.setInt(6, item.getQuantity());
+                    insertIntoInventoryItemsTableQuery.setString(7, item.getOwner());
+                    insertIntoInventoryItemsTableQuery.setInt(8, item.getPetId());
+                    insertIntoInventoryItemsTableQuery.setInt(9, item.getFlag());
+                    insertIntoInventoryItemsTableQuery.setLong(10, item.getExpiration());
+                    insertIntoInventoryItemsTableQuery.setString(11, item.getGiftFrom());
+                    int affectedRows = insertIntoInventoryItemsTableQuery.executeUpdate();
+                    if (affectedRows == 0) {
+                        System.out.println("Failed to insert item 1 " + item.getItemId());
+                    }
+                    inventoryItemsTableGeneratedKeysResult = insertIntoInventoryItemsTableQuery.getGeneratedKeys();
+                    int itemid = -1;
+                    if (inventoryItemsTableGeneratedKeysResult.next()) {
+                        itemid = inventoryItemsTableGeneratedKeysResult.getInt(1);
+                    } else {
+                        System.out.println("Failed to insert item 2 " + item.getItemId());
+                    }
+
+                    if (item instanceof Equip && itemid >= 0) {
+                        Equip eq = (Equip) item;
+
+                        insertIntoInventoryEquipmentTableQuery.setInt(1, itemid);
+                        insertIntoInventoryEquipmentTableQuery.setByte(2, eq.getUpgradeSlots());
+                        insertIntoInventoryEquipmentTableQuery.setByte(3, eq.getLevel());
+                        insertIntoInventoryEquipmentTableQuery.setShort(4, eq.getStr());
+                        insertIntoInventoryEquipmentTableQuery.setShort(5, eq.getDex());
+                        insertIntoInventoryEquipmentTableQuery.setShort(6, eq.getInt());
+                        insertIntoInventoryEquipmentTableQuery.setShort(7, eq.getLuk());
+                        insertIntoInventoryEquipmentTableQuery.setShort(8, eq.getHp());
+                        insertIntoInventoryEquipmentTableQuery.setShort(9, eq.getMp());
+                        insertIntoInventoryEquipmentTableQuery.setShort(10, eq.getWatk());
+                        insertIntoInventoryEquipmentTableQuery.setShort(11, eq.getMatk());
+                        insertIntoInventoryEquipmentTableQuery.setShort(12, eq.getWdef());
+                        insertIntoInventoryEquipmentTableQuery.setShort(13, eq.getMdef());
+                        insertIntoInventoryEquipmentTableQuery.setShort(14, eq.getAcc());
+                        insertIntoInventoryEquipmentTableQuery.setShort(15, eq.getAvoid());
+                        insertIntoInventoryEquipmentTableQuery.setShort(16, eq.getHands());
+                        insertIntoInventoryEquipmentTableQuery.setShort(17, eq.getSpeed());
+                        insertIntoInventoryEquipmentTableQuery.setShort(18, eq.getJump());
+                        insertIntoInventoryEquipmentTableQuery.setByte(19, (byte) 0);
+                        insertIntoInventoryEquipmentTableQuery.setShort(20, eq.getVicious());
+                        insertIntoInventoryEquipmentTableQuery.setByte(21, eq.getItemLevel());
+                        insertIntoInventoryEquipmentTableQuery.setInt(22, eq.getItemExp());
+                        insertIntoInventoryEquipmentTableQuery.setInt(23, eq.getRingId());
+                        insertIntoInventoryEquipmentTableQuery.addBatch();
+                    }
+
+                    if (item instanceof MaplePet) {
+                        data = ((MaplePet) item).getDbValues();
+                        insertIntoPetsTableQuery.setString(1, (String) data[1]);
+                        insertIntoPetsTableQuery.setByte(2, (byte) data[2]);
+                        insertIntoPetsTableQuery.setInt(3, (int) data[3]);
+                        insertIntoPetsTableQuery.setInt(4, (int) data[4]);
+                        insertIntoPetsTableQuery.setByte(5, (byte) data[5]);
+                        insertIntoPetsTableQuery.setInt(6, (int) data[0]);
+                        insertIntoPetsTableQuery.addBatch();
+                    }
+                }
+
+            }
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "PreparedStatements for new inventoryitems", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
+
+            updateInventoryItemsTableQuery.executeBatch();
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "upds.executeBatch()", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
+            updateInventoryEquipmentTableQuery.executeBatch();
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "eqs.executeBatch()", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
+            deleteFromInventoryItemsTableQuery.executeBatch();
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "dels.executeBatch()", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
+            updatePetsTableQuery.executeBatch();
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "pets.executeBatch()", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
+            insertIntoInventoryEquipmentTableQuery.executeBatch();
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "ieqs.executeBatch()", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
+            insertIntoPetsTableQuery.executeBatch();
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "ipets.executeBatch()", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
+            lastTaskTime = System.currentTimeMillis();
+            con.commit();
+            taskSuccess = true;
+        } catch (SQLException e) {
+            MapleLogger.info("ERROR: Exception caught while saving character, " + this.getName(), e);
+        } finally {
+            String taskStatus = TASK_FAILED;
+            if (taskSuccess) {
+                taskStatus = TASK_SUCCESSFUL;
+            }
+            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Save Inventory", this.getName(), taskStatus, System.currentTimeMillis() - lastTaskTime);
+            con.close();
+            if (allCharacterItemsQuery != null) allCharacterItemsQuery.close();
+            if (allCharacterItemsResult != null) allCharacterItemsResult.close();
+            if (deleteFromInventoryItemsTableQuery != null) deleteFromInventoryItemsTableQuery.close();
+            if (updateInventoryItemsTableQuery != null) updateInventoryItemsTableQuery.close();
+            if (updateInventoryEquipmentTableQuery != null) updateInventoryEquipmentTableQuery.close();
+            if (updatePetsTableQuery != null) updatePetsTableQuery.close();
+            if (insertIntoInventoryEquipmentTableQuery != null) insertIntoInventoryEquipmentTableQuery.close();
+            if (insertIntoPetsTableQuery != null) insertIntoPetsTableQuery.close();
+            if (insertIntoInventoryItemsTableQuery != null) insertIntoInventoryItemsTableQuery.close();
+            if (inventoryItemsTableGeneratedKeysResult != null) inventoryItemsTableGeneratedKeysResult.close();
         }
-    	
-        PreparedStatement dels = con.prepareStatement("DELETE FROM inventoryitems WHERE inventoryitemid=?");
-        PreparedStatement upds = con.prepareStatement("UPDATE inventoryitems SET type=?, characterid=?, itemid=?, inventorytype=?, "
-                                + "position=?, quantity=?, owner=?, petid=?, flag=?, expiration=?, giftFrom=? WHERE inventoryitemid=?");
-        PreparedStatement eqs = con.prepareStatement("UPDATE inventoryequipment SET upgradeslots=?, level=?, str=?, dex=?, "
-                                    + "`int`=?, luk=?, hp=?, mp=?, watk=?, matk=?, wdef=?, mdef=?, acc=?, avoid=?, hands=?, speed=?, "
-                                    + "jump=?, locked=?, vicious=?, itemlevel=?, itemexp=?, ringid=? WHERE inventoryitemid=?");
-        PreparedStatement pets = con.prepareStatement("UPDATE pets SET name=?, level=?, closeness=?, fullness=?, "
-                                        + "summoned=? WHERE petid=?");
-        PreparedStatement ieqs = con.prepareStatement("INSERT INTO inventoryequipment VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        PreparedStatement ipets = con.prepareStatement("INSERT INTO pets VALUES (DEFAULT, ?, ?, ?, ?, ?)");
-        
-    	while (rs.next()) {
-    		
-    		MapleInventoryType type = MapleInventoryType.getByType(rs.getByte("inventorytype"));
-    		
-    		short slot = rs.getShort("position");
-    		
-    		Item thisItem = new Item(rs.getInt("itemid"), rs.getShort("position"), rs.getShort("quantity"), rs.getInt("petid"));
-    		
-    		Item current = getInventory(type).getItem((short)slot);
-    		
-    		items.get(type).remove((Object)slot);
-    		
-    		if (current == null) {//We already know it existed in the past since we got it back in the query
-    			//Delete the item from database
-                dels.setInt(1, rs.getInt("inventoryitemid"));
-    			dels.addBatch();
-    			
-    		} else if(!current.equals(thisItem)) {
-    			//Update this item with the new data
-    			
-                Object[] data = null;
-                upds.setByte(1, (byte)1);
-                upds.setInt(2, this.id);
-                upds.setInt(3, current.getItemId());
-                upds.setByte(4, type.getType());
-                upds.setShort(5, (short)slot);
-                upds.setInt(6, current.getQuantity());
-                upds.setString(7, current.getOwner());
-                upds.setInt(8, current.getPetId());
-                upds.setByte(9, current.getFlag());
-                upds.setLong(10, current.getExpiration());
-                upds.setString(11, current.getGiftFrom());
-                upds.setInt(12, rs.getInt("inventoryitemid"));
-                upds.addBatch();
-
-        		if(current instanceof Equip){
-                    Equip eq = (Equip) current;
-
-                    eqs.setByte(1, eq.getUpgradeSlots());
-                    eqs.setByte(2, eq.getLevel());
-                    eqs.setShort(3, eq.getStr());
-                    eqs.setShort(4, eq.getDex());
-                    eqs.setShort(5, eq.getInt());
-                    eqs.setShort(6, eq.getLuk());
-                    eqs.setShort(7, eq.getHp());
-                    eqs.setShort(8, eq.getMp());
-                    eqs.setShort(9, eq.getWatk());
-                    eqs.setShort(10, eq.getMatk());
-                    eqs.setShort(11, eq.getWdef());
-                    eqs.setShort(12, eq.getMdef());
-                    eqs.setShort(13, eq.getAcc());
-                    eqs.setShort(14, eq.getAvoid());
-                    eqs.setShort(15, eq.getHands());
-                    eqs.setShort(16, eq.getSpeed());
-                    eqs.setShort(17, eq.getJump());
-                    eqs.setByte(18, (byte)0);
-                    eqs.setShort(19, eq.getVicious());
-                    eqs.setByte(20, eq.getItemLevel());
-                    eqs.setInt(21, eq.getItemExp());
-                    eqs.setInt(22, eq.getRingId());
-                    eqs.setInt(23, rs.getInt("inventoryitemid"));
-                    eqs.addBatch();
-                }
-        		
-        		if(current instanceof MaplePet) {
-        			data = ((MaplePet) current).getDbValues();
-                    pets.setString(1, (String)data[1]);
-                    pets.setByte(2, (byte)data[2]);
-                    pets.setInt(3, (int)data[3]);
-                    pets.setInt(4, (int)data[4]);
-                    pets.setByte(5, (byte)data[5]);
-                    pets.addBatch();
-        		}
-    			
-    		}
-    		
-    	}
-        MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                "PreparedStatements for existing inventoryitems", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
-        lastTaskTime = System.currentTimeMillis();
-    	
-    	//Handle all unhandled values here by inserting them
-    	
-    	for (MapleInventoryType type : items.keySet()) {
-    		List<Short> slots = items.get(type);
-    		
-    		for (short slot : slots) {
-                PreparedStatement ins = con.prepareStatement("INSERT INTO inventoryitems VALUES (DEFAULT, ?, ?, DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-    			
-    			Item item = getInventory(type).getItem(slot);
-    			
-    			Object[] data = null;
-                ins.setInt(1, 1);
-                ins.setInt(2, this.id);
-                ins.setInt(3, item.getItemId());
-                ins.setInt(4, type.getType());
-                ins.setShort(5, item.getPosition());
-                ins.setInt(6, item.getQuantity());
-                ins.setString(7, item.getOwner());
-                ins.setInt(8, item.getPetId());
-                ins.setInt(9, item.getFlag());
-                ins.setLong(10, item.getExpiration());
-                ins.setString(11, item.getGiftFrom());
-                int affectedRows = ins.executeUpdate();
-                if (affectedRows == 0) {
-                    System.out.println("Failed to insert item 1 " + item.getItemId());
-                }
-                ResultSet keys = ins.getGeneratedKeys();
-                int itemid = -1;
-                if (keys.next()) {
-                    itemid = keys.getInt(1);
-                }
-                else {
-                    System.out.println("Failed to insert item 2 " + item.getItemId());
-                }
-        		
-        		if (item instanceof Equip && itemid >= 0){
-                    Equip eq = (Equip) item;
-
-                    ieqs.setInt(1, itemid);
-                    ieqs.setByte(2, eq.getUpgradeSlots());
-                    ieqs.setByte(3, eq.getLevel());
-                    ieqs.setShort(4, eq.getStr());
-                    ieqs.setShort(5, eq.getDex());
-                    ieqs.setShort(6, eq.getInt());
-                    ieqs.setShort(7, eq.getLuk());
-                    ieqs.setShort(8, eq.getHp());
-                    ieqs.setShort(9, eq.getMp());
-                    ieqs.setShort(10, eq.getWatk());
-                    ieqs.setShort(11, eq.getMatk());
-                    ieqs.setShort(12, eq.getWdef());
-                    ieqs.setShort(13, eq.getMdef());
-                    ieqs.setShort(14, eq.getAcc());
-                    ieqs.setShort(15, eq.getAvoid());
-                    ieqs.setShort(16, eq.getHands());
-                    ieqs.setShort(17, eq.getSpeed());
-                    ieqs.setShort(18, eq.getJump());
-                    ieqs.setByte(19, (byte)0);
-                    ieqs.setShort(20, eq.getVicious());
-                    ieqs.setByte(21, eq.getItemLevel());
-                    ieqs.setInt(22, eq.getItemExp());
-                    ieqs.setInt(23, eq.getRingId());
-                    ieqs.addBatch();
-                }
-        		
-        		if(item instanceof MaplePet) {
-        			data = ((MaplePet) item).getDbValues();
-                    ipets.setString(1, (String)data[1]);
-                    ipets.setByte(2, (byte)data[2]);
-                    ipets.setInt(3, (int)data[3]);
-                    ipets.setInt(4, (int)data[4]);
-                    ipets.setByte(5, (byte)data[5]);
-                    ipets.setInt(6, (int)data[0]);
-                    ipets.addBatch();
-        		}
-    		}
-    		
-    	}
-        MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                "PreparedStatements for new inventoryitems", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
-        lastTaskTime = System.currentTimeMillis();
-
-        upds.executeBatch();
-        MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                "upds.executeBatch()", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
-        lastTaskTime = System.currentTimeMillis();
-        eqs.executeBatch();
-        MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                "eqs.executeBatch()", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
-        lastTaskTime = System.currentTimeMillis();
-        dels.executeBatch();
-        MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                "dels.executeBatch()", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
-        lastTaskTime = System.currentTimeMillis();
-        pets.executeBatch();
-        MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                "pets.executeBatch()", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
-        lastTaskTime = System.currentTimeMillis();
-        ieqs.executeBatch();
-        MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                "ieqs.executeBatch()", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
-        lastTaskTime = System.currentTimeMillis();
-        ipets.executeBatch();
-        MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                "ipets.executeBatch()", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
-        lastTaskTime = System.currentTimeMillis();
-
-        rs.close();
-        ps.close();
-        con.close();
 }
 
     public void addCrushRing(MapleRing r) {
@@ -6837,7 +6869,7 @@ public void saveInventory() throws SQLException {
     private final String TASK_NAME = "saveToDB";
     private final String TASK_SUCCESSFUL = "SUCCESS";
     private final String TASK_FAILED = "FAILED";
-    private final String TASK_IN_PROGROESS = "IN PROGRESS";
+    private final String TASK_IN_PROGRESS = "IN PROGRESS";
 
     /*public void saveToDB() {
         if(ServerConstants.USE_AUTOSAVE) {
@@ -7030,7 +7062,7 @@ public void saveInventory() throws SQLException {
             }
             
             MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                    "Save Character", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - startTaskTime);
+                    "Save Character", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - startTaskTime);
             long lastTaskTime = System.currentTimeMillis();
             
             petLock.lock();
@@ -7061,7 +7093,7 @@ public void saveInventory() throws SQLException {
             }
 
             MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                    "Save Pets", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+                    "Save Pets", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
 
@@ -7126,7 +7158,7 @@ public void saveInventory() throws SQLException {
             ps.executeBatch();
 
             MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                    "Save Key Bindings and Macros", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+                    "Save Key Bindings and Macros", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
             
             /*
@@ -7140,8 +7172,6 @@ public void saveInventory() throws SQLException {
             */
             saveInventory();
 
-            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                    "Save Inventory", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 			
             deleteWhereCharacterId(con, "DELETE FROM skills WHERE characterid = ?");
@@ -7156,7 +7186,7 @@ public void saveInventory() throws SQLException {
             }
             ps.executeBatch();
             MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                    "Save Skills", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+                    "Save Skills", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
             deleteWhereCharacterId(con, "DELETE FROM savedlocations WHERE characterid = ?");
@@ -7195,7 +7225,7 @@ public void saveInventory() throws SQLException {
             }
             ps.executeBatch();
             MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                    "Save Locations", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+                    "Save Locations", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
             deleteWhereCharacterId(con, "DELETE FROM buddies WHERE characterid = ? AND pending = 0");
@@ -7210,7 +7240,7 @@ public void saveInventory() throws SQLException {
             }
             ps.executeBatch();
             MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                    "Save Buddies", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+                    "Save Buddies", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
             deleteWhereCharacterId(con, "DELETE FROM area_info WHERE charid = ?");
@@ -7223,7 +7253,7 @@ public void saveInventory() throws SQLException {
             }
             ps.executeBatch();
             MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                    "Save Area Info", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+                    "Save Area Info", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
             deleteWhereCharacterId(con, "DELETE FROM eventstats WHERE characterid = ?");
@@ -7265,7 +7295,7 @@ public void saveInventory() throws SQLException {
                 
             }
             MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                    "Save Quests", this.getName(), TASK_IN_PROGROESS, System.currentTimeMillis() - lastTaskTime);
+                    "Save Quests", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
             ps = con.prepareStatement("UPDATE accounts SET gm = ?  WHERE id = ?");
