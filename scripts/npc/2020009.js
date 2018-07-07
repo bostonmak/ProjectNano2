@@ -35,7 +35,7 @@ function isMage(jobId) {
 }
 
 function start() {
-    if (!(cm.getPlayer().getLevel() >= 70 && isMage(cm.getJobId()))){
+    if (!(cm.getPlayer().getLevel() >= 50 && isMage(cm.getJobId()))){
 	    cm.sendNext("Hi there.");
 		cm.dispose();
 		return;

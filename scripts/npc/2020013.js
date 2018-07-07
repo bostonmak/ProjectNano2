@@ -35,7 +35,7 @@ function isPirate(jobId) {
 }
 
 function start() {
-     if (!(cm.getPlayer().getLevel() >= 70 && isPirate(cm.getJobId()))){
+     if (!(cm.getPlayer().getLevel() >= 50 && isPirate(cm.getJobId()))){
         cm.sendNext("Hi there.");
         cm.dispose();
         return;

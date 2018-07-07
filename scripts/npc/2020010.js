@@ -37,7 +37,7 @@ function isArcher(jobId) {
 }
 
 function start() {
-     if (!(cm.getPlayer().getLevel() >= 70 && isArcher(cm.getJobId()))){
+     if (!(cm.getPlayer().getLevel() >= 50 && isArcher(cm.getJobId()))){
 	    cm.sendNext("Hi there.");
 		cm.dispose();
 		return;

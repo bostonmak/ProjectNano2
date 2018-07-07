@@ -173,7 +173,7 @@
             <int name="type" value="0"/>
             <int name="attackAfter" value="1620"/>
             <int name="jumpAttack" value="1"/>
-            <int name="PADamage" value="3065"/>
+            <int name="PADamage" value="1250"/>
             <int name="tremble" value="1"/>
             <int name="knockback" value="1"/>
         </imgdir>

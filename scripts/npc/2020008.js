@@ -50,7 +50,7 @@ function start() {
         return;
     }
     
-    if (!(cm.getPlayer().getLevel() >= 70 && isWarriorOrAran(cm.getJobId()))){
+    if (!(cm.getPlayer().getLevel() >= 50 && isWarriorOrAran(cm.getJobId()))){
         cm.sendNext("Hi there.");
         cm.dispose();
         return;

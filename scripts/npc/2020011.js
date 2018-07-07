@@ -34,7 +34,7 @@ function isThief(jobId) {
 }
 
 function start() {
-     if (!(cm.getPlayer().getLevel() >= 70 && isThief(cm.getJobId()))){
+     if (!(cm.getPlayer().getLevel() >= 50 && isThief(cm.getJobId()))){
         cm.sendNext("Hi there.");
         cm.dispose();
         return;

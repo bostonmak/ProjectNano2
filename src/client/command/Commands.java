@@ -988,65 +988,7 @@ public class Commands {
                     break;
                     
                         
-                case "sp":
-                        if (sub.length < 2){
-				player.yellowMessage("Syntax: !sp [<playername>] <newsp>");
-				break;
-			}
-                        
-			if (sub.length == 2) {
-                                int newSp = Integer.parseInt(sub[1]);
-                                if(newSp < 0) newSp = 0;
-                                else if(newSp > ServerConstants.MAX_AP) newSp = ServerConstants.MAX_AP;
-                            
-				player.setRemainingSp(newSp);
-				player.updateSingleStat(MapleStat.AVAILABLESP, player.getRemainingSp());
-			} else {
-				victim = c.getChannelServer().getPlayerStorage().getCharacterByName(sub[1]);
-                                
-                                if(victim != null) {
-                                        int newSp = Integer.parseInt(sub[2]);
-                                        if(newSp < 0) newSp = 0;
-                                        else if(newSp > ServerConstants.MAX_AP) newSp = ServerConstants.MAX_AP;
-                                    
-                                        victim.setRemainingSp(newSp);
-                                        victim.updateSingleStat(MapleStat.AVAILABLESP, player.getRemainingSp());
-
-                                        player.dropMessage(5, "SP given.");
-                                } else {
-                                        player.message("Player '" + sub[1] + "' could not be found on this channel.");
-                                }
-			}
-                    break;
-                    
-                case "ap":
-                        if (sub.length < 2){
-				player.yellowMessage("Syntax: !ap [<playername>] <newap>");
-				break;
-			}
-                        
-			if (sub.length < 3) {
-                                int newAp = Integer.parseInt(sub[1]);
-                                if(newAp < 0) newAp = 0;
-                                else if(newAp > ServerConstants.MAX_AP) newAp = ServerConstants.MAX_AP;
-                            
-				player.setRemainingAp(newAp);
-				player.updateSingleStat(MapleStat.AVAILABLEAP, player.getRemainingAp());
-			} else {
-				victim = c.getChannelServer().getPlayerStorage().getCharacterByName(sub[1]);
-                                
-                                if(victim != null) {
-                                        int newAp = Integer.parseInt(sub[2]);
-                                        if(newAp < 0) newAp = 0;
-                                        else if(newAp > ServerConstants.MAX_AP) newAp = ServerConstants.MAX_AP;
-                                        
-                                        victim.setRemainingAp(newAp);
-                                        victim.updateSingleStat(MapleStat.AVAILABLEAP, victim.getRemainingAp());
-                                } else {
-                                        player.message("Player '" + sub[1] + "' could not be found on this channel.");
-                                }
-			}
-                    break;
+                
                     
                 case "buffme":
                         //GM Skills : Haste(Super) - Holy Symbol - Bless - Hyper Body - Echo of Hero - maple warrior - sharp eyes
@@ -1350,9 +1292,7 @@ public class Commands {
                         }
                     break;
                 
-                case "gmshop":
-			MapleShopFactory.getInstance().getShop(1337).sendShop(c);
-                    break;
+               
                     
                 case "heal":
 			player.setHpMp(30000);
@@ -1387,50 +1327,7 @@ public class Commands {
 			}
                     break;
                     
-                case "setstat":
-                        if (sub.length < 2){
-				player.yellowMessage("Syntax: !setstat <newstat>");
-				break;
-			}
-                    
-                        int x;
-                        try {
-                            x = Integer.parseInt(sub[1]);
-                            
-                            if(x > Short.MAX_VALUE) x = Short.MAX_VALUE;
-                            else if(x < 0) x = 0;
-                            
-                            player.setStr(x);
-                            player.setDex(x);
-                            player.setInt(x);
-                            player.setLuk(x);
-                            player.updateSingleStat(MapleStat.STR, x);
-                            player.updateSingleStat(MapleStat.DEX, x);
-                            player.updateSingleStat(MapleStat.INT, x);
-                            player.updateSingleStat(MapleStat.LUK, x);
-                            
-                        } catch(NumberFormatException nfe) {}
-                    break;
-                    
-                case "maxstat":
-			final String[] s = {"setstat", String.valueOf(Short.MAX_VALUE)};
-			executeHeavenMsCommandLv2(cserv, srv, c, s);
-                        player.loseExp(player.getExp(), false, false);
-			player.setLevel(255);
-                        
-                        player.resetPlayerRates();
-                        if(ServerConstants.USE_ADD_RATES_BY_LEVEL == true) player.setPlayerRates();
-                        player.setWorldRates();
-			
-                        player.setFame(13337);
-			player.setMaxHp(30000);
-			player.setMaxMp(30000);
-			player.updateSingleStat(MapleStat.LEVEL, 255);
-			player.updateSingleStat(MapleStat.FAME, 13337);
-			player.updateSingleStat(MapleStat.MAXHP, 30000);
-			player.updateSingleStat(MapleStat.MAXMP, 30000);
-                        player.yellowMessage("Stats maxed out.");
-                    break;
+                
                     
 		case "maxskill":
 			for (MapleData skill_ : MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/" + "String.wz")).getData("Skill.img").getChildren()) {
@@ -1490,10 +1387,85 @@ public class Commands {
                         player.yellowMessage("Skills reset.");
                     break;
                     
-                case "mesos":
-                        if (sub.length >= 2) {
-                                player.gainMeso(Integer.parseInt(sub[1]), true);
-                        }
+                case "ban":
+			if (sub.length < 3) {
+				player.yellowMessage("Syntax: !ban <IGN> <Reason> (Please be descriptive)");
+				break;
+			}
+			String ign = sub[1];
+			String reason = joinStringFrom(sub, 2);
+			MapleCharacter target = c.getChannelServer().getPlayerStorage().getCharacterByName(ign);
+			if (target != null) {
+				String readableTargetName = MapleCharacter.makeMapleReadable(target.getName());
+				String ip = target.getClient().getSession().getRemoteAddress().toString().split(":")[0];
+				//Ban ip
+				PreparedStatement ps = null;
+				try {
+					Connection con = DatabaseConnection.getConnection();
+					if (ip.matches("/[0-9]{1,3}\\..*")) {
+						ps = con.prepareStatement("INSERT INTO ipbans VALUES (DEFAULT, ?, ?)");
+						ps.setString(1, ip);
+                                                ps.setString(2, String.valueOf(target.getClient().getAccID()));
+                                                
+						ps.executeUpdate();
+						ps.close();
+					}
+                                        
+                                        con.close();
+				} catch (SQLException ex) {
+                                        ex.printStackTrace();
+					c.getPlayer().message("Error occured while banning IP address");
+					c.getPlayer().message(target.getName() + "'s IP was not banned: " + ip);
+				}
+				target.getClient().banMacs();
+				reason = c.getPlayer().getName() + " banned " + readableTargetName + " for " + reason + " (IP: " + ip + ") " + "(MAC: " + c.getMacs() + ")";
+				target.ban(reason);
+				target.yellowMessage("You have been banned by #b" + c.getPlayer().getName() + " #k.");
+				target.yellowMessage("Reason: " + reason);
+				c.announce(MaplePacketCreator.getGMEffect(4, (byte) 0));
+				final MapleCharacter rip = target;
+				TimerManager.getInstance().schedule(new Runnable() {
+					@Override
+					public void run() {
+						rip.getClient().disconnect(false, false);
+					}
+				}, 5000); //5 Seconds
+				Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, "[RIP]: " + ign + " has been banned."));
+			} else if (MapleCharacter.ban(ign, reason, false)) {
+				c.announce(MaplePacketCreator.getGMEffect(4, (byte) 0));
+				Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, "[RIP]: " + ign + " has been banned."));
+			} else {
+				c.announce(MaplePacketCreator.getGMEffect(6, (byte) 1));
+			}
+                    break;
+  
+                    
+                case "unban":
+                        if (sub.length < 2){
+				player.yellowMessage("Syntax: !unban <playername>");
+				break;
+			}
+                    
+			try {
+                                Connection con = DatabaseConnection.getConnection();
+                                int aid = MapleCharacter.getAccountIdByName(sub[1]);
+                                
+                                PreparedStatement p = con.prepareStatement("UPDATE accounts SET banned = -1 WHERE id = " + aid);
+                                p.executeUpdate();
+                            
+				p = con.prepareStatement("DELETE FROM ipbans WHERE aid = " + aid);
+				p.executeUpdate();
+                                        
+                                p = con.prepareStatement("DELETE FROM macbans WHERE aid = " + aid);
+				p.executeUpdate();
+                                
+                                con.close();
+			} catch (Exception e) {
+                                e.printStackTrace();
+				player.message("Failed to unban " + sub[1]);
+				return true;
+			}
+			player.message("Unbanned " + sub[1]);
                     break;
         
                 case "jail":
@@ -1518,9 +1490,9 @@ public class Commands {
                                 int mapid = 300000012;
                                 
                                 if(victim.getMapId() != mapid) {    // those gone to jail won't be changing map anyway
-                                        MapleMap target = cserv.getMapFactory().getMap(mapid);
-                                        MaplePortal targetPortal = target.getPortal(0);
-                                        victim.changeMap(target, targetPortal);
+                                        MapleMap target1 = cserv.getMapFactory().getMap(mapid);
+                                        MaplePortal targetPortal = target1.getPortal(0);
+                                        victim.changeMap(target1, targetPortal);
                                         player.message(victim.getName() + " was jailed for " + minutesJailed + " minutes.");
                                 }
                                 else {
@@ -1672,6 +1644,121 @@ public class Commands {
                                 }
                         }
                 break;
+                    
+                    case "setstat":
+                        if (sub.length < 2){
+				player.yellowMessage("Syntax: !setstat <newstat>");
+				break;
+			}
+                    
+                        int x;
+                        try {
+                            x = Integer.parseInt(sub[1]);
+                            
+                            if(x > Short.MAX_VALUE) x = Short.MAX_VALUE;
+                            else if(x < 0) x = 0;
+                            
+                            player.setStr(x);
+                            player.setDex(x);
+                            player.setInt(x);
+                            player.setLuk(x);
+                            player.updateSingleStat(MapleStat.STR, x);
+                            player.updateSingleStat(MapleStat.DEX, x);
+                            player.updateSingleStat(MapleStat.INT, x);
+                            player.updateSingleStat(MapleStat.LUK, x);
+                            
+                        } catch(NumberFormatException nfe) {}
+                    break;
+                    
+                case "maxstat":
+			final String[] s = {"setstat", String.valueOf(Short.MAX_VALUE)};
+			executeHeavenMsCommandLv2(cserv, srv, c, s);
+                        player.loseExp(player.getExp(), false, false);
+			player.setLevel(255);
+                        
+                        player.resetPlayerRates();
+                        if(ServerConstants.USE_ADD_RATES_BY_LEVEL == true) player.setPlayerRates();
+                        player.setWorldRates();
+			
+                        player.setFame(13337);
+			player.setMaxHp(30000);
+			player.setMaxMp(30000);
+			player.updateSingleStat(MapleStat.LEVEL, 255);
+			player.updateSingleStat(MapleStat.FAME, 13337);
+			player.updateSingleStat(MapleStat.MAXHP, 30000);
+			player.updateSingleStat(MapleStat.MAXMP, 30000);
+                        player.yellowMessage("Stats maxed out.");
+                    break;
+                    
+                    case "mesos":
+                        if (sub.length >= 2) {
+                                player.gainMeso(Integer.parseInt(sub[1]), true);
+                        }
+                    break;
+                        
+                     case "gmshop":
+			MapleShopFactory.getInstance().getShop(1337).sendShop(c);
+                    break;
+                    
+                    case "sp":
+                        if (sub.length < 2){
+				player.yellowMessage("Syntax: !sp [<playername>] <newsp>");
+				break;
+			}
+                        
+			if (sub.length == 2) {
+                                int newSp = Integer.parseInt(sub[1]);
+                                if(newSp < 0) newSp = 0;
+                                else if(newSp > ServerConstants.MAX_AP) newSp = ServerConstants.MAX_AP;
+                            
+				player.setRemainingSp(newSp);
+				player.updateSingleStat(MapleStat.AVAILABLESP, player.getRemainingSp());
+			} else {
+				victim = c.getChannelServer().getPlayerStorage().getCharacterByName(sub[1]);
+                                
+                                if(victim != null) {
+                                        int newSp = Integer.parseInt(sub[2]);
+                                        if(newSp < 0) newSp = 0;
+                                        else if(newSp > ServerConstants.MAX_AP) newSp = ServerConstants.MAX_AP;
+                                    
+                                        victim.setRemainingSp(newSp);
+                                        victim.updateSingleStat(MapleStat.AVAILABLESP, player.getRemainingSp());
+
+                                        player.dropMessage(5, "SP given.");
+                                } else {
+                                        player.message("Player '" + sub[1] + "' could not be found on this channel.");
+                                }
+			}
+                    break;
+                    
+                case "ap":
+                        if (sub.length < 2){
+				player.yellowMessage("Syntax: !ap [<playername>] <newap>");
+				break;
+			}
+                        
+			if (sub.length < 3) {
+                                int newAp = Integer.parseInt(sub[1]);
+                                if(newAp < 0) newAp = 0;
+                                else if(newAp > ServerConstants.MAX_AP) newAp = ServerConstants.MAX_AP;
+                            
+				player.setRemainingAp(newAp);
+				player.updateSingleStat(MapleStat.AVAILABLEAP, player.getRemainingAp());
+			} else {
+				victim = c.getChannelServer().getPlayerStorage().getCharacterByName(sub[1]);
+                                
+                                if(victim != null) {
+                                        int newAp = Integer.parseInt(sub[2]);
+                                        if(newAp < 0) newAp = 0;
+                                        else if(newAp > ServerConstants.MAX_AP) newAp = ServerConstants.MAX_AP;
+                                        
+                                        victim.setRemainingAp(newAp);
+                                        victim.updateSingleStat(MapleStat.AVAILABLEAP, victim.getRemainingAp());
+                                } else {
+                                        player.message("Player '" + sub[1] + "' could not be found on this channel.");
+                                }
+			}
+                    break;
                     
                 case "item":
                 case "drop":
@@ -1947,27 +2034,28 @@ public class Commands {
                         }
                     break;
                    
-		case "music":
+		 case "music":
 			if (sub.length < 2) {
 				player.yellowMessage("Syntax: !music <song>");
-				for (String s : songs){
-					player.yellowMessage(s);
+				for (String s1 : songs){
+					player.yellowMessage(s1);
 				}
 				break;
 			}
 			String song = joinStringFrom(sub, 1); 
-			for (String s : songs){
-				if (s.equals(song)){
-					player.getMap().broadcastMessage(MaplePacketCreator.musicChange(s));
+			for (String s1 : songs){
+				if (s1.equals(song)){
+					player.getMap().broadcastMessage(MaplePacketCreator.musicChange(s1));
 					player.yellowMessage("Now playing song " + song + ".");
 					break;
 				}
 			}
 			player.yellowMessage("Song not found, please enter a song below.");
-			for (String s : songs){
-				player.yellowMessage(s);
+			for (String s1 : songs){
+				player.yellowMessage(s1);
 			}
                     break;
+                   
                     
 		case "monitor":
 			if (sub.length < 1){
@@ -2163,9 +2251,9 @@ public class Commands {
 			}
 			try {
 				try (BufferedReader dis = new BufferedReader(new InputStreamReader(new URL("http://www.mapletip.com/search_java.php?search_value=" + sub[1] + "&check=true").openConnection().getInputStream()))) {
-					String s;
-					while ((s = dis.readLine()) != null) {
-						player.dropMessage(s);
+					String s1;
+					while ((s1 = dis.readLine()) != null) {
+						player.dropMessage(s1);
 					}
 				}
 			} catch (Exception e) {
@@ -2332,12 +2420,12 @@ public class Commands {
 			for (Channel ch : srv.getChannelsFromWorld(player.getWorld())) {
 				int size = ch.getPlayerStorage().getAllCharacters().size();
 				total += size;
-				String s = "(Channel " + ch.getId() + " Online: " + size + ") : ";
+				String s2 = "(Channel " + ch.getId() + " Online: " + size + ") : ";
 				if (ch.getPlayerStorage().getAllCharacters().size() < 50) {
 					for (MapleCharacter chr : ch.getPlayerStorage().getAllCharacters()) {
-						s += MapleCharacter.makeMapleReadable(chr.getName()) + ", ";
+						s2 += MapleCharacter.makeMapleReadable(chr.getName()) + ", ";
 					}
-					player.dropMessage(6, s.substring(0, s.length() - 2));
+					player.dropMessage(6, s2.substring(0, s2.length() - 2));
 				}
 			}
 			
@@ -2352,86 +2440,7 @@ public class Commands {
 			}
                     break;
                     
-		case "ban":
-			if (sub.length < 3) {
-				player.yellowMessage("Syntax: !ban <IGN> <Reason> (Please be descriptive)");
-				break;
-			}
-			String ign = sub[1];
-			String reason = joinStringFrom(sub, 2);
-			MapleCharacter target = c.getChannelServer().getPlayerStorage().getCharacterByName(ign);
-			if (target != null) {
-				String readableTargetName = MapleCharacter.makeMapleReadable(target.getName());
-				String ip = target.getClient().getSession().getRemoteAddress().toString().split(":")[0];
-				//Ban ip
-				PreparedStatement ps = null;
-				try {
-					con = DatabaseConnection.getConnection();
-					if (ip.matches("/[0-9]{1,3}\\..*")) {
-						ps = con.prepareStatement("INSERT INTO ipbans VALUES (DEFAULT, ?, ?)");
-						ps.setString(1, ip);
-                                                ps.setString(2, String.valueOf(target.getClient().getAccID()));
-                                                
-						ps.executeUpdate();
-						ps.close();
-					}
-                                        
-                                        con.close();
-				} catch (SQLException ex) {
-                                        ex.printStackTrace();
-					c.getPlayer().message("Error occured while banning IP address");
-					c.getPlayer().message(target.getName() + "'s IP was not banned: " + ip);
-				}
-				target.getClient().banMacs();
-				reason = c.getPlayer().getName() + " banned " + readableTargetName + " for " + reason + " (IP: " + ip + ") " + "(MAC: " + c.getMacs() + ")";
-				target.ban(reason);
-				target.yellowMessage("You have been banned by #b" + c.getPlayer().getName() + " #k.");
-				target.yellowMessage("Reason: " + reason);
-				c.announce(MaplePacketCreator.getGMEffect(4, (byte) 0));
-				final MapleCharacter rip = target;
-				TimerManager.getInstance().schedule(new Runnable() {
-					@Override
-					public void run() {
-						rip.getClient().disconnect(false, false);
-					}
-				}, 5000); //5 Seconds
-				Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, "[RIP]: " + ign + " has been banned."));
-			} else if (MapleCharacter.ban(ign, reason, false)) {
-				c.announce(MaplePacketCreator.getGMEffect(4, (byte) 0));
-				Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, "[RIP]: " + ign + " has been banned."));
-			} else {
-				c.announce(MaplePacketCreator.getGMEffect(6, (byte) 1));
-			}
-                    break;
-  
-                    
-                case "unban":
-                        if (sub.length < 2){
-				player.yellowMessage("Syntax: !unban <playername>");
-				break;
-			}
-                    
-			try {
-                                con = DatabaseConnection.getConnection();
-                                int aid = MapleCharacter.getAccountIdByName(sub[1]);
-                                
-                                PreparedStatement p = con.prepareStatement("UPDATE accounts SET banned = -1 WHERE id = " + aid);
-                                p.executeUpdate();
-                            
-				p = con.prepareStatement("DELETE FROM ipbans WHERE aid = " + aid);
-				p.executeUpdate();
-                                        
-                                p = con.prepareStatement("DELETE FROM macbans WHERE aid = " + aid);
-				p.executeUpdate();
-                                
-                                con.close();
-			} catch (Exception e) {
-                                e.printStackTrace();
-				player.message("Failed to unban " + sub[1]);
-				return true;
-			}
-			player.message("Unbanned " + sub[1]);
-                    break;
+		
 
                 case "healmap":
                         for (MapleCharacter mch : player.getMap().getCharacters()) {
