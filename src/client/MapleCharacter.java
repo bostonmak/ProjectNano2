@@ -502,7 +502,7 @@ public void saveInventory() throws SQLException {
         MapleLogger.info("Task: {}, Character: {}, Status: {}",
                 "Save Inventory", this.getName(), "STARTING");
         boolean taskSuccess = false;
-        long lastTaskTime = System.currentTimeMillis();
+        long saveInventoryTaskTime = System.currentTimeMillis();
         Connection con = null;
         PreparedStatement allCharacterItemsQuery = null;
         ResultSet allCharacterItemsResult = null;
@@ -515,6 +515,7 @@ public void saveInventory() throws SQLException {
         PreparedStatement insertIntoInventoryItemsTableQuery = null;
         ResultSet inventoryItemsTableGeneratedKeysResult = null;
         try {
+            long lastTaskTime = System.currentTimeMillis();
             con = DatabaseConnection.getConnection();
             con.setAutoCommit(false);
             allCharacterItemsQuery = con.prepareStatement("SELECT * FROM inventoryitems WHERE characterid=?", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
@@ -740,12 +741,9 @@ public void saveInventory() throws SQLException {
         } catch (SQLException e) {
             MapleLogger.info("ERROR: Exception caught while saving character, " + this.getName(), e);
         } finally {
-            String taskStatus = TASK_FAILED;
-            if (taskSuccess) {
-                taskStatus = TASK_SUCCESSFUL;
-            }
+            String taskStatus = taskSuccess ? TASK_SUCCESSFUL : TASK_FAILED;
             MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                    "Save Inventory", this.getName(), taskStatus, System.currentTimeMillis() - lastTaskTime);
+                    "Save Inventory", this.getName(), taskStatus, System.currentTimeMillis() - saveInventoryTaskTime);
             con.close();
             if (allCharacterItemsQuery != null) allCharacterItemsQuery.close();
             if (allCharacterItemsResult != null) allCharacterItemsResult.close();
