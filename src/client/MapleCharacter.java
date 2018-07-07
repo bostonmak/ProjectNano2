@@ -567,7 +567,7 @@ public void saveInventory() throws SQLException {
                     deleteFromInventoryItemsTableQuery.setInt(1, allCharacterItemsResult.getInt("inventoryitemid"));
                     deleteFromInventoryItemsTableQuery.addBatch();
 
-                } else if (current.isTheSame(thisItem)) {
+                } else if (!current.isTheSame(thisItem)) {
                     //Update this item with the new data
 
                     Object[] data = null;
