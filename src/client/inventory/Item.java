@@ -175,14 +175,4 @@ public class Item implements Comparable<Item> {
     public MaplePet getPet() {
         return pet;
     }
-
-    public boolean isTheSame(Item item) {
-        if( this.getItemId() == item.getItemId() &&
-            this.getPosition() == item.getPosition() &&
-            this.getQuantity() == item.getQuantity() &&
-            this.getPetId() == item.getPetId() ) {
-            return true;
-        }
-        return false;
-    }
 }

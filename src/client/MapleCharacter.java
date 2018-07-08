@@ -568,7 +568,7 @@ public void saveInventory() throws SQLException {
                     deleteFromInventoryItemsTableQuery.setInt(1, allCharacterItemsResult.getInt("inventoryitemid"));
                     deleteFromInventoryItemsTableQuery.addBatch();
 
-                } else if (!current.isTheSame(thisItem)) {
+                } else if (!current.equals(thisItem)) {
                     //Update this item with the new data
 
                     Object[] data = null;
@@ -744,7 +744,7 @@ public void saveInventory() throws SQLException {
             String taskStatus = taskSuccess ? TASK_SUCCESSFUL : TASK_FAILED;
             MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Save Inventory", this.getName(), taskStatus, System.currentTimeMillis() - saveInventoryTaskTime);
-            con.close();
+            if (con != null) con.close();
             if (allCharacterItemsQuery != null) allCharacterItemsQuery.close();
             if (allCharacterItemsResult != null) allCharacterItemsResult.close();
             if (deleteFromInventoryItemsTableQuery != null) deleteFromInventoryItemsTableQuery.close();
