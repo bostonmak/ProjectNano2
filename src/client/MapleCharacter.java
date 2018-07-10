@@ -499,7 +499,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     }
     
 public void saveInventory() throws SQLException {
-        MapleLogger.info("Task: {}, Character: {}, Status: {}",
+        MapleLogger.debug("Task: {}, Character: {}, Status: {}",
                 "Save Inventory", this.getName(), "STARTING");
         boolean taskSuccess = false;
         long saveInventoryTaskTime = System.currentTimeMillis();
@@ -628,7 +628,7 @@ public void saveInventory() throws SQLException {
                 }
 
             }
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Creating PreparedStatements batch for existing inventoryitems", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
@@ -708,41 +708,41 @@ public void saveInventory() throws SQLException {
                 }
 
             }
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "PreparedStatements for new inventoryitems", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
 
             updateInventoryItemsTableQuery.executeBatch();
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "upds.executeBatch()", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
             updateInventoryEquipmentTableQuery.executeBatch();
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "eqs.executeBatch()", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
             deleteFromInventoryItemsTableQuery.executeBatch();
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "dels.executeBatch()", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
             updatePetsTableQuery.executeBatch();
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "pets.executeBatch()", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
             insertIntoInventoryEquipmentTableQuery.executeBatch();
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "ieqs.executeBatch()", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
             insertIntoPetsTableQuery.executeBatch();
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "ipets.executeBatch()", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
             con.commit();
             taskSuccess = true;
         } catch (SQLException e) {
-            MapleLogger.info("ERROR: Exception caught while saving character, " + this.getName(), e);
+            MapleLogger.error("ERROR: Exception caught while saving character, " + this.getName(), e);
         } finally {
             String taskStatus = taskSuccess ? TASK_SUCCESSFUL : TASK_FAILED;
-            MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Save Inventory", this.getName(), taskStatus, System.currentTimeMillis() - saveInventoryTaskTime);
             if (con != null) con.close();
             if (allCharacterItemsQuery != null) allCharacterItemsQuery.close();
