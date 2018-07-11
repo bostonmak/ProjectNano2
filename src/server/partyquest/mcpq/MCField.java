@@ -362,6 +362,9 @@ public class MCField {
 
         red.setEnemy(blue);
         blue.setEnemy(red);
+
+        red.resetCP();
+        blue.resetCP();
     }
 
     private void beginCarnival() {

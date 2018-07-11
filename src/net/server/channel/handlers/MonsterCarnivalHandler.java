@@ -30,6 +30,7 @@ import server.partyquest.MonsterCarnival;
 import server.life.MapleLifeFactory;
 import server.maps.MapleReactor;
 import server.maps.MapleReactorFactory;
+import server.partyquest.mcpq.MCField;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
@@ -40,19 +41,20 @@ import tools.data.input.SeekableLittleEndianAccessor;
 public final class MonsterCarnivalHandler extends AbstractMaplePacketHandler{
     public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
         MapleCharacter chr = c.getPlayer();
-        MonsterCarnival carnival = chr.getCarnival();
+        MCField field = chr.getMCPQField();
         int tab = slea.readByte();
         int number = slea.readShort();
-        if (carnival != null) {
-            if (chr.getCarnivalParty() != carnival.getPartyRed() || chr.getCarnivalParty() != carnival.getPartyBlue()) {
+        if (field != null) {
+            if (chr.getMCPQTeam().code != MCField.MCTeam.RED.code && chr.getMCPQTeam().code != MCField.MCTeam.BLUE.code) {
                 chr.getMap().broadcastMessage(MaplePacketCreator.leaveCPQ(chr));
                 chr.changeMap(980000010);
             }
-            if (chr.getCP() > getPrice(tab, number)) {
+            else if (chr.getCP() > getPrice(tab, number)) {
                 if (tab == 0) { //SPAWNING
-                    if (chr.getCarnivalParty().canSummon()) {
-                        chr.getMap().spawnCPQMonster(MapleLifeFactory.getMonster(getMonster(number)), new Point(1, 1), carnival.oppositeTeam(chr.getCarnivalParty()).getTeam());
-                        chr.getCarnivalParty().summon();
+                    if (chr.getMCPQParty().canSummon()) {
+                        chr.getMap().spawnCPQMonster(MapleLifeFactory.getMonster(getMonster(number)), new Point(1, 1), chr.getMCPQTeam().code % 1);
+                        chr.getMCPQParty().summon();
+                        chr.loseCP(getPrice(tab, number));
                     } else
                         chr.announce(MaplePacketCreator.CPQMessage((byte) 2));
 

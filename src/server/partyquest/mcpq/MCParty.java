@@ -27,6 +27,7 @@ public class MCParty {
     private List<MapleCharacter> characters = new ArrayList<>();
     private int availCP = 0;
     private int totalCP = 0;
+    private int summons = 7;
     private MCField.MCTeam team = MCField.MCTeam.NONE;
     private MCField field;
     private MCParty enemy;
@@ -141,6 +142,14 @@ public class MCParty {
     public void broadcast(byte[] pkt) {
         for (MapleCharacter chr : getMembers()) {
             chr.getClient().announce(pkt);
+        }
+    }
+
+    public void resetCP() {
+        for (MapleCharacter chr : getMembers()) {
+            chr.setAvailableCP(0);
+            chr.setObtainedCP(0);
+            chr.setTotalCP(0);
         }
     }
 
@@ -298,5 +307,13 @@ public class MCParty {
 
     public int getTotalCP() {
         return totalCP;
+    }
+
+    public void summon() {
+        this.summons--;
+    }
+
+    public boolean canSummon() {
+        return this.summons > 0;
     }
 } 
