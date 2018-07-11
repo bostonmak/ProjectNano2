@@ -69,6 +69,7 @@ import java.sql.Connection;
 import server.MakerItemFactory.MakerItemCreateEntry;
 import server.life.MapleMonsterInformationProvider;
 import server.life.MapleLifeFactory;
+import tools.StringUtil;
 
 /**
  *
@@ -81,6 +82,7 @@ public class MapleItemInformationProvider {
     protected MapleDataProvider itemData;
     protected MapleDataProvider equipData;
     protected MapleDataProvider stringData;
+    protected MapleDataProvider etcData;
     protected MapleData cashStringData;
     protected MapleData consumeStringData;
     protected MapleData eqpStringData;
@@ -112,11 +114,14 @@ public class MapleItemInformationProvider {
     protected Map<Integer, Boolean> consumeOnPickupCache = new HashMap<>();
     protected Map<Integer, Boolean> isQuestItemCache = new HashMap<>();
     protected Map<Integer, Boolean> isPartyQuestItemCache = new HashMap<>();
+     protected Map<Integer, Pair<Integer, String>> replaceOnExpireCache = new HashMap<>();
     protected Map<Integer, String> equipmentSlotCache = new HashMap<>();
     protected Map<Integer, Boolean> noCancelMouseCache = new HashMap<>();
     protected Map<Integer, Integer> mobCrystalMakerCache = new HashMap<>();
     protected Map<Integer, Pair<String, Integer>> statUpgradeMakerCache = new HashMap<>();
     protected Map<Integer, MakerItemFactory.MakerItemCreateEntry> makerItemCache = new HashMap<>();
+    protected Map<Integer, Integer> makerCatalystCache = new HashMap<>();
+ 
 
 
     private MapleItemInformationProvider() {
@@ -469,6 +474,19 @@ public class MapleItemInformationProvider {
         }
         priceCache.put(itemId, pEntry);
         return pEntry;
+    }
+    public Pair<Integer, String> getReplaceOnExpire(int itemId) {   // thanks to GabrielSin
+        if (replaceOnExpireCache.containsKey(itemId)) {
+            return replaceOnExpireCache.get(itemId);
+        }
+ 
+        int itemReplacement = MapleDataTool.getInt("info/replace/itemid", getItemData(itemId), 0);
+        String msg = MapleDataTool.getString("info/replace/msg", getItemData(itemId));
+ 
+        Pair<Integer, String> ret = new Pair<>(itemReplacement, msg);
+        replaceOnExpireCache.put(itemId, ret);
+ 
+        return ret;
     }
     
     protected String getEquipmentSlot(int itemId) {

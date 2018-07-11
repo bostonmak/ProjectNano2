@@ -56,7 +56,7 @@ import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MaplePet;
 import constants.ItemConstants;
-
+import constants.GameConstants;
 /**
  *
  * @author Matze
@@ -77,7 +77,9 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
                 this.npcOid = oid;
 		this.scriptName = scriptName;
 	}
-
+        public GameConstants getGameConstantsInstance(){
+            return GameConstants.getInstance();
+        }
 	public int getNpc() {
 		return npc;
 	}

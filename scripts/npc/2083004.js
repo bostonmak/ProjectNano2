@@ -34,6 +34,7 @@ var em;
 var exped = MapleExpeditionType.HORNTAIL;
 var expedName = "Horntail";
 var expedBoss = "mighty Horntail";
+var eye = 4001017;
 
 var list = "What would you like to do?#b\r\n\r\n#L1#View current Expedition members#l\r\n#L2#Start the fight!#l\r\n#L3#Stop the expedition.#l";
 
@@ -70,14 +71,21 @@ function action(mode, type, selection) {
                     cm.sendOk("You have already registered for the expedition. Please wait for #r" + expedition.getLeader().getName() + "#k to begin the expedition.");
                     cm.dispose();
                 } else { //If you aren't in it, you're going to get added
+                    if(cm.haveItem(eye, 1)) {
                     cm.sendOk(expedition.addMember(cm.getPlayer()));
                     cm.dispose();
+                    }
+                    else {
+                        cm.sendOk("Sorry, you need 1 Eye of Fire to Horntail");
+                    }
                 }
             } else if (expedition.isInProgress()) { //Only if the expedition is in progress
                 if (expedition.contains(player)) { //If you're registered, warp you in
                     var eim = em.getInstance(expedName + player.getClient().getChannel());
                     if(eim.getIntProperty("canJoin") == 1) {
                         eim.registerPlayer(player);
+                        eim.gainItem(eye, -1);
+                       
                     } else {
                         cm.sendOk("Your expedition already started the battle against " + expedBoss + ". Lets pray for those brave souls.");
                     }
@@ -136,7 +144,15 @@ function action(mode, type, selection) {
                     return;
                 }
                 
+                else if(cm.haveItem(eye, 1)) {
                 cm.sendOk("Good luck! All of Leafre is counting on you.");
+                cm.gainItem(eye, -1);
+                }
+                else{
+                    cm.sendOk("Sorry, you need 1 Eye of Fire to Horntail");
+                    cm.dispose();
+                    return;
+                }
                 status = 4;
             } else if (selection == 3) {
                 player.getMap().broadcastMessage(MaplePacketCreator.serverNotice(6, expedition.getLeader().getName() + " has ended the expedition."));

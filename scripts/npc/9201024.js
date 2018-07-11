@@ -1,30 +1,80 @@
+/*
+    This file is part of the HeavenMS (MapleSolaxiaV2) MapleStory Server
+    Copyleft (L) 2017 RonanLana
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation version 3 as published by
+    the Free Software Foundation. You may not use, modify or distribute
+    this program under any other version of the GNU Affero General Public
+    License.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/* Nana, the Love fairy
+	Amoria (680000000)
+	Engagement ring NPC.
+ */
+
+var status;
+var state;
 
 var item;
-var common = Array(1702699, 1702698, 1072697, 1702696, 1702695, 1702694, 1702693, 1702692, 1702691, 1702690, 1702689, 1702688, 1702687, 1702686, 1702685, 1702684, 1702682, 1702681, 1702680, 1702679, 1702677, 1702676, 1702675, 1702673);
-var normal = Array(1702659, 1702658, 1702657, 1702656, 1702655, 1702654, 1702653, 1702652, 1702651, 1702650, 1702644, 1702648, 1702646, 1702642, 1702640, 1702638, 1702639, 1702637, 1702635, 1702634, 1702633, 1702632, 1702631, 1702630, 1702629); 
-var rare = Array(1702608, 1702607, 1702606, 1702605, 1702604, 1702603, 1702602, 1702601, 1702600, 1702599, 1702597, 1702595, 1702594, 1702593, 1702591, 1702590, 1702589, 1702588, 1702587, 1702586, 1702585, 1702584, 1702583, 1702581, 1702579);
-var rare1 = Array(1702623, 1702621, 1702619, 1702616, 1702617, 1702614, 1702613, 1702612, 1702611, 1702672, 1702671, 1702668, 1702667, 1702666, 1702628, 1702627, 1702626, 1702625, 1702624, 1702577, 1702576, 1702575, 1702574, 1702572);
-var rare2 = Array(1702670, 1702571, 1702570, 1702567, 1702566, 1702565, 1702564, 1702562, 1702561, 1702560, 1702559, 1702557, 1702556, 1702555, 1702554, 1702553, 1702551, 1702550, 1702549, 1702541, 1702540);
+var mats;
+var matQty;
+var cost;
 
-function getRandom(min, max) {
-    if (min > max) {
-        return(-1);
+var options;
+
+function hasProofOfLoves(player) {
+    var count = 0;
+    
+    for(var i = 4031367; i <= 4031372; i++) {
+        if(player.haveItem(i)) {
+            count++;
+        }
     }
-
-    if (min == max) {
-        return(min);
-    }
-
-    return(min + parseInt(Math.random() * (max - min + 1)));
+    
+    return count >= 4;
 }
 
-var icommon = common[getRandom(0, common.length - 1)];
-var inormal = normal[getRandom(0, normal.length - 1)];
-var irare = rare[getRandom(0, rare.length - 1)];
-var irare1 = rare1[getRandom(0, rare1.length - 1)];
-var irare2 = rare2[getRandom(0, rare2.length - 1)];
+function getNanaLocation(player) {
+    var mapid = player.getMap().getId();
+    
+    for(var i = 0; i < mapids.length; i++) {
+        if(mapid == mapids[i]) {
+            return i;
+        }
+    }
+    
+    return -1;
+}
 
-var chance = getRandom(0, 9);
+var nanaLoc;
+var mapids = [100000000, 103000000, 102000000, 101000000, 200000000, 220000000];
+var questItems = [4000001, 4000037, 4000215, 4000026, 4000070, 4000128];
+var questExp = [2000, 5000, 10000, 17000, 22000, 30000];
+
+function processNanaQuest() {
+    if(cm.haveItem(questItems[nanaLoc], 50)) {
+        if(cm.canHold(4031367 + nanaLoc, 1)) {
+            cm.gainItem(questItems[nanaLoc], -50);
+            cm.gainItem(4031367 + nanaLoc, 1);
+
+            cm.sendOk("Kyaaaa~ Thank you a lot, here get the #b#t4031367##k.");
+            return true;
+        } else {
+            cm.sendOk("Please have a free ETC slot available to hold the token of love.");
+        }
+    } else {
+        cm.sendOk("Please gather to me #b50 #t" + questItems[nanaLoc] + "##k.");
+    }
+    
+    return false;
+}
 
 function start() {
     status = -1;
@@ -35,46 +85,58 @@ function action(mode, type, selection) {
     if (mode == -1) {
         cm.dispose();
     } else {
-        if (mode == 0) {
-            cm.sendOk("#rOkay, come back when you're ready to test your #eRNG!");
+        if (mode == 0 && type > 0) {
             cm.dispose();
             return;
-        } else if (mode == 1) {
-            status++;
         }
+        if (mode == 1)
+            status++;
+        else
+            status--;
 
-        if (status == 0) {
-            cm.sendNext(" #i3991013##i3991023##i3991006##i3991000##i3991002##i3991007##i3991000##i3991015##i3991014##i3991013# \r\nHello #h #,\r\n\r\nWant to try your luck at the #r#eNX Weapon Gachapon?#n#k You can earn assorted up to date NX Weapons Remember that it will cost you #r#e10,000,000 mesos#n#k a spin! #b#eGood Luck!");
-        } else if (status == 1) {
-            if (cm.getMeso() >= 10000000) {
-                //cm.gainMeso([-1]);
-                cm.sendNext(" #eFeatured NX Items in May#e \r\n\r\n #i1702565# #i1702671#  #i1702585# #i1702593# #i1702630# #i1702695# #i1702594#\r\n ------------------------------------------------------------------------------ \r\n#i1702631# #i1702689# #i1702645# #i1702606# #i1702676# #i1702694# #i1702677# \r\n ------------------------------------------------------------------------------ \r\n #i1702603# #i1702687# #i1702602# #i1702651# #i1702601# #i1702686# #i1702600# \r\n ------------------------------------------------------------------------------ \r\n \t\t\t\t\t\#e#rGood Luck Adventurer!");
-                
-            } else {
-                cm.sendOk("Sorry you dont have 10,000,000 mesos :(");
-                cm.dispose();               
-                }
-        } else if (status == 2) {
-        //           cm.setDailyReward('DailyGift');
-                     
-
-            if (chance > 0 && chance <= 1) {
-            cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(icommon, 1) + "##k #v" + icommon + "#"); 
-            cm.gainMeso([-10000000]);
-            } else if (chance >= 2 && chance <= 3) {
-            cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(inormal, 1) + "##k #v" + inormal + "#");
-            cm.gainMeso([-10000000]);
-            } else if (chance >=4 && chance <=5) {
-            cm.sendOk("#b#eCongratulations!#n#k You have obtained a #d#t" + cm.gainItem(irare, 1) + "##k #v" + irare + "#");
-            cm.gainMeso([-10000000]);
-            } else if (chance >= 6 && chance <= 7) {
-            cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare1, 1) + "##k #v" + irare1 + "#");
-            cm.gainMeso([-10000000]);
-            } else if (chance >= 8 && chance <= 9) {
-            cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare2, 1) + "##k #v" + irare2 + "#");
-            cm.gainMeso([-10000000]);
+        if(status == 0) {
+            if(!cm.isQuestStarted(100400)) {
+                cm.sendOk("Hello #b#h0##k, I'm #p9201001# the fairy of Love.");
+                cm.dispose();
+                return;
             }
-            cm.dispose();
+            
+            nanaLoc = getNanaLocation(cm.getPlayer());
+            if(nanaLoc == -1) {
+                cm.sendOk("Hello #b#h0##k, I'm #p9201001# the fairy of Love.");
+                cm.dispose();
+                return;
+            }
+            
+            if(!cm.haveItem(4031367 + nanaLoc, 1)) {
+                if(cm.isQuestCompleted(100401 + nanaLoc)) {
+                    state = 1;
+                    cm.sendAcceptDecline("Did you lost the #k#t4031367##k I gave to you? Well, I can share another one with you, but you will need to redo the favor I asked last time, is that ok? I need you to bring me #r50 #t" + questItems[nanaLoc] + "#'s.#k");
+                } else if(cm.isQuestStarted(100401 + nanaLoc)) {
+                    if(processNanaQuest()) {
+                        cm.gainExp(questExp[nanaLoc] * cm.getPlayer().getExpRate());
+                        cm.completeQuest(100401 + nanaLoc);
+                    }
+                    
+                    cm.dispose();
+                } else {
+                    state = 0;
+                    cm.sendAcceptDecline("Are you searching for #k#t4031367#'s#k? I can share one with you, but you must do a favor for me, is that ok?");
+                }
+            } else {
+                cm.sendOk("Hey there. Did you get the #t4031367# from the other Nana's already?");
+                cm.dispose();
+            }
+        } else if(status == 1) {
+            if(state == 0) {
+                cm.startQuest(100401 + nanaLoc);
+                
+                cm.sendOk("I need you to collect #r50 #t" + questItems[nanaLoc] + "##k.");
+                cm.dispose();
+            } else {
+                processNanaQuest();
+                cm.dispose();
+            }
         }
     }
 }

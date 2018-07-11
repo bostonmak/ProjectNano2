@@ -29,21 +29,21 @@ function action(mode, type, selection) {
                 var selStr = ""; 
                 /*if (cm.getLevel() >= 20 && cm.getLevel() <= 30) { NOT IMPLEMENTED
                     selStr += "#0# Ariant Coliseum"; 
-                } */
-
+                } 
+*/
                 if (cm.getLevel() >= 25) { 
                     selStr += "#1# Mu Lung Dojo"; 
                 } 
 
-                /*if (cm.getLevel() >= 30 && cm.getLevel() <= 50) { NOT IMPLEMENTED
+                if (cm.getLevel() >= 30 && cm.getLevel() <= 50) {
                     selStr += "#2# Monster Carnival 1"; 
                 } 
 
-                if (cm.getLevel() >= 51 && cm.getLevel() <= 70) { NOT IMPLEMENTED
+                if (cm.getLevel() >= 51 && cm.getLevel() <= 70) { 
                     selStr += "#3# Monster Carnival 2"; 
                 } 
 
-                if (cm.getLevel() >= 40) { NOT IMPLEMENTED
+                /*(cm.getLevel() >= 40) { NOT IMPLEMENTED
                     selStr += "#5# Nett's Pyramid"; 
                 } 
 

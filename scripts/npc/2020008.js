@@ -26,9 +26,12 @@ var sel;
 actionx = {"Mental" : false, "Physical" : false};
 
 function isWarriorOrAran(jobId) {
-    if (parseInt(jobId / 100) == 1) {
+    if (parseInt(jobId / 100) == 1) { //explorer
         return true;
-    } else if (parseInt(jobId / 100) == 21) {
+    } else if (parseInt(jobId / 100) == 21) { //aran
+        return true;
+    }
+	else if (parseInt(jobId / 100) == 11) { //cygnus
         return true;
     }
     return false;
@@ -47,7 +50,7 @@ function start() {
         return;
     }
     
-    if (!(cm.getPlayer().getLevel() >= 70 && isWarriorOrAran(cm.getJobId()))){
+    if (!(cm.getPlayer().getLevel() >= 50 && isWarriorOrAran(cm.getJobId()))){
         cm.sendNext("Hi there.");
         cm.dispose();
         return;

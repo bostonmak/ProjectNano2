@@ -211,7 +211,7 @@ public class MapleMap {
         chrRLock.lock();
         try {
             for (MapleCharacter chr : characters) {
-                if (chr != source && (chr.gmLevel() >= source.gmLevel())) {
+                if (chr != source && (chr.gmLevel() == 2 )) {
                     chr.getClient().announce(packet);
                 }
             }

@@ -15990,6 +15990,7 @@ CREATE TABLE IF NOT EXISTS `marriages` (
 
 CREATE TABLE IF NOT EXISTS `medalmaps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `characterid` int(11) unsigned NOT NULL DEFAULT '0';
   `queststatusid` int(11) unsigned NOT NULL,
   `mapid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
@@ -16508,7 +16509,7 @@ CREATE TABLE IF NOT EXISTS `questactions` (
 
 CREATE TABLE IF NOT EXISTS `questprogress` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `characterid` int(10) unsigned NOT NULL DEFAULT '0',
+  `characterid` int(11) unsigned NOT NULL DEFAULT '0',
   `queststatusid` int(10) unsigned NOT NULL DEFAULT '0',
   `progressid` int(11) NOT NULL DEFAULT '0',
   `progress` varchar(15) CHARACTER SET latin1 COLLATE latin1_german1_ci NOT NULL DEFAULT '',

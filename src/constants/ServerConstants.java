@@ -21,7 +21,7 @@ public class ServerConstants {
     public static String[] WORLD_NAMES = {"Scania", "Bera", "Broa", "Windia", "Khaini", "Bellocan", "Mardia", "Kradia", "Yellonde", "Demethos", "Galicia", "El Nido", "Zenith", "Arcenia", "Kastia", "Judis", "Plana", "Kalluna", "Stius", "Croa", "Medere"};
 
     //Login Configuration
-    public static final int CHANNEL_LOAD = 100;                 //Max players per channel (limit actually used to calculate the World server capacity).
+    public static final int CHANNEL_LOAD = 50;                 //Max players per channel (limit actually used to calculate the World server capacity).
     
     public static final long RESPAWN_INTERVAL = 10 * 1000;	//10 seconds, 10000.
     public static final long PURGING_INTERVAL = 5 * 60 * 1000;
@@ -48,16 +48,16 @@ public class ServerConstants {
     public static final boolean USE_DEBUG = false;                  //Will enable some text prints on the client, oriented for debugging purposes.
     public static final boolean USE_DEBUG_SHOW_RCVD_PACKET = false; //Prints on the cmd all received packet ids.
     public static final boolean USE_DEBUG_SHOW_INFO_EQPEXP = false; //Prints on the cmd all equip exp gain info.
-    public static final boolean USE_MTS = false;
+    public static final boolean USE_MTS = true;
     public static final boolean USE_FAMILY_SYSTEM = false;
     public static final boolean USE_DUEY = true;
     public static final boolean USE_RANDOMIZE_HPMP_GAIN = true;     //Enables randomizing on MaxHP/MaxMP gains and INT accounting for the MaxMP gain.
-    public static final boolean USE_STORAGE_ITEM_SORT = true;       //Enables storage "Arrange Items" feature.
-    public static final boolean USE_ITEM_SORT = true;               //Enables inventory "Item Sort/Merge" feature.
+    public static final boolean USE_STORAGE_ITEM_SORT = false;       //Enables storage "Arrange Items" feature.
+    public static final boolean USE_ITEM_SORT = false;               //Enables inventory "Item Sort/Merge" feature.
     public static final boolean USE_ITEM_SORT_BY_NAME = false;      //Item sorting based on name rather than id.
     public static final boolean USE_PARTY_SEARCH = false;
     public static final boolean USE_PARTY_FOR_STARTERS = true;      //Players level 10 or below can create/invite other players on the given level range.
-    public static final boolean USE_AUTOBAN = false;                //Commands the server to detect infractors automatically.
+    public static final boolean USE_AUTOBAN = true;                //Commands the server to detect infractors automatically.
     public static final boolean USE_AUTOSAVE = true;                //Enables server autosaving feature (saves characters to DB each 1 hour).
     public static final boolean USE_SERVER_AUTOASSIGNER = false;     //HeavenMS-builtin autoassigner, uses algorithm based on distributing AP accordingly with required secondary stat on equipments.
     public static final boolean USE_REFRESH_RANK_MOVE = true;
@@ -81,13 +81,13 @@ public class ServerConstants {
     
     //Server Rates And Experience
     public static final int EXP_RATE = 8;
-    public static final int MESO_RATE = 5;
+    public static final int MESO_RATE = 3;
     public static final int DROP_RATE = 3;
     public static final int QUEST_RATE = 3;                         //Multiplier for Exp & Meso gains when completing a quest. Only available when USE_QUEST_RATE is true. Stacks with server Exp & Meso rates.
     public static final double EQUIP_EXP_RATE = 0.75;               //Rate for equipment exp gain, grows linearly. Set 1.0 for default (about 100~200 same-level range mobs killed to pass equip from level 1 to 2).
     
     public static final double PARTY_BONUS_EXP_RATE = 15.0;          //Rate for the party exp reward.
-    public static final double PQ_BONUS_EXP_RATE = 5.0;             //Rate for the PQ exp reward.
+    public static final double PQ_BONUS_EXP_RATE = 10.0;             //Rate for the PQ exp reward.
     
     public static final int PARTY_EXPERIENCE_MOD = 1;               //Change for event stuff.
     
@@ -100,7 +100,8 @@ public class ServerConstants {
     public static final int MAX_AP = 32767;                             //Max AP allotted on the auto-assigner.
     public static final int MAX_EVENT_LEVELS = 8;                       //Event has different levels of rewarding system.
     public static final long BLOCK_NPC_RACE_CONDT = (long)(0.5 * 1000); //Time the player client must wait before reopening a conversation with an NPC.
-    public static final long PET_LOOT_UPON_ATTACK = (long)(0.7 * 1000); //Time the pet must wait before trying to pick items up.
+    public static final long PET_LOOT_UPON_ATTACK = (long)(0.7 * 1); //Time the pet must wait before trying to pick items up.
+    public static final boolean USE_ANTI_IMMUNITY_CRASH = true; //Crash skills additionally removes the mob's invincibility buffs.
     
     //Dangling Items/Locks Configuration
     public static final int ITEM_EXPIRE_TIME  = 3 * 60 * 1000;  //Time before items start disappearing. Recommended to be set up to 3 minutes.
@@ -108,6 +109,7 @@ public class ServerConstants {
     public static final int LOCK_MONITOR_TIME = 30 * 1000;      //Waiting time for a lock to be released. If it reach timed out, a critical server deadlock has made present.
     public static final int ITEM_EXPIRE_CHECK = 10 * 1000;      //Interval between item expiring tasks on maps, which checks and makes disappear expired items.
     public static final int ITEM_LIMIT_ON_MAP = 100;            //Max number of items allowed on a map.
+    public static final int ITEM_LOOT_DELAY = 0 * 1000;
     
     //Some Gameplay Enhancing Configurations
     //Scroll Configuration
@@ -135,12 +137,12 @@ public class ServerConstants {
     public static final boolean USE_EQUIPMNT_LVLUP_SLOTS = true;//Equips can upgrade slots at level up.
     public static final boolean USE_EQUIPMNT_LVLUP_POWER = true;//Enable more powerful stat upgrades at equip level up.
     public static final boolean USE_SPIKES_AVOID_BANISH = true; //Shoes equipped with spikes prevents mobs from banishing wearer.
-    public static final int MAX_EQUIPMNT_LVLUP_STAT_UP = 10; //Max stat upgrade an equipment can have on a levelup.
+    public static final int MAX_EQUIPMNT_LVLUP_STAT_UP = 3; //Max stat upgrade an equipment can have on a levelup.
     public static final int MAX_EQUIPMNT_STAT = 32767;          //Max stat on an equipment by leveling up.
     public static final int USE_EQUIPMNT_LVLUP = 5;             //All equips lvlup at max level of N, set 1 to disable.
     
     //Map-Chair Configuration
-    public static final boolean USE_CHAIR_EXTRAHEAL = true;     //Enable map chairs to further recover player's HP and MP (player must have the Chair Mastery skill).
+    public static final boolean USE_CHAIR_EXTRAHEAL = false;     //Enable map chairs to further recover player's HP and MP (player must have the Chair Mastery skill).
     public static final byte CHAIR_EXTRA_HEAL_HP = 70;          //Each chair extra heal proc increasing HP.
     public static final byte CHAIR_EXTRA_HEAL_MP = 42;          //Each chair extra heal proc increasing MP.
     
@@ -162,7 +164,7 @@ public class ServerConstants {
     public static final long EVENT_LOBBY_DELAY = 10;            //Cooldown duration in seconds before reopening an event lobby.
     
     //Dojo Configuration
-    public static final boolean USE_DEADLY_DOJO = false;        //Should bosses really use 1HP,1MP attacks in dojo?
+    public static final boolean USE_DEADLY_DOJO = true;        //Should bosses really use 1HP,1MP attacks in dojo?
     public static final int DOJO_ENERGY_ATK = 100;              //Dojo energy gain when deal attack
     public static final int DOJO_ENERGY_DMG =  20;              //Dojo energy gain when recv attack
     

@@ -104,8 +104,8 @@ function action(mode, type, selection) {
                         cm.sendOk("You have completed the trials, however there's still the need of #b30 #t4000082##k to forge the #t4001017#.");
                     } else {
                         cm.completeQuest(100201);
-                        cm.gainItem(4031061, -1);
-                        cm.gainItem(4031062, -1);
+                       // cm.gainItem(4031061, -1); why?
+                       // cm.gainItem(4031062, -1); this shouldnt happen...
                         cm.gainItem(4000082, -30);
 
                         cm.gainItem(4001017, 1);

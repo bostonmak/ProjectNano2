@@ -5,9 +5,10 @@ function start() {
 function action(mode, type, selection) {
 		//cm.resetStats();
  // Double Swing
-		cm.teachSkill(21000000,0, 0); // Combat Ability
+ if(cm.getPlayer().getSkillLevel(2221003) == 0)
+		cm.teachSkill(2221003,0, 10); // Combat Ability
  // Combat Step
-		cm.teachSkill(21001003,0, 0); // Pole Arm Booster
+		/*cm.teachSkill(21001003,0, 0); // Pole Arm Booster
 		// Aran Second job
  // Triple Swing
 		cm.teachSkill(21100000,0, 0); // Pole Arm Mastery
@@ -22,7 +23,29 @@ function action(mode, type, selection) {
 		cm.teachSkill(21110004,0,0); // Fenir Phantom
 		cm.teachSkill(21111005,0,0); // Snow Charge
 		cm.teachSkill(21110006,0,0); // WhirlWind
-		cm.teachSkill(21111001,0,0); // Smart Knockback*/
+		cm.teachSkill(21111001,0,0); // Smart Knockback
+		if(cm.getJobId() == 212) {
+                                        if(cm.getPlayer().getSkillLevel(2121007) == 0)
+                                                cm.teachSkill(2121007 , 0, 10, -1);
+                                        if(cm.getPlayer().getSkillLevel(2121005) == 0)
+                                                cm.teachSkill(2121005 , 0, 10, -1);
+                                        if(cm.getPlayer().getSkillLevel(2121005) == 0)
+                                                cm.teachSkill(2121005 , 0, 10, -1);
+                                } else if(cm.getJobId() == 222) {
+                                        if(cm.getPlayer().getSkillLevel(2221007) == 0)
+                                                cm.teachSkill(2221007 , 0, 10, -1);
+                                        if(cm.getPlayer().getSkillLevel(2221005) == 0)
+                                                cm.teachSkill(2221005 , 0, 10, -1);
+                                        if(cm.getPlayer().getSkillLevel(2221003) == 0)
+                                                cm.teachSkill(2221003 , 0, 10, -1);
+                                } else if(cm.getJobId() == 232) {
+                                        if (cm.getPlayer().getSkillLevel(2321008) < 1)
+                                                cm.teachSkill(2321008, 0, 10,-1); // Genesis 
+                                        if (cm.getPlayer().getSkillLevel(2321006) < 1)
+                                                cm.teachSkill(2321006, 0, 10,-1); // res
+                                }
+                                cm.sendOk("It is done. Leave me now.");
+                        }*/
 cm.dispose();
 	    }
 

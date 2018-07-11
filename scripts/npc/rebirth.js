@@ -25,9 +25,6 @@ function writeJobSelections() {
 }
 
 var status;
-var GOLDEN_MAPLE_LEAF_ID = 4001168;
-var NUMBER_OF_ITEMS_REQUIRED_TO_REBIRTH = 1;
-var NAME_OF_ITEM_REQUIRED_TO_REBIRTH = "Golden Maple Leaf";
 
 function start() {
     status = -1
@@ -36,6 +33,7 @@ function start() {
 }
 
 function action(mode, type, selection) {
+    var GameConstantsInstance = cm.getGameConstantsInstance();
     if (mode === -1) {
         cm.dispose();
     } else {
@@ -60,19 +58,23 @@ function action(mode, type, selection) {
             cm.sendSimple(sendStr);
         } else if (status === 1) {
             if (cm.getPlayer().isMaxLevel()) {
-                if (cm.getPlayer().haveItemWithId(GOLDEN_MAPLE_LEAF_ID, false)) {
+                if (
+                    cm.getPlayer().haveItemWithId(GameConstantsInstance.getItemIdUsedForRebirth(), false) &&
+                    cm.getPlayer().getItemQuantity(GameConstantsInstance.getItemIdUsedForRebirth(), false) >= cm.getPlayer().getNumberOfItemsRequiredToRebirth()
+                ) {
                     if (selection === 0) {
                         cm.getPlayer().rebirthToBeginner();
                         cm.dispose();
                     } else if (selection === 1) {
                         cm.getPlayer().rebirthToNoblesse();
+						cm.warp(130030000, 0);
                         cm.dispose();
                     } else if (selection === 2) {
                         cm.getPlayer().rebirthToLegend();
                         cm.dispose();
                     }
                 } else {
-                    cm.sendOk("You cannot rebirth. You are missing " + NUMBER_OF_ITEMS_REQUIRED_TO_REBIRTH + " " + NAME_OF_ITEM_REQUIRED_TO_REBIRTH + ".")
+                    cm.sendOk("You cannot rebirth. You are missing " + cm.getPlayer().getNumberOfItemsRequiredToRebirth() + " " + GameConstantsInstance.getItemNameUsedForRebirth() + ".")
                 }
             } else {
                 cm.sendOk("You cannot rebirth. You do not meet the level requirement to rebirth.");
