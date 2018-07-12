@@ -15990,7 +15990,7 @@ CREATE TABLE IF NOT EXISTS `marriages` (
 
 CREATE TABLE IF NOT EXISTS `medalmaps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `characterid` int(11) unsigned NOT NULL DEFAULT '0';
+  `characterid` int(11) unsigned NOT NULL DEFAULT '0',
   `queststatusid` int(11) unsigned NOT NULL,
   `mapid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
