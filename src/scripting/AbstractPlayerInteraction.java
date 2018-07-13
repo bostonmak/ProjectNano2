@@ -964,7 +964,7 @@ public class AbstractPlayerInteraction {
 	 *	2 - A Bossentries object was null
 	 *	3 - Bossentries list was empty
 	 */
-	private int AllPartyMembersHaveEntriesLeftForExpedition(List<MapleCharacter> players, MapleExpeditionType mapleExpeditionType) {
+	private int allPartyMembersHaveEntriesLeftForExpedition(List<MapleCharacter> players, MapleExpeditionType mapleExpeditionType) {
 		List<Bossentries> bossentriesList = new ArrayList<>();
 		try {
 			bossentriesList = BossentriesRepository.GetEntriesForParty(players);
@@ -1009,19 +1009,19 @@ public class AbstractPlayerInteraction {
 	}
 
 	public int allPartyMembersHaveEntriesLeftForZakum(List<MapleCharacter> players) {
-		return AllPartyMembersHaveEntriesLeftForExpedition(players, MapleExpeditionType.ZAKUM);
+		return allPartyMembersHaveEntriesLeftForExpedition(players, MapleExpeditionType.ZAKUM);
 	}
 
 	public int allPartyMembersHaveEntriesLeftForHorntail(List<MapleCharacter> players) {
-		return AllPartyMembersHaveEntriesLeftForExpedition(players, MapleExpeditionType.HORNTAIL);
+		return allPartyMembersHaveEntriesLeftForExpedition(players, MapleExpeditionType.HORNTAIL);
 	}
 
     public int allPartyMembersHaveEntriesLeftForShowaboss(List<MapleCharacter> players) {
-        return AllPartyMembersHaveEntriesLeftForExpedition(players, MapleExpeditionType.SHOWA);
+        return allPartyMembersHaveEntriesLeftForExpedition(players, MapleExpeditionType.SHOWA);
     }
 
     public int allPartyMembersHaveEntriesLeftForScarlion(List<MapleCharacter> players) {
-        return AllPartyMembersHaveEntriesLeftForExpedition(players, MapleExpeditionType.SCARGA);
+        return allPartyMembersHaveEntriesLeftForExpedition(players, MapleExpeditionType.SCARGA);
     }
 
     /**
@@ -1090,15 +1090,22 @@ public class AbstractPlayerInteraction {
 	 * 1 - Exception was thrown
 	 */
 	public int decrementEntriesForParty(List<MapleCharacter> players, MapleExpeditionType mapleExpeditionType) {
+		long startTime = System.currentTimeMillis();
+		boolean success = false;
 		try {
             BossentriesRepository.DecrementEntriesForParty(players, mapleExpeditionType);
+            success = true;
 		} catch (DecrementBossentryZeroOrLessException | UpdatedRowCountMismatchException e) {
 			logger.error("Error in DecrementEntriesForParty.", e);
 			return 1;
 		} catch (NoMapleCharacterIdsException ex) {
             logger.error("Error expedition party was found to be empty.", ex);
             return 1;
-        }
+        } finally {
+			String status = success ? "SUCCESS" : "FAILED";
+			logger.info("Task: {}, Status: {}, ExecutionTime: {}ms, Party: {}, Boss: {}",
+					this, status, System.currentTimeMillis() - startTime, players, mapleExpeditionType);
+		}
 
 		return 0;
 	}
