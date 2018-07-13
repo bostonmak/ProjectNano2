@@ -21,6 +21,8 @@
  */
 package server.maps;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.sql.Connection;
@@ -59,6 +61,7 @@ public class MapleMapFactory {
     private ReadLock mapsRLock;
     private WriteLock mapsWLock;
     private int channel, world;
+    private static Logger MapleLogger = LoggerFactory.getLogger(MapleMapFactory.class);
 
     public MapleMapFactory(EventInstanceManager eim, MapleDataProvider source, MapleDataProvider stringSource, int world, int channel) {
         this.source = source;
@@ -563,15 +566,19 @@ public class MapleMapFactory {
             map.setRespawning(false);
         }
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("SELECT * FROM playernpcs WHERE map = ?")) {
+            Connection con = DatabaseConnection.getConnection();
+            con.setReadOnly(true);
+            try (PreparedStatement ps = con.prepareStatement("SELECT * FROM playernpcs WHERE map = ?")) {
                 ps.setInt(1, omapid);
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         map.addMapObject(new PlayerNPCs(rs));
                     }
+                    rs.close();
                 }
             }
         } catch (Exception e) {
+            MapleLogger.warn("Monster Carnival NPC Exception", e);
         }
         for (MapleData life : mapData.getChildByPath("life")) {
             String id = MapleDataTool.getString(life.getChildByPath("id"));
@@ -630,7 +637,7 @@ public class MapleMapFactory {
                 backTypes.put(layerNum, type);
             }
         } catch (Exception e) {
-            // swallow cause I'm cool
+            MapleLogger.warn("Maple Map Layer Exception", e);
         }
         map.setBackgroundTypes(backTypes);
         return map;
