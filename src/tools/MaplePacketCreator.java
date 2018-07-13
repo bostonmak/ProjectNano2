@@ -75,6 +75,7 @@ import server.maps.MapleSummon;
 import server.maps.PlayerNPCs;
 import server.movement.LifeMovementFragment;
 import server.partyquest.MonsterCarnivalParty;
+import server.partyquest.mcpq.MCParty;
 import tools.data.output.LittleEndianWriter;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import client.BuddylistEntry;
@@ -7242,10 +7243,10 @@ public class MaplePacketCreator {
                 return mplew.getPacket();
         }
 
-        public static byte[] updatePartyCP(MonsterCarnivalParty party) {
+        public static byte[] updatePartyCP(MCParty party) {
                 final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(7);
                 mplew.writeShort(SendOpcode.MONSTER_CARNIVAL_PARTY_CP.getValue());
-                mplew.write(party.getTeam()); //Team where the points are given to.
+                mplew.write(party.getTeam().code); //Team where the points are given to.
                 mplew.writeShort(party.getAvailableCP()); //Obtained CP - Used CP
                 mplew.writeShort(party.getTotalCP()); //Total Obtained CP
                 return mplew.getPacket();

@@ -21,6 +21,8 @@
  */
 package server.maps;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.sql.Connection;
@@ -44,6 +46,7 @@ import server.PortalFactory;
 import server.life.AbstractLoadedMapleLife;
 import server.life.MapleLifeFactory;
 import server.life.MapleMonster;
+import server.partyquest.mcpq.MCWZData;
 import scripting.event.EventInstanceManager;
 import tools.DatabaseConnection;
 import tools.StringUtil;
@@ -58,6 +61,7 @@ public class MapleMapFactory {
     private ReadLock mapsRLock;
     private WriteLock mapsWLock;
     private int channel, world;
+    private static Logger MapleLogger = LoggerFactory.getLogger(MapleMapFactory.class);
 
     public MapleMapFactory(EventInstanceManager eim, MapleDataProvider source, MapleDataProvider stringSource, int world, int channel) {
         this.source = source;
@@ -471,5 +475,171 @@ public class MapleMapFactory {
         
         for(MapleMap map: mapValues) map.setEventInstance(null);
         this.event = null;
+    }
+    
+    public MapleMap instanceMap(int mapid, boolean respawns, boolean npcs) {
+        return instanceMap(mapid, respawns, npcs, true);
+    }
+
+    public MapleMap instanceMap(int mapid, boolean respawns, boolean npcs, boolean reactors) {
+        Integer omapid = Integer.valueOf(mapid);
+        MapleMap map;
+        String mapName = getMapName(mapid);
+        MapleData mapData = source.getData(mapName);
+        String link = MapleDataTool.getString(mapData.getChildByPath("info/link"), "");
+        if (!link.equals("")) { //nexon made hundreds of dojo maps so to reduce the size they added links.
+            mapName = getMapName(Integer.parseInt(link));
+            mapData = source.getData(mapName);
+        }
+        float monsterRate = 0;
+        MapleData mobRate = mapData.getChildByPath("info/mobRate");
+        if (mobRate != null) {
+            monsterRate = ((Float) mobRate.getData()).floatValue();
+        }
+        map = new MapleMap(mapid, world, channel, MapleDataTool.getInt("info/returnMap", mapData), monsterRate);
+
+        String onFirstEnter = MapleDataTool.getString(mapData.getChildByPath("info/onFirstUserEnter"), String.valueOf(mapid));
+        map.setOnFirstUserEnter(onFirstEnter.equals("") ? String.valueOf(mapid) : onFirstEnter);
+
+        String onEnter = MapleDataTool.getString(mapData.getChildByPath("info/onUserEnter"), String.valueOf(mapid));
+        map.setOnUserEnter(onEnter.equals("") ? String.valueOf(mapid) : onEnter);
+
+        map.setFieldLimit(MapleDataTool.getInt(mapData.getChildByPath("info/fieldLimit"), 0));
+        map.setMobInterval((short) MapleDataTool.getInt(mapData.getChildByPath("info/createMobInterval"), 5000));
+        PortalFactory portalFactory = new PortalFactory();
+        for (MapleData portal : mapData.getChildByPath("portal")) {
+            map.addPortal(portalFactory.makePortal(MapleDataTool.getInt(portal.getChildByPath("pt")), portal));
+        }
+        MapleData timeMob = mapData.getChildByPath("info/timeMob");
+        if (timeMob != null) {
+            map.timeMob(MapleDataTool.getInt(timeMob.getChildByPath("id")),
+                    MapleDataTool.getString(timeMob.getChildByPath("message")));
+        }
+
+        List<MapleFoothold> allFootholds = new LinkedList<>();
+        Point lBound = new Point();
+        Point uBound = new Point();
+        for (MapleData footRoot : mapData.getChildByPath("foothold")) {
+            for (MapleData footCat : footRoot) {
+                for (MapleData footHold : footCat) {
+                    int x1 = MapleDataTool.getInt(footHold.getChildByPath("x1"));
+                    int y1 = MapleDataTool.getInt(footHold.getChildByPath("y1"));
+                    int x2 = MapleDataTool.getInt(footHold.getChildByPath("x2"));
+                    int y2 = MapleDataTool.getInt(footHold.getChildByPath("y2"));
+                    MapleFoothold fh = new MapleFoothold(new Point(x1, y1), new Point(x2, y2), Integer.parseInt(footHold.getName()));
+                    fh.setPrev(MapleDataTool.getInt(footHold.getChildByPath("prev")));
+                    fh.setNext(MapleDataTool.getInt(footHold.getChildByPath("next")));
+                    if (fh.getX1() < lBound.x) {
+                        lBound.x = fh.getX1();
+                    }
+                    if (fh.getX2() > uBound.x) {
+                        uBound.x = fh.getX2();
+                    }
+                    if (fh.getY1() < lBound.y) {
+                        lBound.y = fh.getY1();
+                    }
+                    if (fh.getY2() > uBound.y) {
+                        uBound.y = fh.getY2();
+                    }
+                    allFootholds.add(fh);
+                }
+            }
+        }
+        MapleFootholdTree fTree = new MapleFootholdTree(lBound, uBound);
+        for (MapleFoothold fh : allFootholds) {
+            fTree.insert(fh);
+        }
+        map.setFootholds(fTree);
+        if (mapData.getChildByPath("area") != null) {
+            for (MapleData area : mapData.getChildByPath("area")) {
+                int x1 = MapleDataTool.getInt(area.getChildByPath("x1"));
+                int y1 = MapleDataTool.getInt(area.getChildByPath("y1"));
+                int x2 = MapleDataTool.getInt(area.getChildByPath("x2"));
+                int y2 = MapleDataTool.getInt(area.getChildByPath("y2"));
+                map.addMapleArea(new Rectangle(x1, y1, (x2 - x1), (y2 - y1)));
+            }
+        }
+        MapleData mcData = mapData.getChildByPath("monsterCarnival");
+        if (mcData != null) {
+            MCWZData mcpqInfo = new MCWZData(mcData);
+            map.setMCPQData(mcpqInfo);
+            map.setRespawning(false);
+        }
+        try {
+            Connection con = DatabaseConnection.getConnection();
+            con.setReadOnly(true);
+            try (PreparedStatement ps = con.prepareStatement("SELECT * FROM playernpcs WHERE map = ?")) {
+                ps.setInt(1, omapid);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        map.addMapObject(new PlayerNPCs(rs));
+                    }
+                    rs.close();
+                }
+            }
+        } catch (Exception e) {
+            MapleLogger.warn("Monster Carnival NPC Exception", e);
+        }
+        for (MapleData life : mapData.getChildByPath("life")) {
+            String id = MapleDataTool.getString(life.getChildByPath("id"));
+            String type = MapleDataTool.getString(life.getChildByPath("type"));
+            if (id.equals("9001105")) {
+                id = "9001108";//soz
+            }
+            AbstractLoadedMapleLife myLife = loadLife(life, id, type);
+            if (myLife instanceof MapleMonster) {
+                MapleMonster monster = (MapleMonster) myLife;
+                int mobTime = MapleDataTool.getInt("mobTime", life, 0);
+                int team = MapleDataTool.getInt("team", life, -1);
+                if (mobTime == -1) { //does not respawn, force spawn once
+                    map.spawnMonster(monster);
+                } else {
+                    map.addMonsterSpawn(monster, mobTime, team);
+                }
+            } else {
+                map.addMapObject(myLife);
+            }
+        }
+        if (mapData.getChildByPath("reactor") != null) {
+            for (MapleData reactor : mapData.getChildByPath("reactor")) {
+                String id = MapleDataTool.getString(reactor.getChildByPath("id"));
+                if (id != null) {
+                    MapleReactor newReactor = loadReactor(reactor, id);
+                    map.spawnReactor(newReactor);
+                }
+            }
+        }
+        try {
+            map.setMapName(MapleDataTool.getString("mapName", nameData.getChildByPath(getMapStringName(omapid)), ""));
+            map.setStreetName(MapleDataTool.getString("streetName", nameData.getChildByPath(getMapStringName(omapid)), ""));
+        } catch (Exception e) {
+            map.setMapName("");
+            map.setStreetName("");
+        }
+
+        map.setClock(mapData.getChildByPath("clock") != null);
+        map.setEverlast(mapData.getChildByPath("everlast") != null);
+        map.setTown(mapData.getChildByPath("info/town") != null);
+        map.setHPDec(MapleDataTool.getIntConvert("info/decHP", mapData, 0));
+        map.setHPDecProtect(MapleDataTool.getIntConvert("info/protectItem", mapData, 0));
+        map.setForcedReturnMap(MapleDataTool.getInt(mapData.getChildByPath("info/forcedReturn"), 999999999));
+        map.setBoat(mapData.getChildByPath("shipObj") != null);
+        map.setTimeLimit(MapleDataTool.getIntConvert("timeLimit", mapData.getChildByPath("info"), -1));
+        map.setFieldType(MapleDataTool.getIntConvert("info/fieldType", mapData, 0));
+        map.setMobCapacity(MapleDataTool.getIntConvert("fixedMobCapacity", mapData.getChildByPath("info"), 500));//Is there a map that contains more than 500 mobs?
+
+        HashMap<Integer, Integer> backTypes = new HashMap<>();
+        try {
+            for (MapleData layer : mapData.getChildByPath("back")) { // yolo
+                int layerNum = Integer.parseInt(layer.getName());
+                int type = MapleDataTool.getInt(layer.getChildByPath("type"), 0);
+
+                backTypes.put(layerNum, type);
+            }
+        } catch (Exception e) {
+            MapleLogger.warn("Maple Map Layer Exception", e);
+        }
+        map.setBackgroundTypes(backTypes);
+        return map;
     }
 }

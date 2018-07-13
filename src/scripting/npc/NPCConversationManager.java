@@ -281,6 +281,8 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 		return getPlayer().getLevel();
 	}
 
+	public int getChannel() { return c.getChannel(); }
+
 	public void showEffect(String effect) {
 		getPlayer().getMap().broadcastMessage(MaplePacketCreator.environmentChange(effect, 3));
 	}

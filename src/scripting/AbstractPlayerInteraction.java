@@ -21,6 +21,8 @@
  */
 package scripting;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.awt.Point;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -68,6 +70,8 @@ import server.life.MapleNPC;
 import tools.Pair;
 
 public class AbstractPlayerInteraction {
+
+	private static Logger MapleLogger = LoggerFactory.getLogger(AbstractPlayerInteraction.class);
 
 	public MapleClient c;
 
@@ -299,9 +303,9 @@ public class AbstractPlayerInteraction {
 		return c.getPlayer().getQuest(MapleQuest.getInstance(id)).getStatus().getId();
 	}
         
-        private MapleQuestStatus.Status getQuestStat(int id) {
-                return c.getPlayer().getQuest(MapleQuest.getInstance(id)).getStatus();
-        }
+	private MapleQuestStatus.Status getQuestStat(int id) {
+		return c.getPlayer().getQuest(MapleQuest.getInstance(id)).getStatus();
+	}
         
 	public boolean isQuestCompleted(int quest) {
 		try {
@@ -312,7 +316,7 @@ public class AbstractPlayerInteraction {
 		}
 	}
 
-        public boolean isQuestActive(int quest) {
+	public boolean isQuestActive(int quest) {
             return isQuestStarted(quest);
         }
         
@@ -320,94 +324,94 @@ public class AbstractPlayerInteraction {
 		try {
 			return getQuestStat(quest) == MapleQuestStatus.Status.STARTED;
 		} catch (NullPointerException e) {
-                        e.printStackTrace();
+			e.printStackTrace();
 			return false;
 		}
 	}
         
-        public void setQuestProgress(int qid, int progress) {
-                MapleQuestStatus status = c.getPlayer().getQuest(MapleQuest.getInstance(qid));
-                status.setProgress(status.getAnyProgressKey(), String.valueOf(progress));
-        }
-        
-        public void setQuestProgress(int qid, int pid, int progress) {
-                MapleQuestStatus status = c.getPlayer().getQuest(MapleQuest.getInstance(qid));
-                status.setProgress(pid, String.valueOf(progress));
+	public void setQuestProgress(int qid, int progress) {
+			MapleQuestStatus status = c.getPlayer().getQuest(MapleQuest.getInstance(qid));
+			status.setProgress(status.getAnyProgressKey(), String.valueOf(progress));
+	}
+
+	public void setQuestProgress(int qid, int pid, int progress) {
+			MapleQuestStatus status = c.getPlayer().getQuest(MapleQuest.getInstance(qid));
+			status.setProgress(pid, String.valueOf(progress));
 	}
         
-        public void setStringQuestProgress(int qid, int pid, String progress) {
-                MapleQuestStatus status = c.getPlayer().getQuest(MapleQuest.getInstance(qid));
-                status.setProgress(pid, progress);
-        }
-        
-        public int getQuestProgress(int qid) {
-                MapleQuestStatus status = c.getPlayer().getQuest(MapleQuest.getInstance(qid));
-                String progress = status.getProgress(status.getAnyProgressKey());
-            
-                if(progress.isEmpty()) return 0;
-                return Integer.parseInt(progress);
-        }
-        
-        public int getQuestProgress(int qid, int pid) {
-                if(getPlayer().getQuest(MapleQuest.getInstance(qid)).getProgress(pid).isEmpty()) return 0;
+	public void setStringQuestProgress(int qid, int pid, String progress) {
+			MapleQuestStatus status = c.getPlayer().getQuest(MapleQuest.getInstance(qid));
+			status.setProgress(pid, progress);
+	}
+
+	public int getQuestProgress(int qid) {
+			MapleQuestStatus status = c.getPlayer().getQuest(MapleQuest.getInstance(qid));
+			String progress = status.getProgress(status.getAnyProgressKey());
+
+			if(progress.isEmpty()) return 0;
+			return Integer.parseInt(progress);
+	}
+
+	public int getQuestProgress(int qid, int pid) {
+		if(getPlayer().getQuest(MapleQuest.getInstance(qid)).getProgress(pid).isEmpty()) return 0;
 		return Integer.parseInt(getPlayer().getQuest(MapleQuest.getInstance(qid)).getProgress(pid));
 	}
         
-        public String getStringQuestProgress(int qid, int pid) {
-                if(getPlayer().getQuest(MapleQuest.getInstance(qid)).getProgress(pid).isEmpty()) return "";
-                return getPlayer().getQuest(MapleQuest.getInstance(qid)).getProgress(pid);
-        }
-        
-        public void resetAllQuestProgress(int qid) {
-                getPlayer().getQuest(MapleQuest.getInstance(qid)).resetAllProgress();
-                getClient().announce(MaplePacketCreator.updateQuest(getPlayer().getQuest(MapleQuest.getInstance(qid)), false));
-        }
-        
-        public void resetQuestProgress(int qid, int pid) {
-                getPlayer().getQuest(MapleQuest.getInstance(qid)).resetProgress(pid);
-                getClient().announce(MaplePacketCreator.updateQuest(getPlayer().getQuest(MapleQuest.getInstance(qid)), false));
-        }
-        
-        public Item evolvePet(byte slot, int afterId) {
-            MaplePet evolved = null;
-            MaplePet target;
-            
-            long period = 90 * 24 * 60 * 60 * 1000;    //refreshes expiration date: 90 days
-            
-            target = getPlayer().getPet(slot);
-            if(target == null) {
-                getPlayer().message("Pet could not be evolved...");
-                return(null);
-            }
-            
-            Item tmp = gainItem(afterId, (short) 1, false, true, period, target);
-            getPlayer().unequipPet(target, true, false);
-            
-            /*
-            evolved = MaplePet.loadFromDb(tmp.getItemId(), tmp.getPosition(), tmp.getPetId());
-            
-            evolved = tmp.getPet();
-            if(evolved == null) {
-                getPlayer().message("Pet structure non-existent for " + tmp.getItemId() + "...");
-                return(null);
-            }
-            else if(tmp.getPetId() == -1) {
-                getPlayer().message("Pet id -1");
-                return(null);
-            }
-            
-            getPlayer().addPet(evolved);
-            
-            getPlayer().getMap().broadcastMessage(c.getPlayer(), MaplePacketCreator.showPet(c.getPlayer(), evolved, false, false), true);
-            c.announce(MaplePacketCreator.petStatUpdate(c.getPlayer()));
-            c.announce(MaplePacketCreator.enableActions());
-            chr.getClient().getWorldServer().registerPetHunger(chr, chr.getPetIndex(evolved));
-            */
-            
-            MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.CASH, target.getPosition(), (short) 1, false);
-            
-            return evolved;
-        }
+	public String getStringQuestProgress(int qid, int pid) {
+			if(getPlayer().getQuest(MapleQuest.getInstance(qid)).getProgress(pid).isEmpty()) return "";
+			return getPlayer().getQuest(MapleQuest.getInstance(qid)).getProgress(pid);
+	}
+
+	public void resetAllQuestProgress(int qid) {
+			getPlayer().getQuest(MapleQuest.getInstance(qid)).resetAllProgress();
+			getClient().announce(MaplePacketCreator.updateQuest(getPlayer().getQuest(MapleQuest.getInstance(qid)), false));
+	}
+
+	public void resetQuestProgress(int qid, int pid) {
+			getPlayer().getQuest(MapleQuest.getInstance(qid)).resetProgress(pid);
+			getClient().announce(MaplePacketCreator.updateQuest(getPlayer().getQuest(MapleQuest.getInstance(qid)), false));
+	}
+
+	public Item evolvePet(byte slot, int afterId) {
+		MaplePet evolved = null;
+		MaplePet target;
+
+		long period = 90 * 24 * 60 * 60 * 1000;    //refreshes expiration date: 90 days
+
+		target = getPlayer().getPet(slot);
+		if(target == null) {
+			getPlayer().message("Pet could not be evolved...");
+			return(null);
+		}
+
+		Item tmp = gainItem(afterId, (short) 1, false, true, period, target);
+		getPlayer().unequipPet(target, true, false);
+
+		/*
+		evolved = MaplePet.loadFromDb(tmp.getItemId(), tmp.getPosition(), tmp.getPetId());
+
+		evolved = tmp.getPet();
+		if(evolved == null) {
+			getPlayer().message("Pet structure non-existent for " + tmp.getItemId() + "...");
+			return(null);
+		}
+		else if(tmp.getPetId() == -1) {
+			getPlayer().message("Pet id -1");
+			return(null);
+		}
+
+		getPlayer().addPet(evolved);
+
+		getPlayer().getMap().broadcastMessage(c.getPlayer(), MaplePacketCreator.showPet(c.getPlayer(), evolved, false, false), true);
+		c.announce(MaplePacketCreator.petStatUpdate(c.getPlayer()));
+		c.announce(MaplePacketCreator.enableActions());
+		chr.getClient().getWorldServer().registerPetHunger(chr, chr.getPetIndex(evolved));
+		*/
+
+		MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.CASH, target.getPosition(), (short) 1, false);
+
+		return evolved;
+	}
         
 	public void gainItem(int id, short quantity) {
 		gainItem(id, quantity, false, true);
@@ -429,38 +433,38 @@ public class AbstractPlayerInteraction {
 		return gainItem(id, quantity, randomStats, showMessage, -1);
 	}
 
-        public Item gainItem(int id, short quantity, boolean randomStats, boolean showMessage, long expires) {
-            return gainItem(id, quantity, randomStats, showMessage, expires, null);
-        }
-        
-        public Item gainItem(int id, short quantity, boolean randomStats, boolean showMessage, long expires, MaplePet from) {
-		Item item = null;
-                MaplePet evolved;
-                int petId = -1;
+	public Item gainItem(int id, short quantity, boolean randomStats, boolean showMessage, long expires) {
+		return gainItem(id, quantity, randomStats, showMessage, expires, null);
+	}
+
+	public Item gainItem(int id, short quantity, boolean randomStats, boolean showMessage, long expires, MaplePet from) {
+	Item item = null;
+			MaplePet evolved;
+			int petId = -1;
 		
 		if (quantity >= 0) {
-                        if (ItemConstants.isPet(id)) {
-                                petId = MaplePet.createPet(id);
+			if (ItemConstants.isPet(id)) {
+					petId = MaplePet.createPet(id);
 
-                                if(from != null) {
-                                    evolved = MaplePet.loadFromDb(id, (short) 0, petId);
+					if(from != null) {
+						evolved = MaplePet.loadFromDb(id, (short) 0, petId);
 
-                                    Point pos = getPlayer().getPosition();
-                                    pos.y -= 12;
-                                    evolved.setPos(pos);
-                                    evolved.setFh(getPlayer().getMap().getFootholds().findBelow(evolved.getPos()).getId());
-                                    evolved.setStance(0);
-                                    evolved.setSummoned(true);
+						Point pos = getPlayer().getPosition();
+						pos.y -= 12;
+						evolved.setPos(pos);
+						evolved.setFh(getPlayer().getMap().getFootholds().findBelow(evolved.getPos()).getId());
+						evolved.setStance(0);
+						evolved.setSummoned(true);
 
-                                    evolved.setName(from.getName().compareTo(MapleItemInformationProvider.getInstance().getName(from.getItemId())) != 0 ? from.getName() : MapleItemInformationProvider.getInstance().getName(id));
-                                    evolved.setCloseness(from.getCloseness());
-                                    evolved.setFullness(from.getFullness());
-                                    evolved.setLevel(from.getLevel());
-                                    evolved.saveToDb();
-                                }
+						evolved.setName(from.getName().compareTo(MapleItemInformationProvider.getInstance().getName(from.getItemId())) != 0 ? from.getName() : MapleItemInformationProvider.getInstance().getName(id));
+						evolved.setCloseness(from.getCloseness());
+						evolved.setFullness(from.getFullness());
+						evolved.setLevel(from.getLevel());
+						evolved.saveToDb();
+					}
 
-                                //MapleInventoryManipulator.addById(c, id, (short) 1, null, petId, expires == -1 ? -1 : System.currentTimeMillis() + expires);
-                        }
+					//MapleInventoryManipulator.addById(c, id, (short) 1, null, petId, expires == -1 ? -1 : System.currentTimeMillis() + expires);
+			}
                     
 			MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
 
@@ -512,10 +516,10 @@ public class AbstractPlayerInteraction {
 		return item;
 	}
         
-        public void gainFame(int delta) {
-                c.getPlayer().addFame(delta);
-                c.announce(MaplePacketCreator.getShowFameGain(delta));
-        }
+	public void gainFame(int delta) {
+			c.getPlayer().addFame(delta);
+			c.announce(MaplePacketCreator.getShowFameGain(delta));
+	}
 
 	public void changeMusic(String songName) {
 		getPlayer().getMap().broadcastMessage(MaplePacketCreator.musicChange(songName));
@@ -566,8 +570,6 @@ public class AbstractPlayerInteraction {
 		showIntro(intro);
 	}
 
-
-
 	public void showIntro(String path) {
 		c.announce(MaplePacketCreator.showIntro(path));
 	}
@@ -596,22 +598,20 @@ public class AbstractPlayerInteraction {
 		return getPlayer().getParty();
 	}
         
-        public boolean isLeader() {
-                return isPartyLeader();
-        }
-        
-        public boolean isGuildLeader() {
-                return getPlayer().isGuildLeader();
-        }
+	public boolean isLeader() {
+			return isPartyLeader();
+	}
 
-        public boolean isPartyLeader() {
-		if(getParty() == null)
-			return false;
-		
-                return getParty().getLeaderId() == getPlayer().getId();
+	public boolean isGuildLeader() {
+			return getPlayer().isGuildLeader();
+	}
+
+	public boolean isPartyLeader() {
+		if (getParty() == null)	return false;
+		return getParty().getLeaderId() == getPlayer().getId();
 	}
         
-        public boolean isEventLeader() {
+	public boolean isEventLeader() {
 		return getEventInstance() != null && getPlayer().getId() == getEventInstance().getLeaderId();
 	}
 
@@ -647,9 +647,9 @@ public class AbstractPlayerInteraction {
 		}
 	}
         
-        public void giveCharacterExp(int amount, MapleCharacter chr) {
-                chr.gainExp((amount * chr.getExpRate()), true, true);
-        }
+	public void giveCharacterExp(int amount, MapleCharacter chr) {
+			chr.gainExp((amount * chr.getExpRate()), true, true);
+	}
 
 	public void givePartyExp(int amount, List<MapleCharacter> party) {
 		for (MapleCharacter chr : party) {
@@ -789,18 +789,18 @@ public class AbstractPlayerInteraction {
 		c.announce(MaplePacketCreator.modifyInventory(false, Collections.singletonList(new ModifyInventory(0, newItem))));
 	}
         
-        public static void spawnNpc(int npcId, Point pos, MapleMap map) {
-                MapleNPC npc = MapleLifeFactory.getNPC(npcId);
-                if (npc != null) {
-                        npc.setPosition(pos);
-                        npc.setCy(pos.y);
-                        npc.setRx0(pos.x + 50);
-                        npc.setRx1(pos.x - 50);
-                        npc.setFh(map.getFootholds().findBelow(pos).getId());
-                        map.addMapObject(npc);
-                        map.broadcastMessage(MaplePacketCreator.spawnNPC(npc));
-                }
-        }
+	public static void spawnNpc(int npcId, Point pos, MapleMap map) {
+		MapleNPC npc = MapleLifeFactory.getNPC(npcId);
+		if (npc != null) {
+			npc.setPosition(pos);
+			npc.setCy(pos.y);
+			npc.setRx0(pos.x + 50);
+			npc.setRx1(pos.x - 50);
+			npc.setFh(map.getFootholds().findBelow(pos).getId());
+			map.addMapObject(npc);
+			map.broadcastMessage(MaplePacketCreator.spawnNPC(npc));
+		}
+	}
         
 	public void spawnMonster(int id, int x, int y) {
 		MapleMonster monster = MapleLifeFactory.getMonster(id);
@@ -812,7 +812,7 @@ public class AbstractPlayerInteraction {
 		return MapleLifeFactory.getMonster(mid);
 	}
         
-        public static MobSkill getMobSkill(int skill, int level) {
+	public static MobSkill getMobSkill(int skill, int level) {
 		return MobSkillFactory.getMobSkill(skill, level);
 	}
 
@@ -832,15 +832,15 @@ public class AbstractPlayerInteraction {
 		c.announce(MaplePacketCreator.dojoWarpUp());
 	}
         
-        public void resetDojoEnergy() {
-                c.getPlayer().setDojoEnergy(0);
-        }
-        
-        public void resetPartyDojoEnergy() {
-                for(MapleCharacter pchr: c.getPlayer().getPartyMembersOnSameMap()) {
-                        pchr.setDojoEnergy(0);
-                }
-        }
+	public void resetDojoEnergy() {
+			c.getPlayer().setDojoEnergy(0);
+	}
+
+	public void resetPartyDojoEnergy() {
+		for(MapleCharacter pchr: c.getPlayer().getPartyMembersOnSameMap()) {
+			pchr.setDojoEnergy(0);
+		}
+	}
 
 	public void enableActions() {
 		c.announce(MaplePacketCreator.enableActions());
@@ -924,27 +924,27 @@ public class AbstractPlayerInteraction {
 		return null;
 	}
         
-        public long getJailTimeLeft() {
-                return getPlayer().getJailExpirationTimeLeft();
-        }
-        
-        public List<MaplePet> getDriedPets() {
-                List<MaplePet> list = new LinkedList<>();
-            
-                long curTime = System.currentTimeMillis();
-                for(Item it : getPlayer().getInventory(MapleInventoryType.CASH).list()) {
-                        if(ItemConstants.isPet(it.getItemId()) && it.getExpiration() < curTime) {
-                                MaplePet pet = it.getPet();
-                                if (pet != null) {
-                                        list.add(pet);
-                                }
-                        }
-                }
-                
-                return list;
-        }
-        
-        public boolean startDungeonInstance(int dungeonid) {
+	public long getJailTimeLeft() {
+			return getPlayer().getJailExpirationTimeLeft();
+	}
+
+	public List<MaplePet> getDriedPets() {
+			List<MaplePet> list = new LinkedList<>();
+
+			long curTime = System.currentTimeMillis();
+			for(Item it : getPlayer().getInventory(MapleInventoryType.CASH).list()) {
+					if(ItemConstants.isPet(it.getItemId()) && it.getExpiration() < curTime) {
+							MaplePet pet = it.getPet();
+							if (pet != null) {
+									list.add(pet);
+							}
+					}
+			}
+
+			return list;
+	}
+
+	public boolean startDungeonInstance(int dungeonid) {
                 return c.getChannelServer().addMiniDungeon(dungeonid);
         }
 

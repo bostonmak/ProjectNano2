@@ -138,6 +138,8 @@ public class MapleStatEffect {
     private Point lt, rb;
     private byte bulletCount, bulletConsume;
     private byte mapProtection;
+    private boolean consumeOnPickup, party;
+    private int cp, nuffSkill;
 
     public static MapleStatEffect loadSkillEffectFromData(MapleData source, int skillid, boolean overtime) {
         return loadFromData(source, skillid, true, overtime);
@@ -1698,5 +1700,21 @@ public class MapleStatEffect {
 
     public Map<MonsterStatus, Integer> getMonsterStati() {
         return monsterStatus;
+    }
+    
+    public int getCP() {
+        return cp;
+    }
+
+    public boolean isParty() {
+        return party;
+    }
+
+    public boolean isConsumeOnPickup() {
+        return consumeOnPickup;
+    }
+
+    public int getNuffSkill() {
+        return nuffSkill;
     }
 }

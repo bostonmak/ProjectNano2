@@ -81,6 +81,7 @@ import server.life.MonsterGlobalDropEntry;
 import server.life.SpawnPoint;
 import server.partyquest.MonsterCarnival;
 import server.partyquest.MonsterCarnivalParty;
+import server.partyquest.mcpq.MCWZData;
 //import server.partyquest.Pyramid;
 import scripting.event.EventInstanceManager;
 import server.life.MonsterListener;
@@ -159,6 +160,10 @@ public class MapleMap {
     private final WriteLock chrWLock;
     private final ReadLock objectRLock;
     private final WriteLock objectWLock;
+    
+    //CPQ
+    private boolean respawning = true;
+    private MCWZData mcpqData;
 
     // due to the nature of loadMapFromWz (synchronized), sole function that calls 'generateMapDropRangeCache', this lock remains optional.
     private static final Lock bndLock = new MonitoredReentrantLock(MonitoredLockType.MAP_BOUNDS, true);
@@ -1122,10 +1127,11 @@ public class MapleMap {
         monster.setHpZero();
         removeMapObject(monster);
         
-        if (monster.getCP() > 0 && chr.getCarnival() != null) {
-            chr.getCarnivalParty().addCP(chr, monster.getCP());
-            chr.announce(MaplePacketCreator.updateCP(chr.getCP(), chr.getObtainedCP()));
-            broadcastMessage(MaplePacketCreator.updatePartyCP(chr.getCarnivalParty()));
+        if (monster.getCP() > 0 && chr.getMCPQField() != null && chr.getMCPQParty() != null) {
+            chr.getMCPQParty().gainCP(monster.getCP());
+            chr.gainCP(monster.getCP());
+            chr.announce(MaplePacketCreator.updateCP(chr.getCP(), chr.getTotalCP()));
+            broadcastMessage(MaplePacketCreator.updatePartyCP(chr.getMCPQParty()));
             //they drop items too ):
         }
         if (monster.getId() >= 8800003 && monster.getId() <= 8800010) {
@@ -3517,6 +3523,29 @@ public class MapleMap {
         return mobInterval;
     }
     
+    public final List<MapleMonster> getAllMonsters() {
+        return getAllMapObjects(MapleMapObjectType.MONSTER);
+    }
+
+    public void setReactorState(MapleReactor reactor, byte state) {
+        synchronized (this.mapobjects) {
+            reactor.setState(state);
+            broadcastMessage(MaplePacketCreator.triggerReactor(reactor, state));
+        }
+    }
+    
+    public <E extends MapleMapObject> List<E> getAllMapObjects(MapleMapObjectType type) {
+        List<E> ret = new ArrayList<>();
+        synchronized (mapobjects) {
+            for (MapleMapObject l : mapobjects.values()) {
+                if (l.getType() == type) {
+                    ret.add((E) l);
+                }
+            }
+        }
+        return ret;
+    }
+    
     public void clearMapObjects() {
         clearDrops();
         killAllMonsters();
@@ -3624,5 +3653,30 @@ public class MapleMap {
 
             spawnMonsterOnGroundBelow(m, targetPoint);
         }
+    }
+    
+    public Collection<SpawnPoint> getSpawnPoints() {
+        return monsterSpawn;
+    }
+
+    public void beginSpawning() {
+        this.respawning = true;
+        this.respawn();
+    }
+    
+    public boolean isRespawning() {
+        return respawning;
+    }
+
+    public void setRespawning(boolean respawning) {
+        this.respawning = respawning;
+    }
+
+    public MCWZData getMCPQData() {
+        return this.mcpqData;
+    }
+
+    public void setMCPQData(MCWZData data) {
+        this.mcpqData = data;
     }
 }
