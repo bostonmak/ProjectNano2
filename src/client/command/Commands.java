@@ -45,15 +45,20 @@ import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
 
+import exception.MoreThanOneRowException;
+import model.Bossentries;
 import net.MaplePacketHandler;
 import net.PacketProcessor;
 import net.server.Server;
 import net.server.channel.Channel;
 import net.server.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
+import repository.BossentriesRepository;
 import scripting.npc.NPCScriptManager;
 import scripting.portal.PortalScriptManager;
 import server.MapleInventoryManipulator;
@@ -110,6 +115,7 @@ import server.maps.FieldLimit;
 
 public class Commands {
         private static HashMap<String, Integer> gotomaps = new HashMap<String, Integer>();
+    private static Logger logger = LoggerFactory.getLogger(Commands.class);
 
 	private static String[] tips = {
 		"Please only use @gm in emergencies or to report somebody.",
@@ -355,7 +361,7 @@ public class Commands {
             equip.setFlag(flag);
         }
         
-        public static boolean executeHeavenMsCommandLv0(Channel cserv, Server srv, MapleClient c, String[] sub) { //Player
+    public static boolean executeHeavenMsCommandLv0(Channel cserv, Server srv, MapleClient c, String[] sub) { //Player
                 MapleCharacter player = c.getPlayer();
             
                 switch(sub[0]) {
@@ -779,7 +785,20 @@ public class Commands {
                         }
                     
                         break;
-                    
+        case "bossentries": {
+            Bossentries bossentries = null;
+            try {
+                bossentries = BossentriesRepository.GetAllEntriesForCharacterId(player.getId());
+            } catch (MoreThanOneRowException e) {
+                logger.error("Error using command !bossentries. CharacterId returned more than one row. Character: {}, Table: {}", player.getName(), BossentriesRepository.TABLE_NAME);
+            }
+            if (bossentries != null) {
+                player.dropMessage(bossentries.toString());
+            } else {
+                player.dropMessage("Your boss entries cannot be accessed right now. Please contact a GM.");
+            }
+            break;
+        }
                             
                 default:
                         return false;
