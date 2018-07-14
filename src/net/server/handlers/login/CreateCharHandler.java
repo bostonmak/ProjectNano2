@@ -21,8 +21,12 @@
  */
 package net.server.handlers.login;
 
+import exception.UpdatedRowCountMismatchException;
 import net.AbstractMaplePacketHandler;
 import net.server.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import repository.BossentriesRepository;
 import server.MapleItemInformationProvider;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
@@ -37,6 +41,7 @@ import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 
 public final class CreateCharHandler extends AbstractMaplePacketHandler {
+    private static Logger logger = LoggerFactory.getLogger(CreateCharHandler.class);
 
 	private static int[] IDs = {
 		1302000, 1312004, 1322005, 1442079,// weapons
@@ -135,8 +140,15 @@ public final class CreateCharHandler extends AbstractMaplePacketHandler {
 			return;
 		}
 		c.announce(MaplePacketCreator.addNewCharEntry(newchar));
-                
-                Server.getInstance().createCharacterid(newchar.getAccountID(), newchar.getId());
-                Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.sendYellowTip("[NEW CHAR]: " + c.getAccountName() + " has created a new character with IGN " + name));
+
+		Server.getInstance().createCharacterid(newchar.getAccountID(), newchar.getId());
+		Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.sendYellowTip("[NEW CHAR]: " + c.getAccountName() + " has created a new character with IGN " + name));
+
+        try {
+            BossentriesRepository.CreateNewEntryForCharacterId(newchar.getId());
+        } catch (UpdatedRowCountMismatchException e) {
+            Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.sendYellowTip("[NEW CHAR]: Could not create new entry in bossentries table for " + newchar.getName()));
+            logger.error(e.getMessage());
+        }
 	}
 }

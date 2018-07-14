@@ -18,6 +18,41 @@ public class BossentriesRepository {
     public static final String TABLE_NAME = "bossentries";
     private static Logger logger = LoggerFactory.getLogger(BossentriesRepository.class);
 
+    public static void CreateNewEntryForCharacterId(int characterId) throws UpdatedRowCountMismatchException {
+        final String INSERT_INTO_BOSSENTRIES_STRING = "INSERT INTO `bossentries` (`characterid`, `zakum`, `horntail`, `showaboss`, `papulatus`, `scarlion`) VALUES ( " + characterId + ", 2, 2, 2, 2, 2)";
+
+        Connection connection = null;
+        PreparedStatement insertIntoBossentriesQuery = null;
+        int rowsUpdated = 0;
+
+        try {
+            connection = DatabaseConnection.getConnection();
+            connection.setAutoCommit(false);
+            insertIntoBossentriesQuery = connection.prepareStatement(INSERT_INTO_BOSSENTRIES_STRING);
+            rowsUpdated = insertIntoBossentriesQuery.executeUpdate();
+            connection.commit();
+        } catch (SQLException e) {
+            logger.error("Error: Could not insert new character into `bossentries` table. CharacterId: {}", characterId, e);
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                logger.error("Could not rollback.", ex);
+            }
+        }
+        finally {
+            try {
+                if(connection != null) connection.close();
+                if(insertIntoBossentriesQuery != null) insertIntoBossentriesQuery.close();
+            } catch (SQLException e) {
+                logger.error("Could not close connection for all boss entries. CharacterId: {}", characterId, e);
+            }
+        }
+
+        if (rowsUpdated == 0) {
+            throw new UpdatedRowCountMismatchException("Error when trying to insert new character into `bossentries` table. CharacterIds: " + characterId);
+        }
+    }
+
     public static Bossentries GetAllEntriesForCharacterId(int characterId) throws ZeroRowsFetchedException, MoreThanOneRowException {
         final Bossentries bossentries = new Bossentries();
         Connection connection = null;
@@ -139,6 +174,11 @@ public class BossentriesRepository {
             connection.commit();
         } catch (SQLException e) {
             logger.error("Could not give all boss entries. CharacterId: {}", characterId, e);
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                logger.error("Could not rollback.", ex);
+            }
         }
         finally {
             try {
