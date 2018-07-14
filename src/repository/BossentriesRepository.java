@@ -18,6 +18,51 @@ public class BossentriesRepository {
     public static final String TABLE_NAME = "bossentries";
     private static Logger logger = LoggerFactory.getLogger(BossentriesRepository.class);
 
+    public static void SetEntriesForAll(int value) {
+        final String COUNT_BOSSENTRIES_STRING = "SELECT COUNT(*) AS rowcount FROM `bossentries`";
+        final String UPDATE_BOSSENTRIES_STRING = WriteUpdateBossentriesForAllQuery(value);
+
+        Connection connection = null;
+        PreparedStatement countBossentriesQuery = null;
+        ResultSet bossentriesCountResult = null;
+        PreparedStatement updateBossentriesForAllQuery = null;
+
+        int rowCount = 0;
+        int rowsUpdated = 0;
+
+        try {
+            connection = DatabaseConnection.getConnection();
+            connection.setAutoCommit(false);
+            countBossentriesQuery = connection.prepareStatement(COUNT_BOSSENTRIES_STRING);
+            bossentriesCountResult = countBossentriesQuery.executeQuery();
+            bossentriesCountResult.next();
+            rowCount = bossentriesCountResult.getInt("rowcount");
+            updateBossentriesForAllQuery = connection.prepareStatement(UPDATE_BOSSENTRIES_STRING);
+            rowsUpdated = updateBossentriesForAllQuery.executeUpdate();
+            connection.commit();
+        } catch (SQLException e) {
+            logger.error("Error: Could not update all rows in `bossentries` table", e);
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                logger.error("Could not rollback.", ex);
+            }
+        } finally {
+            try {
+                if(connection != null) connection.close();
+                if(countBossentriesQuery != null) countBossentriesQuery.close();
+                if(bossentriesCountResult != null) bossentriesCountResult.close();
+                if(updateBossentriesForAllQuery != null) updateBossentriesForAllQuery.close();
+            } catch (SQLException e) {
+                logger.error("Could not close connection for reset boss entries", e);
+            }
+        }
+
+        if (rowCount != rowsUpdated) {
+            throw new UpdatedRowCountMismatchException("Error when trying to reset all rows in `bossentries` table.");
+        }
+    }
+
     public static void CreateNewEntryForCharacterId(int characterId) throws UpdatedRowCountMismatchException {
         final String INSERT_INTO_BOSSENTRIES_STRING = "INSERT INTO `bossentries` (`characterid`, `zakum`, `horntail`, `showaboss`, `papulatus`, `scarlion`) VALUES ( " + characterId + ", 2, 2, 2, 2, 2)";
 
@@ -414,6 +459,17 @@ public class BossentriesRepository {
             }
         }
         return selectZakumEntriesForPartyBuilder.toString();
+    }
+
+    private static String WriteUpdateBossentriesForAllQuery(int entriesToGive) {
+        return new StringBuilder()
+                .append("UPDATE `bossentries` ")
+                .append("SET `zakum` = " + entriesToGive + ", ")
+                .append(" `horntail` = " + entriesToGive + ", ")
+                .append(" `showaboss` = " + entriesToGive + ", ")
+                .append(" `papulatus` = " + entriesToGive + ", ")
+                .append(" `scarlion` = " + entriesToGive + " ")
+                .toString();
     }
 
     private static String WriteUpdateBossentriesForCharacterIdQuery(int characterId, List<Integer> entriesToGive) {
