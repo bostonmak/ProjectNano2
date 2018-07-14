@@ -38,7 +38,8 @@ public enum MapleExpeditionType {
     CHAOS_ZAKUM(1, 30, 120, 255, 5),
     CHAOS_HORNTAIL(1, 30, 120, 255, 5),
     PINKBEAN(1, 30, 120, 255, 5),
-    CWKPQ(6, 30, 100, 255, 5);
+    CWKPQ(6, 30, 100, 255, 5),
+    PAPULATUS();
     
     private int minSize;
     private int maxSize;
@@ -53,6 +54,8 @@ public enum MapleExpeditionType {
         this.maxLevel = maxLevel;
         this.registrationTime = minutes;
     }
+
+    private MapleExpeditionType() {}
 
     public int getMinSize() {
     	return minSize;

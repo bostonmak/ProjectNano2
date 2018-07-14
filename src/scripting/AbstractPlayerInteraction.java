@@ -990,6 +990,10 @@ public class AbstractPlayerInteraction {
                 if (bossentries.getShowaboss() == 0) {
                     return 1;
                 }
+            case PAPULATUS:
+                if (bossentries.getPapulatus() == 0) {
+                    return 1;
+                }
             case SCARGA:
                 if (bossentries.getScarlion() == 0) {
                     return 1;
@@ -1011,6 +1015,10 @@ public class AbstractPlayerInteraction {
 
     public int playerHasEntriesLeftForShowaboss(MapleCharacter mapleCharacter) {
         return playerHasEntriesLeftForExpedition(mapleCharacter, MapleExpeditionType.SHOWA);
+    }
+
+    public int playerHasEntriesLeftForPapulatus(MapleCharacter mapleCharacter) {
+        return playerHasEntriesLeftForExpedition(mapleCharacter, MapleExpeditionType.PAPULATUS);
     }
 
     public int playerHasEntriesLeftForScarlion(MapleCharacter mapleCharacter) {
@@ -1053,6 +1061,10 @@ public class AbstractPlayerInteraction {
 
     public int decrementShowabossEntriesForParty(List<MapleCharacter> players) {
         return decrementEntriesForParty(players, MapleExpeditionType.SHOWA);
+    }
+
+    public int decrementPapulatusEntriesForParty(List<MapleCharacter> players) {
+        return decrementEntriesForParty(players, MapleExpeditionType.PAPULATUS);
     }
 
     public int decrementScarlionEntriesForParty(List<MapleCharacter> players) {

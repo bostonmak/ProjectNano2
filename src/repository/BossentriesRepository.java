@@ -245,6 +245,13 @@ public class BossentriesRepository {
                     );
                     break;
                 }
+                case PAPULATUS: {
+                    int entriesToGive = bossentries.getShowaboss() + numberToGive;
+                    updateEntriesForCharacterId = connection.prepareStatement(
+                            WriteUpdateBossentriesForCharacterIdQuery(characterId, entriesToGive, MapleExpeditionType.PAPULATUS)
+                    );
+                    break;
+                }
                 case SCARGA: {
                     int entriesToGive = bossentries.getScarlion() + numberToGive;
                     updateEntriesForCharacterId = connection.prepareStatement(
@@ -331,6 +338,16 @@ public class BossentriesRepository {
                         }
                         updateEntriesForPartyBatch = connection.prepareStatement("UPDATE `bossentries` SET showaboss = ? WHERE characterid = ?");
                         updateEntriesForPartyBatch.setInt(1, bossentries.getShowaboss() - 1);
+                        updateEntriesForPartyBatch.setInt(2, bossentries.getCharacterid());
+                        updateEntriesForPartyBatch.addBatch();
+                        break;
+                    }
+                    case PAPULATUS: {
+                        if (bossentries.getPapulatus() <= 0) {
+                            throw new DecrementBossentryZeroOrLessException("Error tried to decrement showa boss entry that is already zero or less. CharacterId: " + bossentries.getCharacterid());
+                        }
+                        updateEntriesForPartyBatch = connection.prepareStatement("UPDATE `bossentries` SET papulatus = ? WHERE characterid = ?");
+                        updateEntriesForPartyBatch.setInt(1, bossentries.getPapulatus() - 1);
                         updateEntriesForPartyBatch.setInt(2, bossentries.getCharacterid());
                         updateEntriesForPartyBatch.addBatch();
                         break;
@@ -424,6 +441,10 @@ public class BossentriesRepository {
             }
             case SHOWA: {
                 updateBossentriesQuery.append("SET `showaboss` = " + entriesToGive + " ");
+                break;
+            }
+            case PAPULATUS: {
+                updateBossentriesQuery.append("SET `papulatus` = " + entriesToGive + " ");
                 break;
             }
             case SCARGA: {
