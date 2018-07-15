@@ -13,7 +13,8 @@ repositories {
 
 dependencies {
     compileOnly  'com.zaxxer:HikariCP-java7:2.4.12'
-    compileOnly  'org.apache.directory.studio:org.apache.mina.core:2.0.7'
+//    compileOnly  'org.apache.directory.studio:org.apache.mina.core:2.0.7'
+    compile 'org.apache.mina:mina-core:2.0.7'
     compileOnly  'mysql:mysql-connector-java:5.1.6'
     compileOnly  'org.slf4j:slf4j-api:1.6.6'
     compileOnly  'org.slf4j:slf4j-jdk14:1.7.5'

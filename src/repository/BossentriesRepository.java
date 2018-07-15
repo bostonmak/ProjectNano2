@@ -137,47 +137,6 @@ public class BossentriesRepository {
         return bossentries;
     }
 
-    public static List<Bossentries> GetEntriesForParty(List<MapleCharacter> mapleCharacters) {
-        List<Bossentries> bossentriesList = new ArrayList<>();
-
-        final List<Integer> mapleCharacterIds = GetMaplecharacterIds(mapleCharacters);
-        final String selectZakumEntriesForPartyString = WriteSelectBossentriesQuery(mapleCharacterIds);
-
-        Connection connection = null;
-        PreparedStatement selectEntriesForPartyQuery = null;
-        ResultSet selectEntriesForPartyResult = null;
-        try {
-            connection = DatabaseConnection.getConnection();
-            connection.setReadOnly(true);
-            selectEntriesForPartyQuery = connection.prepareStatement(selectZakumEntriesForPartyString);
-            selectEntriesForPartyResult = selectEntriesForPartyQuery.executeQuery();
-            while(selectEntriesForPartyResult.next()) {
-                Bossentries bossentries = new Bossentries();
-                bossentries.setId(selectEntriesForPartyResult.getInt("id"));
-                bossentries.setCharacterid(selectEntriesForPartyResult.getInt("characterid"));
-                bossentries.setZakum(selectEntriesForPartyResult.getInt("zakum"));
-                bossentries.setHorntail(selectEntriesForPartyResult.getInt("horntail"));
-                bossentries.setShowaboss(selectEntriesForPartyResult.getInt("showaboss"));
-                bossentries.setPapulatus(selectEntriesForPartyResult.getInt("papulatus"));
-                bossentries.setScarlion(selectEntriesForPartyResult.getInt("scarlion"));
-                bossentriesList.add(bossentries);
-            }
-        } catch (SQLException e) {
-            logger.error("Could not get all party member entries. CharacterIds: {}", mapleCharacterIds, e);
-        }
-        finally {
-            try {
-                if(connection != null) connection.close();
-                if(selectEntriesForPartyQuery != null) selectEntriesForPartyQuery.close();
-                if(selectEntriesForPartyResult != null) selectEntriesForPartyResult.close();
-            } catch (SQLException e) {
-                logger.error("Could not close connection for all party member entries.", e);
-            }
-        }
-
-        return bossentriesList;
-    }
-
     public static void GiveEntryToCharacterId(int characterId, int numberToGive) throws ZeroRowsFetchedException, MoreThanOneRowException {
         final Bossentries bossentries = new Bossentries();
         Connection connection = null;
@@ -361,7 +320,9 @@ public class BossentriesRepository {
                         if (bossentries.getZakum() <= 0) {
                             throw new DecrementBossentryZeroOrLessException("Error tried to decrement zakum boss entry that is already zero or less. CharacterId: " + bossentries.getCharacterid());
                         }
-                        updateEntriesForPartyBatch = connection.prepareStatement("UPDATE `bossentries` SET zakum = ? WHERE characterid = ?");
+                        if (updateEntriesForPartyBatch == null) {
+                            updateEntriesForPartyBatch = connection.prepareStatement("UPDATE `bossentries` SET zakum = ? WHERE characterid = ?");
+                        }
                         updateEntriesForPartyBatch.setInt(1, bossentries.getZakum() - 1);
                         updateEntriesForPartyBatch.setInt(2, bossentries.getCharacterid());
                         updateEntriesForPartyBatch.addBatch();
@@ -371,7 +332,9 @@ public class BossentriesRepository {
                         if (bossentries.getHorntail() <= 0) {
                             throw new DecrementBossentryZeroOrLessException("Error tried to decrement horntail boss entry that is already zero or less. CharacterId: " + bossentries.getCharacterid());
                         }
-                        updateEntriesForPartyBatch = connection.prepareStatement("UPDATE `bossentries` SET horntail = ? WHERE characterid = ?");
+                        if (updateEntriesForPartyBatch == null) {
+                            updateEntriesForPartyBatch = connection.prepareStatement("UPDATE `bossentries` SET horntail = ? WHERE characterid = ?");
+                        }
                         updateEntriesForPartyBatch.setInt(1, bossentries.getHorntail() - 1);
                         updateEntriesForPartyBatch.setInt(2, bossentries.getCharacterid());
                         updateEntriesForPartyBatch.addBatch();
@@ -381,7 +344,9 @@ public class BossentriesRepository {
                         if (bossentries.getShowaboss() <= 0) {
                             throw new DecrementBossentryZeroOrLessException("Error tried to decrement showa boss entry that is already zero or less. CharacterId: " + bossentries.getCharacterid());
                         }
-                        updateEntriesForPartyBatch = connection.prepareStatement("UPDATE `bossentries` SET showaboss = ? WHERE characterid = ?");
+                        if (updateEntriesForPartyBatch == null) {
+                            updateEntriesForPartyBatch = connection.prepareStatement("UPDATE `bossentries` SET showaboss = ? WHERE characterid = ?");
+                        }
                         updateEntriesForPartyBatch.setInt(1, bossentries.getShowaboss() - 1);
                         updateEntriesForPartyBatch.setInt(2, bossentries.getCharacterid());
                         updateEntriesForPartyBatch.addBatch();
@@ -391,7 +356,9 @@ public class BossentriesRepository {
                         if (bossentries.getPapulatus() <= 0) {
                             throw new DecrementBossentryZeroOrLessException("Error tried to decrement showa boss entry that is already zero or less. CharacterId: " + bossentries.getCharacterid());
                         }
-                        updateEntriesForPartyBatch = connection.prepareStatement("UPDATE `bossentries` SET papulatus = ? WHERE characterid = ?");
+                        if (updateEntriesForPartyBatch == null) {
+                            updateEntriesForPartyBatch = connection.prepareStatement("UPDATE `bossentries` SET papulatus = ? WHERE characterid = ?");
+                        }
                         updateEntriesForPartyBatch.setInt(1, bossentries.getPapulatus() - 1);
                         updateEntriesForPartyBatch.setInt(2, bossentries.getCharacterid());
                         updateEntriesForPartyBatch.addBatch();
@@ -401,7 +368,9 @@ public class BossentriesRepository {
                         if (bossentries.getScarlion() <= 0) {
                             throw new DecrementBossentryZeroOrLessException("Error tried to decrement scarlion boss entry that is already zero or less. CharacterId: " + bossentries.getCharacterid());
                         }
-                        updateEntriesForPartyBatch = connection.prepareStatement("UPDATE `bossentries` SET scarlion = ? WHERE characterid = ?");
+                        if (updateEntriesForPartyBatch == null) {
+                            updateEntriesForPartyBatch = connection.prepareStatement("UPDATE `bossentries` SET scarlion = ? WHERE characterid = ?");
+                        }
                         updateEntriesForPartyBatch.setInt(1, bossentries.getScarlion() - 1);
                         updateEntriesForPartyBatch.setInt(2, bossentries.getCharacterid());
                         updateEntriesForPartyBatch.addBatch();
@@ -455,7 +424,7 @@ public class BossentriesRepository {
             if (i == 0) {
                 selectZakumEntriesForPartyBuilder.append("SELECT * FROM `bossentries` WHERE characterid = " + mapleCharacterIds.get(0));
             } else {
-                selectZakumEntriesForPartyBuilder.append(" AND characterid = " + mapleCharacterIds.get(i));
+                selectZakumEntriesForPartyBuilder.append(" OR characterid = " + mapleCharacterIds.get(i));
             }
         }
         return selectZakumEntriesForPartyBuilder.toString();
