@@ -21,6 +21,8 @@
  */
 package net.server.channel.handlers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import net.AbstractMaplePacketHandler;
 import server.maps.MapleMapObject;
 import tools.data.input.SeekableLittleEndianAccessor;
@@ -36,6 +38,8 @@ import tools.FilePrinter;
  */
 public final class ItemPickupHandler extends AbstractMaplePacketHandler {
 
+    private static Logger MapleLogger = LoggerFactory.getLogger(ItemPickupHandler.class);
+
     @Override
     public final void handlePacket(final SeekableLittleEndianAccessor slea, final MapleClient c) {
         slea.readInt(); //Timestamp
@@ -44,13 +48,16 @@ public final class ItemPickupHandler extends AbstractMaplePacketHandler {
         int oid = slea.readInt();
         MapleCharacter chr = c.getPlayer();
         MapleMapObject ob = chr.getMap().getMapObject(oid);
+        if(ob == null) {
+            MapleLogger.warn("Invalid MapleMapObject Character: {}, Map: {}, OID: {}", chr.getName(), chr.getMap(), oid);
+            return;
+        }
         Point charPos = chr.getPosition();
         Point obPos = ob.getPosition();
         if (Math.abs(charPos.getX() - obPos.getX()) > 800 || Math.abs(charPos.getY() - obPos.getY()) > 600) {
             FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to pick up an item too far away. Mapid: " + chr.getMapId() + " Player pos: " + charPos + " Object pos: " + obPos + "\r\n");
             return;
         }
-        if(ob == null) return;
         
         chr.pickupItem(ob);
     }
