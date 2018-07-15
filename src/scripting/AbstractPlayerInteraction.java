@@ -24,18 +24,22 @@ package scripting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.awt.Point;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import constants.GameConstants;
+import exception.DecrementBossentryZeroOrLessException;
+import exception.NoMapleCharacterIdsException;
+import exception.UpdatedRowCountMismatchException;
+import exception.ZeroRowsFetchedException;
+import model.Bossentries;
 import net.server.Server;
 import net.server.channel.Channel;
 import net.server.guild.MapleGuild;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import repository.BossentriesRepository;
 import scripting.event.EventInstanceManager;
 import scripting.event.EventManager;
 import scripting.npc.NPCScriptManager;
@@ -70,6 +74,7 @@ import server.life.MapleNPC;
 import tools.Pair;
 
 public class AbstractPlayerInteraction {
+	private static Logger logger = LoggerFactory.getLogger(AbstractPlayerInteraction.class);
 
 	private static Logger MapleLogger = LoggerFactory.getLogger(AbstractPlayerInteraction.class);
 
@@ -951,4 +956,118 @@ public class AbstractPlayerInteraction {
 	public GameConstants getGameConstantsInstance() {
 		return GameConstants.getInstance();
 	}
+
+    /**
+     * Integer Codes
+     * 0 - No Error
+     * 1 - No Entries Left for Player
+     * 2 - Bossentries object was null
+     */
+	private int playerHasEntriesLeftForExpedition(MapleCharacter mapleCharacter, MapleExpeditionType mapleExpeditionType) {
+        Bossentries bossentries = null;
+        try {
+            bossentries = BossentriesRepository.GetAllEntriesForCharacterId(mapleCharacter.getId());
+        } catch (ZeroRowsFetchedException e) {
+            logger.error("Error unable to fetch boss entries. CharacterId: {}", mapleCharacter.getId(), e);
+            return 1;
+        }
+
+        if (bossentries == null) {
+            return 2;
+        }
+        switch (mapleExpeditionType) {
+            case ZAKUM:
+                if (bossentries.getZakum() == 0) {
+                    return 1;
+                }
+                break;
+            case HORNTAIL:
+                if (bossentries.getHorntail() == 0) {
+                    return 1;
+                }
+                break;
+            case SHOWA:
+                if (bossentries.getShowaboss() == 0) {
+                    return 1;
+                }
+            case PAPULATUS:
+                if (bossentries.getPapulatus() == 0) {
+                    return 1;
+                }
+            case SCARGA:
+                if (bossentries.getScarlion() == 0) {
+                    return 1;
+                }
+            default:
+                return 0;
+        }
+
+        return 0;
+    }
+
+    public int playerHasEntriesLeftForZakum(MapleCharacter mapleCharacter) {
+        return playerHasEntriesLeftForExpedition(mapleCharacter, MapleExpeditionType.ZAKUM);
+    }
+
+    public int playerHasEntriesLeftForHorntail(MapleCharacter mapleCharacter) {
+        return playerHasEntriesLeftForExpedition(mapleCharacter, MapleExpeditionType.HORNTAIL);
+    }
+
+    public int playerHasEntriesLeftForShowaboss(MapleCharacter mapleCharacter) {
+        return playerHasEntriesLeftForExpedition(mapleCharacter, MapleExpeditionType.SHOWA);
+    }
+
+    public int playerHasEntriesLeftForPapulatus(MapleCharacter mapleCharacter) {
+        return playerHasEntriesLeftForExpedition(mapleCharacter, MapleExpeditionType.PAPULATUS);
+    }
+
+    public int playerHasEntriesLeftForScarlion(MapleCharacter mapleCharacter) {
+        return playerHasEntriesLeftForExpedition(mapleCharacter, MapleExpeditionType.SCARGA);
+    }
+
+	/**
+	 * Integer Codes
+	 * 0 - No Error
+	 * 1 - Exception was thrown
+	 */
+	public int decrementEntriesForParty(List<MapleCharacter> players, MapleExpeditionType mapleExpeditionType) {
+		long startTime = System.currentTimeMillis();
+		boolean success = false;
+		try {
+            BossentriesRepository.DecrementEntriesForParty(players, mapleExpeditionType);
+            success = true;
+		} catch (DecrementBossentryZeroOrLessException | UpdatedRowCountMismatchException e) {
+			logger.error("Error in DecrementEntriesForParty.", e);
+			return 1;
+		} catch (NoMapleCharacterIdsException ex) {
+            logger.error("Error expedition party was found to be empty.", ex);
+            return 1;
+        } finally {
+			String status = success ? "SUCCESS" : "FAILED";
+			logger.info("Task: {}, Status: {}, ExecutionTime: {}ms, Party: {}, Boss: {}",
+					this, status, System.currentTimeMillis() - startTime, players, mapleExpeditionType);
+		}
+
+		return 0;
+	}
+
+	public int decrementZakumEntriesForParty(List<MapleCharacter> players) {
+		return decrementEntriesForParty(players, MapleExpeditionType.ZAKUM);
+	}
+
+	public int decrementHorntailEntriesForParty(List<MapleCharacter> players) {
+        return decrementEntriesForParty(players, MapleExpeditionType.HORNTAIL);
+    }
+
+    public int decrementShowabossEntriesForParty(List<MapleCharacter> players) {
+        return decrementEntriesForParty(players, MapleExpeditionType.SHOWA);
+    }
+
+    public int decrementPapulatusEntriesForParty(List<MapleCharacter> players) {
+        return decrementEntriesForParty(players, MapleExpeditionType.PAPULATUS);
+    }
+
+    public int decrementScarlionEntriesForParty(List<MapleCharacter> players) {
+        return decrementEntriesForParty(players, MapleExpeditionType.SCARGA);
+    }
 }

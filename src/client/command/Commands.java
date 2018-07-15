@@ -45,15 +45,22 @@ import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
 
+import exception.MoreThanOneRowException;
+import exception.UpdatedRowCountMismatchException;
+import exception.ZeroRowsFetchedException;
+import model.Bossentries;
 import net.MaplePacketHandler;
 import net.PacketProcessor;
 import net.server.Server;
 import net.server.channel.Channel;
 import net.server.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
+import repository.BossentriesRepository;
 import scripting.npc.NPCScriptManager;
 import scripting.portal.PortalScriptManager;
 import server.MapleInventoryManipulator;
@@ -63,6 +70,7 @@ import server.MapleShopFactory;
 import server.TimerManager;
 import server.events.gm.MapleEvent;
 import server.expeditions.MapleExpedition;
+import server.expeditions.MapleExpeditionType;
 import server.gachapon.MapleGachapon.Gachapon;
 import server.life.MapleLifeFactory;
 import server.life.MapleMonster;
@@ -110,6 +118,7 @@ import server.maps.FieldLimit;
 
 public class Commands {
         private static HashMap<String, Integer> gotomaps = new HashMap<String, Integer>();
+    private static Logger logger = LoggerFactory.getLogger(Commands.class);
 
 	private static String[] tips = {
 		"Please only use @gm in emergencies or to report somebody.",
@@ -355,7 +364,7 @@ public class Commands {
             equip.setFlag(flag);
         }
         
-        public static boolean executeHeavenMsCommandLv0(Channel cserv, Server srv, MapleClient c, String[] sub) { //Player
+    public static boolean executeHeavenMsCommandLv0(Channel cserv, Server srv, MapleClient c, String[] sub) { //Player
                 MapleCharacter player = c.getPlayer();
             
                 switch(sub[0]) {
@@ -779,7 +788,20 @@ public class Commands {
                         }
                     
                         break;
-                    
+        case "bossentries": {
+            Bossentries bossentries = null;
+            try {
+                bossentries = BossentriesRepository.GetAllEntriesForCharacterId(player.getId());
+            } catch (MoreThanOneRowException e) {
+                logger.error("Error using command !bossentries. CharacterId returned more than one row. Character: {}, Table: {}", player.getName(), BossentriesRepository.TABLE_NAME);
+            }
+            if (bossentries != null) {
+                player.dropMessage(bossentries.toString());
+            } else {
+                player.dropMessage("Your boss entries cannot be accessed right now. Please contact a GM.");
+            }
+            break;
+        }
                             
                 default:
                         return false;
@@ -2786,11 +2808,11 @@ public class Commands {
                 return true;
         }
         
-        public static boolean executeHeavenMsCommandLv5(Channel cserv, Server srv, MapleClient c, String[] sub) { //Developer
+	public static boolean executeHeavenMsCommandLv5(Channel cserv, Server srv, MapleClient c, String[] sub) { //Developer
                 MapleCharacter player = c.getPlayer();
                 MapleMonster monster;
         
-                switch(sub[0]) {
+		switch(sub[0]) {
                 case "debugmonster":
 			List<MapleMapObject> monsters = player.getMap().getMapObjectsInRange(player.getPosition(), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.MONSTER));
 			for (MapleMapObject monstermo : monsters) {
@@ -2968,7 +2990,69 @@ public class Commands {
 			TimerManager tMan = TimerManager.getInstance();
 			player.dropMessage(6, "Total Task: " + tMan.getTaskCount() + " Current Task: " + tMan.getQueuedTasks() + " Active Task: " + tMan.getActiveCount() + " Completed Task: " + tMan.getCompletedTaskCount());
 			break;
-                    
+
+			case "giveentry": {
+				if (sub.length < 3) {
+					player.yellowMessage("Syntax: !giveentry <playername> <#> <boss> | Action: Gives <#> <boss> entries to <playername>");
+					break;
+				}
+
+				final String playerName = sub[1];
+                final int numberToGive = Integer.parseInt(sub[2]);
+                String bossName = "";
+
+                final MapleCharacter mapleCharacter = c.getChannelServer().getPlayerStorage().getCharacterByName(playerName);
+                if (mapleCharacter == null) {
+                    player.yellowMessage("Error: " + playerName + " could not be found.");
+                    break;
+                }
+
+				if (sub.length == 3) {
+                    try {
+                        BossentriesRepository.GiveEntryToCharacterId(mapleCharacter.getId(), numberToGive);
+                    } catch (ZeroRowsFetchedException | MoreThanOneRowException e) {
+                        player.yellowMessage("Error: " + playerName + " could not be found.");
+                        break;
+                    } catch (UpdatedRowCountMismatchException e) {
+                        player.yellowMessage("Error: Could not update " + playerName);
+                        break;
+                    }
+				} else if (sub.length == 4) {
+                    bossName = sub[3];
+                    MapleExpeditionType mapleExpeditionType = null;
+                    if (bossName.equalsIgnoreCase("zakum")) {
+                        mapleExpeditionType = MapleExpeditionType.ZAKUM;
+                    } else if (bossName.equalsIgnoreCase("horntail")) {
+                        mapleExpeditionType = MapleExpeditionType.HORNTAIL;
+                    } else if (bossName.equalsIgnoreCase("showaboss")) {
+                        mapleExpeditionType = MapleExpeditionType.SHOWA;
+                    } else if (bossName.equalsIgnoreCase("scarlion")) {
+                        mapleExpeditionType = MapleExpeditionType.SCARGA;
+                    }
+                    // TODO: Add Papulatus
+                    if (mapleExpeditionType != null) {
+                        try {
+                            BossentriesRepository.GiveEntryToBossToCharacterId(mapleCharacter.getId(), numberToGive, mapleExpeditionType);
+                        } catch (ZeroRowsFetchedException | MoreThanOneRowException e) {
+                            player.yellowMessage("Error: " + playerName + " could not be found.");
+                            break;
+                        }
+                    } else {
+                        player.yellowMessage("Error: " + bossName + " could not be found. Does that boss have an entry limit?");
+                        break;
+                    }
+                }
+
+                StringBuilder successMessage = new StringBuilder()
+                    .append("Successfully gave " + playerName + " ")
+                    .append(numberToGive + " ")
+                    .append(bossName.equalsIgnoreCase("") ? bossName : " ")
+                    .append("entries ")
+                    .append(bossName.equalsIgnoreCase("") ? "to all bosses" : "");
+				player.dropMessage(successMessage.toString());
+				break;
+			}
+
                 default:
                         return false;
                 }

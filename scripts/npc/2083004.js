@@ -61,6 +61,16 @@ function action(mode, type, selection) {
                 cm.sendOk("You do not meet the criteria to battle " + expedBoss + "!");
                 cm.dispose();
             } else if (expedition == null) { //Start an expedition
+                var entryCheck = cm.playerHasEntriesLeftForHorntail(player);
+                if (entryCheck === 1) {
+                    cm.sendOk("Sorry, I can't let you in. You have run out of entries for today.");
+                    cm.dispose();
+                    return;
+                } else if (entryCheck > 1) {
+                    cm.sendOk("That's strange... I can't access your boss entries. If the problem persists, contact my bosses, the GMs.");
+                    cm.dispose();
+                    return;
+                }
                 cm.sendSimple("#e#b<Expedition: " + expedName + ">\r\n#k#n" + em.getProperty("party") + "\r\n\r\nWould you like to assemble a team to take on #r" + expedBoss + "#k?\r\n#b#L1#Lets get this going!#l\r\n\#L2#No, I think I'll wait a bit...#l");
                 status = 1;
             } else if (expedition.isLeader(player)) { //If you're the leader, manage the exped
@@ -71,6 +81,16 @@ function action(mode, type, selection) {
                     cm.sendOk("You have already registered for the expedition. Please wait for #r" + expedition.getLeader().getName() + "#k to begin the expedition.");
                     cm.dispose();
                 } else { //If you aren't in it, you're going to get added
+                    var entryCheck = cm.playerHasEntriesLeftForHorntail(player);
+                    if (entryCheck === 1) {
+                        cm.sendOk("Sorry, I can't let you in. You have run out of entries for today.");
+                        cm.dispose();
+                        return;
+                    } else if (entryCheck > 1) {
+                        cm.sendOk("That's strange... I can't access your boss entries. If the problem persists, contact my bosses, the GMs.");
+                        cm.dispose();
+                        return;
+                    }
                     if(cm.haveItem(eye, 1)) {
                     cm.sendOk(expedition.addMember(cm.getPlayer()));
                     cm.dispose();
@@ -143,10 +163,16 @@ function action(mode, type, selection) {
                     cm.dispose();
                     return;
                 }
-                
-                else if(cm.haveItem(eye, 1)) {
-                cm.sendOk("Good luck! All of Leafre is counting on you.");
-                cm.gainItem(eye, -1);
+
+                if(cm.haveItem(eye, 1)) {
+                    var decrementCheck = cm.decrementHorntailEntriesForParty(expedition.getMembers());
+                    if (decrementCheck > 0) {
+                        cm.sendOk("An error occurred. Please contact a GM.");
+                        cm.dispose();
+                        return;
+                    }
+                    cm.sendOk("Good luck! All of Leafre is counting on you.");
+                    cm.gainItem(eye, -1);
                 }
                 else{
                     cm.sendOk("Sorry, you need 1 Eye of Fire to Horntail");

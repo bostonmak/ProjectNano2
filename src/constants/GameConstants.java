@@ -28,6 +28,8 @@ public class GameConstants {
     private static final int ITEM_ID_USED_FOR_REBIRTH = 4000313;
     private static final String ITEM_NAME_USED_FOR_REBIRTH = "Golden Maple Leaf";
 
+    public static final int DAILY_BOSS_LIMIT_RESET_VALUE = 2;
+
     public static final int[] OWL_DATA = new int[]{1082002, 2070005, 2070006, 1022047, 1102041, 2044705, 2340000, 2040017, 1092030, 2040804};
     
     // Ronan's rates upgrade system

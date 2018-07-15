@@ -21,6 +21,7 @@
  */
 package net.server;
 
+import batch.ResetDailyBossLimitJob;
 import net.server.worker.CouponWorker;
 import net.server.worker.RankingWorker;
 import java.io.FileInputStream;
@@ -40,6 +41,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tools.locks.MonitoredReentrantLock;
 import java.util.concurrent.locks.Lock;
 
@@ -97,7 +103,10 @@ public class Server {
     private final PlayerBuffStorage buffStorage = new PlayerBuffStorage();
     private final Map<Integer, MapleAlliance> alliances = new HashMap<>(100);
     private final Map<Integer, NewYearCardRecord> newyears = new HashMap<>();
-    
+    private static Scheduler batchScheduler = null;
+
+    private static Logger logger = LoggerFactory.getLogger(Server.class);
+
     private boolean online = false;
     public static long uptime = System.currentTimeMillis();
     
@@ -365,7 +374,26 @@ public class Server {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        
+
+        logger.info("Scheduling Batch Jobs...");
+
+        Trigger trigger = TriggerBuilder.newTrigger()
+                .withIdentity("ResetDailyBossLimit", "reset")
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 1/1 * ? *"))
+                .build();
+
+        JobDetail job = JobBuilder.newJob(ResetDailyBossLimitJob.class)
+                .withIdentity("ResetDailyBossLimit", "reset")
+                .build();
+
+        try {
+            batchScheduler = new StdSchedulerFactory().getScheduler();
+            batchScheduler.start();
+            batchScheduler.scheduleJob(job, trigger);
+        } catch (SchedulerException e) {
+            logger.error("Error starting batch scheduler. Daily boss limits will not be reset automatically.", e);
+        }
+
         System.out.println("Listening on port 8484\r\n\r\n");
 
         System.out.println("HeavenMS is now online.\r\n");

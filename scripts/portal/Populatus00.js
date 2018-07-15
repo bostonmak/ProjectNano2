@@ -25,6 +25,15 @@
 function enter(pi) {
     var em = pi.getEventManager("PapulatusBattle");
 
+    var entryCheck = pi.playerHasEntriesLeftForPapulatus(pi.getPlayer());
+    if (entryCheck === 1) {
+        pi.playerMessage(5, "You are out of entries for today.");
+        return false;
+    } else if (entryCheck > 1) {
+        pi.playerMessage(5, "Your boss entries cannot be accessed. If the problem persists, contact the GMs.");
+        return false;
+    }
+
     if (pi.getParty() == null) {
         pi.playerMessage(5, "You are currently not in a party, create one to attempt the boss.");
         return false;
@@ -41,6 +50,12 @@ function enter(pi) {
         }
         else {  //this should never appear
             pi.playerMessage(5, "You cannot start this battle yet, because either your party is not in the range size, some of your party members are not eligible to attempt it or they are not in this map. If you're having trouble finding party members, try Party Search.");
+            return false;
+        }
+
+        var decrementCheck = pi.decrementPapulatusEntriesForParty(pi.getPartyMembers());
+        if (decrementCheck > 0) {
+            pi.playerMessage(5, "An error occurred. Please contact a GM.");
             return false;
         }
 
