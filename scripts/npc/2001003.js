@@ -55,7 +55,7 @@ var rare = Array(1004794,1004661, 1004660,1004589, 1004472, 1912017, 1052634);
 var rare1 = Array(1004680, 1004756,1004725, 1004738, 1042283, 1072873, 1052677, 1082558, 1052672, 1082592);
 var rare2 = Array(1102835,1052923, 1004503, 1082550, 1003761);
 var rare3 = Array(1102641,1052910, 105911, 1004471, 1112141, 1112252);
-var rare4 = Array(1115108, 1115110, 1115113, 1115114, 1115115, 1115116, 1115032, 1112177,1112289);
+var rare4 = Array(1115108, 1115110, 1115113, 1115114, 1115115, 1115116, 1112284, 1112177,1112289);
 var rare5 = Array(1003359, 1003360, 5000110, 1902024, 1912041, 1902048);
 
 function getRandom(min, max) {
@@ -112,32 +112,36 @@ function action(mode, type, selection) {
 		} else if (status == 2) {
         //    		 cm.setDailyReward('DailyGift');
 					 
-
-			if (chance = 0) {
-			cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(icommon, 1) + "##k #v" + icommon + "#"); 
-			cm.gainMeso([-10000000]);
-			} else if (chance = 1) {
-			cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(inormal, 1) + "##k #v" + inormal + "#");
-			cm.gainMeso([-10000000]);
-			} else if (chance = 2) {
-			cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare, 1) + "##k #v" + irare + "#");
-			cm.gainMeso([-10000000]);
-			} else if (chance = 3) {
-			cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare1, 1) + "##k #v" + irare1 + "#");
-			cm.gainMeso([-10000000]);
-			} else if (chance = 4) {
-			cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare2, 1) + "##k #v" + irare2 + "#");
-			cm.gainMeso([-10000000]);
-			} else if (chance = 5) {
-			cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare3, 1) + "##k #v" + irare3 + "#");
-			cm.gainMeso([-10000000]);
-			} else if (chance = 6) {
-			cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare4, 1) + "##k #v" + irare4 + "#");
-			cm.gainMeso([-10000000]);
-			} else if (chance = 7) {
-			cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare5, 1) + "##k #v" + irare5 + "#");
-			cm.gainMeso([-10000000]);
-			}
+            var randomTemporaryEquipItemId = 1002553;
+            if (cm.canHold(randomTemporaryEquipItemId)) {
+                if (chance === 0) {
+                    cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(icommon, 1) + "##k #v" + icommon + "#");
+                    cm.gainMeso([-10000000]);
+                } else if (chance === 1) {
+                    cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(inormal, 1) + "##k #v" + inormal + "#");
+                    cm.gainMeso([-10000000]);
+                } else if (chance === 2) {
+                    cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare, 1) + "##k #v" + irare + "#");
+                    cm.gainMeso([-10000000]);
+                } else if (chance === 3) {
+                    cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare1, 1) + "##k #v" + irare1 + "#");
+                    cm.gainMeso([-10000000]);
+                } else if (chance === 4) {
+                    cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare2, 1) + "##k #v" + irare2 + "#");
+                    cm.gainMeso([-10000000]);
+                } else if (chance === 5) {
+                    cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare3, 1) + "##k #v" + irare3 + "#");
+                    cm.gainMeso([-10000000]);
+                } else if (chance === 6) {
+                    cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare4, 1) + "##k #v" + irare4 + "#");
+                    cm.gainMeso([-10000000]);
+                } else if (chance === 7) {
+                    cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare5, 1) + "##k #v" + irare5 + "#");
+                    cm.gainMeso([-10000000]);
+                }
+            } else {
+                cm.sendOk("You don't have enough space in your equipment tab.");
+            }
 			cm.dispose();
 		}
 	}

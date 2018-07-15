@@ -51,7 +51,7 @@ public class ServerConstants {
     public static final boolean USE_MTS = true;
     public static final boolean USE_FAMILY_SYSTEM = false;
     public static final boolean USE_DUEY = true;
-    public static final boolean USE_RANDOMIZE_HPMP_GAIN = true;     //Enables randomizing on MaxHP/MaxMP gains and INT accounting for the MaxMP gain.
+    public static final boolean USE_RANDOMIZE_HPMP_GAIN = false;     //Enables randomizing on MaxHP/MaxMP gains and INT accounting for the MaxMP gain.
     public static final boolean USE_STORAGE_ITEM_SORT = false;       //Enables storage "Arrange Items" feature.
     public static final boolean USE_ITEM_SORT = false;               //Enables inventory "Item Sort/Merge" feature.
     public static final boolean USE_ITEM_SORT_BY_NAME = false;      //Item sorting based on name rather than id.
@@ -95,7 +95,7 @@ public class ServerConstants {
     public static final boolean BLOCK_GENERATE_CASH_ITEM = false;   //Prevents creation of cash items with the item/drop command.
     
     //Miscellaneous Configuration
-    public static final byte MIN_UNDERLEVEL_TO_EXP_GAIN = 20;        //Characters are unable to get EXP from a mob if their level are under this threshold, only if "USE_ENFORCE_MOB_LEVEL_RANGE" is enabled. For bosses, this attribute is doubled.
+    public static final byte MIN_UNDERLEVEL_TO_EXP_GAIN = 10;        //Characters are unable to get EXP from a mob if their level are under this threshold, only if "USE_ENFORCE_MOB_LEVEL_RANGE" is enabled. For bosses, this attribute is doubled.
     public static final byte MAX_MONITORED_BUFFSTATS = 5;           //Limits accounting for "dormant" buff effects, that should take place when stronger stat buffs expires.
     public static final int MAX_AP = 32767;                             //Max AP allotted on the auto-assigner.
     public static final int MAX_EVENT_LEVELS = 8;                       //Event has different levels of rewarding system.

@@ -91,21 +91,14 @@ function action(mode, type, selection) {
                         cm.dispose();
                         return;
                     }
-                    if(cm.haveItem(eye, 1)) {
                     cm.sendOk(expedition.addMember(cm.getPlayer()));
                     cm.dispose();
-                    }
-                    else {
-                        cm.sendOk("Sorry, you need 1 Eye of Fire to Horntail");
-                    }
                 }
             } else if (expedition.isInProgress()) { //Only if the expedition is in progress
                 if (expedition.contains(player)) { //If you're registered, warp you in
                     var eim = em.getInstance(expedName + player.getClient().getChannel());
                     if(eim.getIntProperty("canJoin") == 1) {
                         eim.registerPlayer(player);
-                        eim.gainItem(eye, -1);
-                       
                     } else {
                         cm.sendOk("Your expedition already started the battle against " + expedBoss + ". Lets pray for those brave souls.");
                     }
@@ -164,22 +157,17 @@ function action(mode, type, selection) {
                     return;
                 }
 
-                if(cm.haveItem(eye, 1)) {
-                    var decrementCheck = cm.decrementHorntailEntriesForParty(expedition.getMembers());
-                    if (decrementCheck > 0) {
-                        cm.sendOk("An error occurred. Please contact a GM.");
-                        cm.dispose();
-                        return;
-                    }
-                    cm.sendOk("Good luck! All of Leafre is counting on you.");
-                    cm.gainItem(eye, -1);
-                }
-                else{
-                    cm.sendOk("Sorry, you need 1 Eye of Fire to Horntail");
+                var decrementCheck = cm.decrementHorntailEntriesForParty(expedition.getMembers());
+                if (decrementCheck > 0) {
+                    cm.sendOk("An error occurred. Please contact a GM.");
                     cm.dispose();
                     return;
                 }
+
+                cm.sendOk("Good luck! All of Leafre is counting on you.");
+                cm.dispose();
                 status = 4;
+                return;
             } else if (selection == 3) {
                 player.getMap().broadcastMessage(MaplePacketCreator.serverNotice(6, expedition.getLeader().getName() + " has ended the expedition."));
                 cm.endExpedition(expedition);

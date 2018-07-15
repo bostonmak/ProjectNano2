@@ -21,7 +21,7 @@ var items = [1022082,
 /*Starts at 78, VIP Weapoons */                1302147, 1312062, 1322090, 1332120, 1332125, 1372078, 1382099, 1402090, 1412062, 1422063, 1432081, 1442111, 1452106, 1462091, 1472117, 1482079, 1492079];
 
 function start() {
-    cm.sendSimple("Welcome to the vote point exchange npc you have.#r" +cm.getrewardpoints() +"#k votepoints Go to the website and vote to gain votepoints. What would u like to buy with your votepoints? #b\r\n#L0# Buy some scrolls 5 for 1 votepoint #b\r\n#L1# Buy ITCG Equips 3 votepoints #b\r\n#L2# But VIP Weapons for 5 votepoints");
+    cm.sendSimple("Welcome to the vote point exchange npc you have.#r" +cm.getrewardpoints() +"#k votepoints Go to the website and vote to gain votepoints. What would u like to buy with your votepoints? #b\r\n#L0# Buy some scrolls 5 for 1 votepoint #b\r\n#L1# Buy ITCG Equips 3 votepoints #b\r\n#L2# Buy VIP Weapons for 5 votepoints");
 }
 
 function action (m,t,s) {

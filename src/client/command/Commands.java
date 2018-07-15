@@ -392,6 +392,9 @@ public class Commands {
             case "rebirth":
                 c.getAbstractPlayerInteraction().openNpc(9201143, "rebirth");
                 break;
+            case "aranmastery":
+                c.getAbstractPlayerInteraction().openNpc(9201143, "aran");
+                break;
                 
                 case "storage":
                 c.getAbstractPlayerInteraction().openNpc(1012009, "storage");
