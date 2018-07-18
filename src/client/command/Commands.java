@@ -285,7 +285,7 @@ public class Commands {
 
 	static {
 		//gotomaps.put("gmmap", 180000000);
-                gotomaps.put("home", 209080100);
+		gotomaps.put("home", 209080100);
 		gotomaps.put("southperry", 60000);
 		gotomaps.put("amherst", 1000000);
 		gotomaps.put("henesys", 100000000);
@@ -295,9 +295,9 @@ public class Commands {
 		gotomaps.put("lith", 104000000);
 		gotomaps.put("sleepywood", 105040300);
 		gotomaps.put("florina", 110000000);
-                gotomaps.put("nautilus", 120000000);
-                gotomaps.put("ereve", 130000000);
-                gotomaps.put("rien", 140000000);
+		gotomaps.put("nautilus", 120000000);
+		gotomaps.put("ereve", 130000000);
+		gotomaps.put("rien", 140000000);
 		gotomaps.put("orbis", 200000000);
 		gotomaps.put("happytown", 209000000);
 		gotomaps.put("elnath", 211000000);
@@ -308,7 +308,7 @@ public class Commands {
 		gotomaps.put("herb", 251000000);
 		gotomaps.put("omega", 221000000);
 		gotomaps.put("korean", 222000000);
-                gotomaps.put("ellin", 300000000);
+		gotomaps.put("ellin", 300000000);
 		gotomaps.put("nlc", 600000000);
 		gotomaps.put("gpq", 101030104);
 		gotomaps.put("pianus", 230040420);
@@ -326,21 +326,22 @@ public class Commands {
 		gotomaps.put("shrine", 800000000);
 		gotomaps.put("skelegon", 240040511);
 		gotomaps.put("hpq", 100000200);
-		gotomaps.put("horntail", 240040700);
-                gotomaps.put("ariant", 260000000);
+		gotomaps.put("ht", 240040700);
+		gotomaps.put("ariant", 260000000);
 		gotomaps.put("magatia", 261000000);
-                gotomaps.put("singapore", 540000000);
-                gotomaps.put("cwk", 610030000);
-                gotomaps.put("amoria", 680000000);
-                gotomaps.put("temple", 270000100);
-                gotomaps.put("neo", 240070000);
-                gotomaps.put("fm", 910000000);
-                gotomaps.put("fog", 105040306);
-                gotomaps.put("mp3", 541000300);
-                gotomaps.put("wolfspider", 600020300);
-                gotomaps.put("ulu", 541020000);
-                gotomaps.put("castle", 800040000);
-                gotomaps.put("fob", 130030000);
+		gotomaps.put("singapore", 540000000);
+		gotomaps.put("cwk", 610030000);
+		gotomaps.put("amoria", 680000000);
+		gotomaps.put("temple", 270000100);
+		gotomaps.put("neo", 240070000);
+		gotomaps.put("fm", 910000000);
+		gotomaps.put("fog", 105040306);
+		gotomaps.put("mp3", 541000300);
+		gotomaps.put("wolfspider", 600020300);
+		gotomaps.put("ulu", 541020000);
+		gotomaps.put("castle", 800040000);
+		gotomaps.put("fob", 130030000);
+		gotomaps.put("excavation", 101030104);
 	}
         
         private static void hardsetItemStats(Equip equip, short stat) {
@@ -2907,7 +2908,7 @@ public class Commands {
                         player.dropMessage(6, st);
                         
                         break;
-                    case "pmob":
+                case "pmob":
                 {
                     int npcId = Integer.parseInt(sub[1]);
                     int mobTime = Integer.parseInt(sub[2]);
@@ -2948,7 +2949,7 @@ public class Commands {
                     }
                     break;
                 }
-                    case "pnpc":
+                case "pnpc":
         {
             int npcId = Integer.parseInt(sub[1]);
             MapleNPC npc = MapleLifeFactory.getNPC(npcId);

@@ -503,7 +503,7 @@ public class Equip extends Item {
         }
     }
     
-    public void gainItemExp(MapleClient c, int gain) {  // Ronan's Equip Exp gain method
+    public void gainItemExp(MapleClient c, float gain) {  // Ronan's Equip Exp gain method
         MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
         if(!ii.isUpgradeable(this.getItemId()) || itemLevel >= 30) return;
         

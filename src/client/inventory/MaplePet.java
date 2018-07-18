@@ -21,12 +21,9 @@
 */
 package client.inventory;
 
-import com.mysql.jdbc.Statement;
 import constants.ExpTable;
 import java.awt.Point;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 import tools.DatabaseConnection;
 import server.MapleItemInformationProvider;
@@ -34,7 +31,6 @@ import server.movement.AbsoluteLifeMovement;
 import server.movement.LifeMovement;
 import server.movement.LifeMovementFragment;
 import client.MapleCharacter;
-import java.sql.Connection;
 import tools.MaplePacketCreator;
 
 /**

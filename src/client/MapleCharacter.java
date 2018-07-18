@@ -2809,7 +2809,7 @@ public void saveInventory() throws SQLException {
         gainExp(gain, 0, show, inChat, white);
     }
     
-    public void gainExp(int gain, int party, boolean show, boolean inChat, boolean white) {
+    public void gainExp(float gain, int party, boolean show, boolean inChat, boolean white) {
         if (hasDisease(MapleDisease.CURSE)) {
             gain *= 0.5;
             party *= 0.5;
@@ -8777,7 +8777,7 @@ public void saveInventory() throws SQLException {
         pendantExp = 0;
     }
 
-    public void increaseEquipExp(int expGain) {
+    public void increaseEquipExp(float expGain) {
         if(expGain < 0) expGain = Integer.MAX_VALUE;
         
         for (Item item : getInventory(MapleInventoryType.EQUIPPED).list()) {
