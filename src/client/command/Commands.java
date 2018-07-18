@@ -320,7 +320,7 @@ public class Commands {
 		gotomaps.put("horseman", 682000001);
 		gotomaps.put("balrog", 105090900);
 		gotomaps.put("zakum", 211042300);
-		gotomaps.put("papu", 220080001);
+		//gotomaps.put("papu", 220080001);
 		gotomaps.put("showa", 801000000);
 		gotomaps.put("guild", 200000301);
 		gotomaps.put("shrine", 800000000);
@@ -424,6 +424,9 @@ public class Commands {
 		case "staff":
                         c.getAbstractPlayerInteraction().openNpc(2010007, "credits");
 			break;
+					case "event":
+						c.getAbstractPlayerInteraction().openNpc(2010007, "event");
+						break;
                     
 		case "lastrestart":
 		case "uptime":
@@ -454,7 +457,7 @@ public class Commands {
 				}
                         break;
 			}
-			String talkStr = "The #b" + gachaName + "#k Gachapon contains the following items.\r\n\r\n";
+											String talkStr = "The #b" + gachaName + "#k Gachapon contains the following items.\r\n\r\n";
 			for (int i = 0; i < 2; i++){
 				for (int id : gacha.getItems(i)){
 					talkStr += "-" + MapleItemInformationProvider.getInstance().getName(id) + "\r\n";
@@ -479,19 +482,19 @@ public class Commands {
                 case "showrates":
                         String showMsg = "#eEXP RATE#n" + "\r\n";
                         showMsg += "Server EXP Rate: #k" + c.getWorldServer().getExpRate() + "x#k" + "\r\n";
-                        showMsg += "Player EXP Rate: #k" + player.getRawExpRate() + "x#k" + "\r\n";
+                        //showMsg += "Player EXP Rate: #k" + player.getRawExpRate() + "x#k" + "\r\n";
                         if(player.getCouponExpRate() != 1) showMsg += "Coupon EXP Rate: #k" + player.getCouponExpRate() + "x#k" + "\r\n";
                         showMsg += "EXP Rate: #e#b" + player.getExpRate() + "x#k#n" + "\r\n";
                         
                         showMsg += "\r\n" + "#eMESO RATE#n" + "\r\n";
                         showMsg += "Server MESO Rate: #k" + c.getWorldServer().getMesoRate() + "x#k" + "\r\n";
-                        showMsg += "Player MESO Rate: #k" + player.getRawMesoRate() + "x#k" + "\r\n";
+                       // showMsg += "Player MESO Rate: #k" + player.getRawMesoRate() + "x#k" + "\r\n";
                         if(player.getCouponMesoRate() != 1) showMsg += "Coupon MESO Rate: #k" + player.getCouponMesoRate() + "x#k" + "\r\n";
                         showMsg += "MESO Rate: #e#b" + player.getMesoRate() + "x#k#n" + "\r\n";
                         
                         showMsg += "\r\n" + "#eDROP RATE#n" + "\r\n";
                         showMsg += "Server DROP Rate: #k" + c.getWorldServer().getDropRate() + "x#k" + "\r\n";
-                        showMsg += "Player DROP Rate: #k" + player.getRawDropRate() + "x#k" + "\r\n";
+                       // showMsg += "Player DROP Rate: #k" + player.getRawDropRate() + "x#k" + "\r\n";
                         if(player.getCouponDropRate() != 1) showMsg += "Coupon DROP Rate: #k" + player.getCouponDropRate() + "x#k" + "\r\n";
                         showMsg += "DROP Rate: #e#b" + player.getDropRate() + "x#k#n" + "\r\n";
                     
@@ -503,7 +506,7 @@ public class Commands {
                         player.showHint(showMsg, 300);
                     break;
                      
-                case "rates":
+               /* case "rates":
                         String showMsg_ = "#eCHARACTER RATES#n" + "\r\n\r\n";
                         showMsg_ += "EXP Rate: #e#b" + player.getExpRate() + "x#k#n" + "\r\n";
                         showMsg_ += "MESO Rate: #e#b" + player.getMesoRate() + "x#k#n" + "\r\n";
@@ -512,7 +515,7 @@ public class Commands {
                         
                         player.showHint(showMsg_, 300);
                     break;
-                    
+                    */
 		case "online":
 			for (Channel ch : Server.getInstance().getChannelsFromWorld(player.getWorld())) {
 				player.yellowMessage("Players in Channel " + ch.getId() + ":");
@@ -919,12 +922,13 @@ public class Commands {
                     */
                 case "buffme":
                         //GM Skills : Haste(Super) - Holy Symbol - Bless - Hyper Body - Echo of Hero - maple warrior - sharp eyes
-                        SkillFactory.getSkill(9101001).getEffect(SkillFactory.getSkill(9101001).getMaxLevel()).applyTo(player);
-                        SkillFactory.getSkill(9101002).getEffect(SkillFactory.getSkill(9101002).getMaxLevel()).applyTo(player);
-                        SkillFactory.getSkill(9101003).getEffect(SkillFactory.getSkill(9101003).getMaxLevel()).applyTo(player);
+                        SkillFactory.getSkill(4101004).getEffect(SkillFactory.getSkill(4101004).getMaxLevel()).applyTo(player);
+                        //SkillFactory.getSkill(9101002).getEffect(SkillFactory.getSkill(9101002).getMaxLevel()).applyTo(player);
+                       // SkillFactory.getSkill(9101003).getEffect(SkillFactory.getSkill(9101003).getMaxLevel()).applyTo(player);
                         SkillFactory.getSkill(9101008).getEffect(SkillFactory.getSkill(9101008).getMaxLevel()).applyTo(player);
-                       // SkillFactory.getSkill(2321000).getEffect(SkillFactory.getSkill(2321000).getMaxLevel()).applyTo(player);
-                       // SkillFactory.getSkill(3121002).getEffect(SkillFactory.getSkill(3121002).getMaxLevel()).applyTo(player);
+					    SkillFactory.getSkill(4111001).getEffect(SkillFactory.getSkill(4111001).getMaxLevel()).applyTo(player);
+					    SkillFactory.getSkill(0001005).getEffect(SkillFactory.getSkill(0001005).getMaxLevel()).applyTo(player);
+                        // SkillFactory.getSkill(3121002).getEffect(SkillFactory.getSkill(3121002).getMaxLevel()).applyTo(player);
                         //SkillFactory.getSkill(1005).getEffect(SkillFactory.getSkill(1005).getMaxLevel()).applyTo(player);
                                 break;
                        
