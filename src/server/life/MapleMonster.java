@@ -317,40 +317,47 @@ public class MapleMonster extends AbstractLoadedMapleLife {
         return takenDamage.containsKey(chr.getId());
     }
 
-    private void distributeExperienceToParty(int pid, int exp, int killer, Set<MapleCharacter> underleveled, int minThresholdLevel) {
+    private void distributeExperienceToParty(int pid, float exp, int killer, Set<MapleCharacter> underleveled, int minThresholdLevel) {
         List<MapleCharacter> members = new LinkedList<>();
-        MapleCharacter pchar = getMap().getAnyCharacterFromParty(pid);
-        if(pchar != null) {
-            for(MapleCharacter chr : pchar.getPartyMembersOnSameMap()) {
+        if (pid != 1) {
+            MapleCharacter pchar = getMap().getAnyCharacterFromParty(pid);
+            if (pchar != null) {
+                for (MapleCharacter chr : pchar.getPartyMembersOnSameMap()) {
+                    members.add(chr);
+                }
+            } else {
+                MapleCharacter chr = getMap().getCharacterById(killer);
+                if (chr == null) {
+                    return;
+                }
                 members.add(chr);
             }
         } else {
             MapleCharacter chr = getMap().getCharacterById(killer);
-            if(chr == null) return;
-            
+            if (chr == null) {
+                return;
+            }
             members.add(chr);
         }
-            
         int partyLevel = 0;
         int leechCount = 0;
         for (MapleCharacter mc : members) {
-            if (mc.getLevel() >= minThresholdLevel) {    //NO EXP WILL BE GIVEN for those who are underleveled!
+            if (mc.getLevel() >= minThresholdLevel) { //NO EXP WILL BE GIVEN for those who are underleveled!
+
                 partyLevel += mc.getLevel();
                 leechCount++;
             } else {
                 underleveled.add(mc);
             }
         }
-
         final int mostDamageCid = getHighestDamagerId();
-
         for (MapleCharacter mc : members) {
             int id = mc.getId();
             int level = mc.getLevel();
             if (level >= minThresholdLevel) {
                 boolean isKiller = killer == id;
                 boolean mostDamage = mostDamageCid == id;
-                int xp = (int) ((0.80f * exp * level) / partyLevel);
+                float xp = ((0.80f * exp * level) / partyLevel);
                 if (mostDamage) {
                     xp += (0.20f * exp);
                 }
@@ -419,7 +426,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
         }
     }
 
-    public void giveExpToCharacter(MapleCharacter attacker, int exp, boolean isKiller, int numExpSharers) {
+    public void giveExpToCharacter(MapleCharacter attacker, float exp, boolean isKiller, int numExpSharers) {
         if (isKiller) {
             if (getMap().getEventInstance() != null) {
                 getMap().getEventInstance().monsterKilled(attacker, this);
@@ -431,7 +438,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
         
         int partyExp = 0;
         if (attacker.getHp() > 0) {
-            int personalExp = exp * attacker.getExpRate();
+            float personalExp = exp * attacker.getExpRate();
 
             if (exp > 0) {
                 if (partyModifier > 0.0f) {

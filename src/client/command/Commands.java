@@ -2904,7 +2904,7 @@ public class Commands {
                         player.dropMessage(6, st);
                         
                         break;
-                    case "pmob":
+                case "pmob":
                 {
                     int npcId = Integer.parseInt(sub[1]);
                     int mobTime = Integer.parseInt(sub[2]);
@@ -2945,7 +2945,7 @@ public class Commands {
                     }
                     break;
                 }
-                    case "pnpc":
+                case "pnpc":
         {
             int npcId = Integer.parseInt(sub[1]);
             MapleNPC npc = MapleLifeFactory.getNPC(npcId);
