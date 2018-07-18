@@ -1,10 +1,23 @@
+buildscript {
+    repositories {
+        maven { url = "http://jcenter.bintray.com" }
+    }
+
+    dependencies {
+        classpath 'mysql:mysql-connector-java:5.1.37'
+    }
+}
+
 apply plugin: 'java'
+apply plugin: 'application'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 project.archivesBaseName = 'MapleSolaxia' // Temporary
 project.libsDirName = 'dist'
+
+mainClassName = 'net.server.Server'
 
 repositories {
     maven { url = "http://repo.maven.apache.org/maven2" }
@@ -13,15 +26,13 @@ repositories {
 
 dependencies {
     compileOnly  'com.zaxxer:HikariCP-java7:2.4.12'
-//    compileOnly  'org.apache.directory.studio:org.apache.mina.core:2.0.7'
     compile 'org.apache.mina:mina-core:2.0.7'
-    compileOnly  'mysql:mysql-connector-java:5.1.6'
     compileOnly  'org.slf4j:slf4j-api:1.6.6'
     compileOnly  'org.slf4j:slf4j-jdk14:1.7.5'
+    runtime 'mysql:mysql-connector-java:5.1.37'
     compile 'org.quartz-scheduler:quartz:2.2.1'
     compile 'org.quartz-scheduler:quartz-jobs:2.2.1'
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
-
 }
 
 sourceSets {
@@ -47,4 +58,8 @@ task buildAndCopy {
 
     build.mustRunAfter clean
     finalizedBy copyJarToDist
+}
+
+run {
+    println 'Using JVM Options: ' + JAVA_OPTS
 }
