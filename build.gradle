@@ -11,8 +11,8 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'application'
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 project.archivesBaseName = 'MapleSolaxia' // Temporary
 project.libsDirName = 'dist'
@@ -43,9 +43,10 @@ sourceSets {
     }
 }
 
-tasks.withType(JavaCompile) {
-    options.bootClasspath = "$JDK7_HOME/jre/lib/rt.jar;$JDK7_HOME/jre/lib/jce.jar"
-}
+// For Java 7
+//tasks.withType(JavaCompile) {
+//    options.bootClasspath = "$JDK7_HOME/jre/lib/rt.jar;$JDK7_HOME/jre/lib/jce.jar"
+//}
 
 task copyJarToDist(type: Copy) {
     from 'build/dist/MapleSolaxia.jar'
