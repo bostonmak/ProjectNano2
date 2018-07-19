@@ -185,6 +185,14 @@ public class MapleMap {
         objectRLock = objectLock.readLock();
         objectWLock = objectLock.writeLock();
     }
+
+    public Pair<Integer, Integer> getxLimits() {
+        return xLimits;
+    }
+
+    public void setxLimits(Pair<Integer, Integer> xLimits) {
+        this.xLimits = xLimits;
+    }
     
     public void setEventInstance(EventInstanceManager eim) {
         event = eim;

@@ -445,5 +445,13 @@ public class MCBattlefield {
                 this.map.spawnMonster(m);
             }
         }
+        System.out.println(this.map.getId());
+        System.out.println(this.map.getCharacterByName("Bobo").getMap().getId());
+
+        for (MapleMapObject o : this.map.getMapObjects()) {
+            System.out.print(o.getObjectId());
+            System.out.print(", ");
+        }
+        System.out.println();
     } 
 }  

@@ -640,6 +640,8 @@ public class MapleMapFactory {
             MapleLogger.warn("Maple Map Layer Exception", e);
         }
         map.setBackgroundTypes(backTypes);
+        // this is so terrible why are there 2 copies of the same map stored in different places
+        map.setxLimits(getMap(mapid).getxLimits());
         return map;
     }
 }

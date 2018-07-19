@@ -358,7 +358,9 @@ public class MCField {
         validateBattleTask = TimerManager.getInstance().register(new ValidateBattlefieldTask(this),
                 1000, 500); // check every second
 
-        battlefield = new MCBattlefield(getMap(MCMaps.BATTLEFIELD));
+        // This is so hacky and terrible but oh well
+        ArrayList<MapleCharacter> members = (ArrayList) red.getMembers();
+        battlefield = new MCBattlefield(members.get(0).getMap());
 
         red.setEnemy(blue);
         blue.setEnemy(red);
