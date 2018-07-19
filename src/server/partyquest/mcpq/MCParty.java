@@ -112,20 +112,20 @@ public class MCParty {
 
     public void warp(MapleMap map) {
         for (MapleCharacter chr : getMembers()) {
-            chr.changeMap(map, map.getPortal(0));
+            chr.changeCPQMap(map, map.getPortal(0));
         }
     }
 
     public void warp(MapleMap map, String portal) {
         for (MapleCharacter chr : getMembers()) {
-            chr.changeMap(map, map.getPortal(portal));
+            chr.changeCPQMap(map, map.getPortal(portal));
         }
     }
 
     public void warp(MCField.MCMaps type) {
         MapleMap m = this.field.getMap(type);
         for (MapleCharacter chr : getMembers()) {
-            chr.changeMap(m, m.getPortal(0));
+            chr.changeCPQMap(m, m.getPortal(0));
         }
     }
 
