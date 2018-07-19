@@ -154,19 +154,6 @@ public class MonsterCarnival {
         return sb.toString();
     }
 
-    // Reference Information
-
-    // Game Constants
-    public static final int CP_LOSS_ON_DEATH = 10;
-    public static final int TIME_PREBATTLE = 10;
-    public static final int TIME_BATTLE = 100;
-
-    public static final int TIME_LOBBYWAIT = 180;
-
-    public static final int TAB_SPAWNS   = 0;
-    public static final int TAB_DEBUFF   = 1;
-    public static final int TAB_GUARDIAN = 2;
-
     /**
      * Gets a random debuff for (Mini) Cube of Darkness.
      *  [MENTION=850422]return[/MENTION] Random MapleDisease.
@@ -292,6 +279,18 @@ public class MonsterCarnival {
         }
         return false;
     }
+    // Reference Information
+
+    // Game Constants
+    public static final int CP_LOSS_ON_DEATH = 10;
+    public static final int TIME_PREBATTLE = 10;
+    public static final int TIME_BATTLE = 600;
+
+    public static final int TIME_LOBBYWAIT = 180;
+
+    public static final int TAB_SPAWNS   = 0;
+    public static final int TAB_DEBUFF   = 1;
+    public static final int TAB_GUARDIAN = 2;
 
     // Error Codes
     // Note: These would be in an enum, but since these will be used in a NPC, they are not.
