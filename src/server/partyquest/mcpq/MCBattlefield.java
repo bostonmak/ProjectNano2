@@ -126,7 +126,7 @@ public class MCBattlefield {
 
         MapleMonster monster = MapleLifeFactory.getMonster(mobToSummon.id);
         Point pos = new Point(spawnPos.x, spawnPos.y);
-        SpawnPoint sp = new SpawnPoint(monster, pos, !monster.isMobile(), mobToSummon.mobTime, 0, chr.getTeam());
+        SpawnPoint sp = new SpawnPoint(monster, pos, !monster.isMobile(), mobToSummon.mobTime, 0, chr.getMCPQTeam().code);
 
         addedSpawns.add(sp);
         updateMonsterBuffs();
