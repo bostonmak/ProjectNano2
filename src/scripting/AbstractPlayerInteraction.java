@@ -990,6 +990,7 @@ public class AbstractPlayerInteraction {
 			default:
 				return 0;
 		}
+		return 0;
 	}
 
 	private int checkPartyEntries(List<Bossentries> bossentriesList, MapleExpeditionType mapleExpeditionType) {
