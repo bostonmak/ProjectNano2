@@ -40,6 +40,7 @@ public class ServerConstants {
     //Other Configuration
     public static boolean JAVA_8;
     public static boolean SHUTDOWNHOOK;
+    public static final boolean REBIRTH_FEATURE = false;
     
     //Server Flags
     public static final boolean USE_CUSTOM_KEYSET = false;           //Enables auto-setup of the HeavenMS's custom keybindings when creating characters.
@@ -170,6 +171,10 @@ public class ServerConstants {
     
     //Event End Timestamp
     public static final long EVENT_END_TIMESTAMP = 1428897600000L;
+
+    public static boolean isRebirthEnabled() {
+        return REBIRTH_FEATURE;
+    }
 	
     //Properties
     static {
