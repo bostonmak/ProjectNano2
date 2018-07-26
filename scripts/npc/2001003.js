@@ -101,7 +101,7 @@ function action(mode, type, selection) {
 		if (status == 0) {
 			cm.sendNext(" #i3991013##i3991023##i3991006##i3991000##i3991002##i3991007##i3991000##i3991015##i3991014##i3991013# \r\nHello #h #,\r\n\r\nWant to try your luck at the #r#eNX Gachapon?#n#k You can earn assorted up to date NX items as well as mastery books, boss summoning bags, and boss coins! Remember that it will cost you #r#e10,000,000 mesos#n#k a spin! #b#eGood Luck!");
 		} else if (status == 1) {
-			if (cm.getMeso() >= 10000000) {
+			if (cm.getMeso() >= 500000) {
 				//cm.gainMeso([-1]);
 				cm.sendNext(" #eFeatured NX Items in July#e \r\n\r\n #i1003359##i1003360#  #i1912017# #i1902024#\r\n ------------------------------------------------------------------------------ \r\n#i1102641##i5000110##i1102957##i1102789##i1082558#\r\n ------------------------------------------------------------------------------ \r\n #i1004503##i1004472##i1050371##i1052677##i1004471##i1912041# \r\n ------------------------------------------------------------------------------ \r\n \t\t\t\t\t\#e#rGood Luck Adventurer!");
 				
@@ -116,28 +116,28 @@ function action(mode, type, selection) {
             if (cm.canHold(randomTemporaryEquipItemId)) {
                 if (chance === 0) {
                     cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(icommon, 1) + "##k #v" + icommon + "#");
-                    cm.gainMeso([-10000000]);
+                    cm.gainMeso([-500000]);
                 } else if (chance === 1) {
                     cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(inormal, 1) + "##k #v" + inormal + "#");
-                    cm.gainMeso([-10000000]);
+                    cm.gainMeso([-500000]);
                 } else if (chance === 2) {
                     cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare, 1) + "##k #v" + irare + "#");
-                    cm.gainMeso([-10000000]);
+                    cm.gainMeso([-500000]);
                 } else if (chance === 3) {
                     cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare1, 1) + "##k #v" + irare1 + "#");
-                    cm.gainMeso([-10000000]);
+                    cm.gainMeso([-500000]);
                 } else if (chance === 4) {
                     cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare2, 1) + "##k #v" + irare2 + "#");
-                    cm.gainMeso([-10000000]);
+                    cm.gainMeso([-500000]);
                 } else if (chance === 5) {
                     cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare3, 1) + "##k #v" + irare3 + "#");
-                    cm.gainMeso([-10000000]);
+                    cm.gainMeso([-500000]);
                 } else if (chance === 6) {
                     cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare4, 1) + "##k #v" + irare4 + "#");
-                    cm.gainMeso([-10000000]);
+                    cm.gainMeso([-500000]);
                 } else if (chance === 7) {
                     cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare5, 1) + "##k #v" + irare5 + "#");
-                    cm.gainMeso([-10000000]);
+                    cm.gainMeso([-500000]);
                 }
             } else {
                 cm.sendOk("You don't have enough space in your equipment tab.");
