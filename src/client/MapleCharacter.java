@@ -1561,6 +1561,19 @@ public void saveInventory() throws SQLException {
         eventAfterChangedMap(this.getMapId());
     }
 
+    public void changeToTargetMap(final MapleMap target, final MaplePortal pto) {
+        canWarpCounter++;
+
+        eventChangedMap(target.getId());    // player can be dropped from an event here, hence the new warping target.
+        changeMapInternal(target, pto.getPosition(), MaplePacketCreator.getWarpToMap(target, pto.getId(), this));
+        canWarpMap = false;
+
+        canWarpCounter--;
+        if(canWarpCounter == 0) canWarpMap = true;
+
+        eventAfterChangedMap(this.getMapId());
+    }
+
     public void changeCPQMap(final MapleMap target, final MaplePortal pto) {
         canWarpCounter++;
 
