@@ -32,7 +32,7 @@ var desc_lv1 = [];
 var comm_lv0 = [];
 var desc_lv0 = [];
 
-var levels = ["Common", "Donator", "JrGM", "GM", "SuperGM", "Developer", "Admin"];
+var levels = ["Common", "Beta Player", "JrGM", "GM", "SuperGM", "Developer", "Admin"];
 
 var comm_cursor, desc_cursor;
 
