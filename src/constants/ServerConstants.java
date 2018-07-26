@@ -36,6 +36,7 @@ public class ServerConstants {
     
     //Ip Configuration
     public static String HOST;
+    public static final Integer PORT = 8484;
 
     //Other Configuration
     public static boolean JAVA_8;
