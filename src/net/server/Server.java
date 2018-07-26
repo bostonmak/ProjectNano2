@@ -80,6 +80,8 @@ import server.quest.MapleQuest;
 import tools.locks.MonitoredLockType;
 import tools.AutoJCE;
 
+import static constants.ServerConstants.PORT;
+
 public class Server {
     private static final Set<Integer> activeFly = new HashSet<>();
     private static final Map<Integer, Integer> couponRates = new HashMap<>(30);
@@ -367,7 +369,7 @@ public class Server {
         acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 30);
         acceptor.setHandler(new MapleServerHandler());
         try {
-            acceptor.bind(new InetSocketAddress(8484));
+            acceptor.bind(new InetSocketAddress(PORT));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -391,7 +393,7 @@ public class Server {
             logger.error("Error starting batch scheduler. Daily boss limits will not be reset automatically.", e);
         }
 
-        System.out.println("Listening on port 8484\r\n\r\n");
+        System.out.println("Listening on port " + PORT + "\r\n\r\n");
 
         System.out.println("ProjectNano is now online.\r\n");
         online = true;
