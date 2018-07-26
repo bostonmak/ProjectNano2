@@ -26,7 +26,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import java.awt.Point;
 import net.AbstractMaplePacketHandler;
-import server.partyquest.MonsterCarnival;
+import server.partyquest.mcpq.MonsterCarnival;
 import server.life.MapleLifeFactory;
 import server.maps.MapleReactor;
 import server.maps.MapleReactorFactory;
@@ -52,9 +52,7 @@ public final class MonsterCarnivalHandler extends AbstractMaplePacketHandler{
             else if (chr.getCP() > getPrice(tab, number)) {
                 if (tab == 0) { //SPAWNING
                     if (chr.getMCPQParty().canSummon()) {
-                        chr.getMap().spawnCPQMonster(MapleLifeFactory.getMonster(getMonster(number)), new Point(1, 1), chr.getMCPQTeam().code % 1);
-                        chr.getMCPQParty().summon();
-                        chr.loseCP(getPrice(tab, number));
+                        chr.getMCPQField().onAddSpawn(chr, number);
                     } else
                         chr.announce(MaplePacketCreator.CPQMessage((byte) 2));
 
@@ -108,34 +106,34 @@ public final class MonsterCarnivalHandler extends AbstractMaplePacketHandler{
         num++;
         switch (num) {
             case 1:
-                mid = 9300127;
+                mid = MonsterCarnival.MOB_BROWN_TEDDY;
                 break;
             case 2:
-                mid = 9300128;
+                mid = MonsterCarnival.MOB_BLOCKTOPUS;
                 break;
             case 3:
-                mid = 9300129;
+                mid = MonsterCarnival.MOB_RATZ;
                 break;
             case 4:
-                mid = 9300130;
+                mid = MonsterCarnival.MOB_CHRONOS;
                 break;
             case 5:
-                mid = 9300131;
+                mid = MonsterCarnival.MOB_TOY_TROJAN;
                 break;
             case 6:
-                mid = 9300132;
+                mid = MonsterCarnival.MOB_TICK_TOCK;
                 break;
             case 7:
-                mid = 9300133;
+                mid = MonsterCarnival.MOB_ROBO;
                 break;
             case 8:
-                mid = 9300134;
+                mid = MonsterCarnival.MOB_KING_BLOCKTOPUS;
                 break;
             case 9:
-                mid = 9300135;
+                mid = MonsterCarnival.MOB_MASTER_CHRONOS;
                 break;
             case 10:
-                mid = 9300136;
+                mid = MonsterCarnival.MOB_ROMBOT;
                 break;
         }
         return mid;

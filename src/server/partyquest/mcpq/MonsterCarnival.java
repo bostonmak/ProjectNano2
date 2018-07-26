@@ -154,19 +154,6 @@ public class MonsterCarnival {
         return sb.toString();
     }
 
-    // Reference Information
-
-    // Game Constants
-    public static final int CP_LOSS_ON_DEATH = 10;
-    public static final int TIME_PREBATTLE = 10;
-    public static final int TIME_BATTLE = 100;
-
-    public static final int TIME_LOBBYWAIT = 180;
-
-    public static final int TAB_SPAWNS   = 0;
-    public static final int TAB_DEBUFF   = 1;
-    public static final int TAB_GUARDIAN = 2;
-
     /**
      * Gets a random debuff for (Mini) Cube of Darkness.
      *  [MENTION=850422]return[/MENTION] Random MapleDisease.
@@ -213,12 +200,12 @@ public class MonsterCarnival {
 
     public static final boolean isLobbyMap(int mapid) {
         switch (mapid) {
-            case 980000100:
-            case 980000200:
-            case 980000300:
-            case 980000400:
-            case 980000500:
-            case 980000600:
+            case MAP_LOBBY_1:
+            case MAP_LOBBY_2:
+            case MAP_LOBBY_3:
+            case MAP_LOBBY_4:
+            case MAP_LOBBY_5:
+            case MAP_LOBBY_6:
                 return true;
             default:
                 return false;
@@ -235,12 +222,12 @@ public class MonsterCarnival {
 
     public static final boolean isBattlefieldMap(int mapid) {
         switch (mapid) {
-            case 980000101:
-            case 980000201:
-            case 980000301:
-            case 980000401:
-            case 980000501:
-            case 980000601:
+            case MAP_ROOM_1:
+            case MAP_ROOM_2:
+            case MAP_ROOM_3:
+            case MAP_ROOM_4:
+            case MAP_ROOM_5:
+            case MAP_ROOM_6:
                 return true;
             default:
                 return false;
@@ -292,6 +279,18 @@ public class MonsterCarnival {
         }
         return false;
     }
+    // Reference Information
+
+    // Game Constants
+    public static final int CP_LOSS_ON_DEATH = 10;
+    public static final int TIME_PREBATTLE = 10;
+    public static final int TIME_BATTLE = 600;
+
+    public static final int TIME_LOBBYWAIT = 180;
+
+    public static final int TAB_SPAWNS   = 0;
+    public static final int TAB_DEBUFF   = 1;
+    public static final int TAB_GUARDIAN = 2;
 
     // Error Codes
     // Note: These would be in an enum, but since these will be used in a NPC, they are not.
@@ -331,6 +330,32 @@ public class MonsterCarnival {
     public static final int ITEM_IND_MANA  = 2022177;
     public static final int ITEM_IND_ALLC  = 2022178;
 
+    // Mobs
+    public static final int MOB_BROWN_TEDDY = 9300127;
+    public static final int MOB_BLOCKTOPUS = 9300128;
+    public static final int MOB_RATZ = 9300129;
+    public static final int MOB_CHRONOS = 9300130;
+    public static final int MOB_TOY_TROJAN = 9300131;
+    public static final int MOB_TICK_TOCK = 9300132;
+    public static final int MOB_ROBO = 9300133;
+    public static final int MOB_KING_BLOCKTOPUS = 9300134;
+    public static final int MOB_MASTER_CHRONOS = 9300135;
+    public static final int MOB_ROMBOT = 9300136;
+
+    // Maps
+    public static final int MAP_LOBBY_1 = 980000100;
+    public static final int MAP_LOBBY_2 = 980000200;
+    public static final int MAP_LOBBY_3 = 980000300;
+    public static final int MAP_LOBBY_4 = 980000400;
+    public static final int MAP_LOBBY_5 = 980000500;
+    public static final int MAP_LOBBY_6 = 980000600;
+    public static final int MAP_ROOM_1 = 980000101;
+    public static final int MAP_ROOM_2 = 980000201;
+    public static final int MAP_ROOM_3 = 980000301;
+    public static final int MAP_ROOM_4 = 980000401;
+    public static final int MAP_ROOM_5 = 980000501;
+    public static final int MAP_ROOM_6 = 980000601;
+
     // Guardians
     public static final int GUARDIAN_RED = 9980000;
     public static final int GUARDIAN_BLUE = 9980001;
@@ -347,4 +372,5 @@ public class MonsterCarnival {
     public static final int NUM_FIELDS = 6;
 
     // Debug
-    public static final boolean DEBUG = false; } 
+    public static final boolean DEBUG = false;
+}

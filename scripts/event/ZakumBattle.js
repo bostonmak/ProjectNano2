@@ -1,4 +1,4 @@
-/**
+    /**
  * @author: Ronan
  * @event: Zakum Battle
 */
@@ -83,11 +83,11 @@ function setup(channel) {
 }
 
 function playerEntry(eim, player) {
+   
     eim.dropMessage(5, "[Expedition] " + player.getName() + " has entered the map.");
     var map = eim.getMapInstance(entryMap);
     player.changeMap(map, map.getPortal(0));
 }
-
 function scheduledTimeout(eim) {
     end(eim);
 }
@@ -120,9 +120,8 @@ function playerRevive(eim, player) {
         eim.dropMessage(5, "[Expedition] " + player.getName() + " has left the event.");
         eim.unregisterPlayer(player);
     }
-}
 
-function playerDisconnected(eim, player) {
+
     if (eim.isEventTeamLackingNow(true, minPlayers, player)) {
         eim.dropMessage(5, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.");
         eim.unregisterPlayer(player);
@@ -133,6 +132,19 @@ function playerDisconnected(eim, player) {
         eim.unregisterPlayer(player);
     }
 }
+
+    function playerDisconnected(eim, player) {
+    if (eim.isEventTeamLackingNow(true, minPlayers, player)) {
+        eim.dropMessage(5, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.");
+        eim.unregisterPlayer(player);
+        end(eim);
+    }
+    else {
+        eim.dropMessage(5, "[Expedition] " + player.getName() + " has left the event.");
+        eim.unregisterPlayer(player);
+    }
+}
+
 
 function leftParty (eim, player) {}
 

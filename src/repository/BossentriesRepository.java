@@ -405,6 +405,46 @@ public class BossentriesRepository {
         }
     }
 
+    public static List<Bossentries> GetEntriesForParty(List<MapleCharacter> mapleCharacters) throws NoMapleCharacterIdsException, DecrementBossentryZeroOrLessException, UpdatedRowCountMismatchException {
+        final List<Integer> mapleCharacterIds = GetMaplecharacterIds(mapleCharacters);
+        final String selectEntriesForPartyString = WriteSelectBossentriesQuery(mapleCharacterIds);
+
+        Connection connection = null;
+        PreparedStatement selectEntriesForPartyQuery = null;
+        ResultSet selectEntriesForPartyResult = null;
+
+        List<Bossentries> bossentriesList = new ArrayList<>();
+        try {
+            connection = DatabaseConnection.getConnection();
+            connection.setReadOnly(true);
+            selectEntriesForPartyQuery = connection.prepareStatement(selectEntriesForPartyString);
+            selectEntriesForPartyResult = selectEntriesForPartyQuery.executeQuery();
+            while(selectEntriesForPartyResult.next()) {
+                Bossentries bossentries = new Bossentries();
+                bossentries.setId(selectEntriesForPartyResult.getInt("id"));
+                bossentries.setCharacterid(selectEntriesForPartyResult.getInt("characterid"));
+                bossentries.setZakum(selectEntriesForPartyResult.getInt("zakum"));
+                bossentries.setHorntail(selectEntriesForPartyResult.getInt("horntail"));
+                bossentries.setShowaboss(selectEntriesForPartyResult.getInt("showaboss"));
+                bossentries.setPapulatus(selectEntriesForPartyResult.getInt("papulatus"));
+                bossentries.setScarlion(selectEntriesForPartyResult.getInt("scarlion"));
+                bossentriesList.add(bossentries);
+            }
+        } catch (SQLException e) {
+            logger.error("Could not get all party member entries. CharacterIds: {}", mapleCharacterIds, e);
+        }
+        finally {
+            try {
+                if(connection != null) connection.close();
+                if(selectEntriesForPartyQuery != null) selectEntriesForPartyQuery.close();
+                if(selectEntriesForPartyResult != null) selectEntriesForPartyResult.close();
+            } catch (SQLException e) {
+                logger.error("Could not close connection for get all party member entries.", e);
+            }
+        }
+        return bossentriesList;
+    }
+
     private static List<Integer> GetMaplecharacterIds(List<MapleCharacter> mapleCharacters) throws NoMapleCharacterIdsException {
         List<Integer> mapleCharacterIds = new ArrayList<>();
         for(MapleCharacter mapleCharacter : mapleCharacters) {

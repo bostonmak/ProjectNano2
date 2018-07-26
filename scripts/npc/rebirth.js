@@ -3,6 +3,8 @@
     It is intended to be used with the @rebirth command
 */
 
+importPackage(Packages.constants);
+
 var JOB_BEGINNER_NAME = "Beginner";
 var JOB_NOBLESSE_NAME = "Noblesse";
 var JOB_LEGEND_NAME = "Legend";
@@ -33,7 +35,13 @@ function start() {
 }
 
 function action(mode, type, selection) {
-    var GameConstantsInstance = cm.getGameConstantsInstance();
+    if (!ServerConstants.isRebirthEnabled()) {
+        mode = -1;
+        status = -1;
+        cm.sendOk("I'm terribly sorry. Rebirthing has been disabled.");
+        cm.dispose();
+        return;
+    }
     if (mode === -1) {
         cm.dispose();
     } else {

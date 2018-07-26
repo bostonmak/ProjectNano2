@@ -7,6 +7,8 @@ function action(mode, type, selection) {
  // Double Swing
  if(cm.getPlayer().getSkillLevel(2221003) == 0)
 		cm.teachSkill(2221003,0, 10); // Combat Ability
+		if(cm.getPlayer().getSkillLevel(21000000) == 0)
+		cm.teachSkill(21000000,0,10);
  // Combat Step
  if(cm.getPlayer().getSkillLevel(21001003) == 0)
 		cm.teachSkill(21001003,0, 0); // Pole Arm Booster
