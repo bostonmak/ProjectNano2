@@ -989,6 +989,8 @@ public class Server {
                     acceptor.unbind();
                     acceptor = null;
                     if (!restart) {
+                        System.out.println("Server has gracefully shutdown.");
+                        System.out.println("This window may now be closed.");
                         System.exit(0);
                     } else {
                         System.out.println("\r\nRestarting the server....\r\n");
