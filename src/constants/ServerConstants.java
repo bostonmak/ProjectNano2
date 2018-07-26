@@ -52,7 +52,7 @@ public class ServerConstants {
     public static final boolean USE_MTS = true;
     public static final boolean USE_FAMILY_SYSTEM = false;
     public static final boolean USE_DUEY = true;
-    public static final boolean USE_RANDOMIZE_HPMP_GAIN = false;     //Enables randomizing on MaxHP/MaxMP gains and INT accounting for the MaxMP gain.
+    public static final boolean USE_RANDOMIZE_HPMP_GAIN = true;     //Enables randomizing on MaxHP/MaxMP gains and INT accounting for the MaxMP gain.
     public static final boolean USE_STORAGE_ITEM_SORT = false;       //Enables storage "Arrange Items" feature.
     public static final boolean USE_ITEM_SORT = false;               //Enables inventory "Item Sort/Merge" feature.
     public static final boolean USE_ITEM_SORT_BY_NAME = false;      //Item sorting based on name rather than id.
@@ -87,8 +87,8 @@ public class ServerConstants {
     public static final int QUEST_RATE = 3;                         //Multiplier for Exp & Meso gains when completing a quest. Only available when USE_QUEST_RATE is true. Stacks with server Exp & Meso rates.
     public static final double EQUIP_EXP_RATE = 0.75;               //Rate for equipment exp gain, grows linearly. Set 1.0 for default (about 100~200 same-level range mobs killed to pass equip from level 1 to 2).
     
-    public static final double PARTY_BONUS_EXP_RATE = 15.0;          //Rate for the party exp reward.
-    public static final double PQ_BONUS_EXP_RATE = 10.0;             //Rate for the PQ exp reward.
+    public static final double PARTY_BONUS_EXP_RATE = 15;          //Rate for the party exp reward.
+    public static final double PQ_BONUS_EXP_RATE = 10;             //Rate for the PQ exp reward.
     
     public static final int PARTY_EXPERIENCE_MOD = 1;               //Change for event stuff.
     
@@ -109,7 +109,7 @@ public class ServerConstants {
     public static final int ITEM_MONITOR_TIME = 5 * 60 * 1000;  //Interval between item monitoring tasks on maps, which checks for dangling (null) item objects on the map item history.
     public static final int LOCK_MONITOR_TIME = 30 * 1000;      //Waiting time for a lock to be released. If it reach timed out, a critical server deadlock has made present.
     public static final int ITEM_EXPIRE_CHECK = 10 * 1000;      //Interval between item expiring tasks on maps, which checks and makes disappear expired items.
-    public static final int ITEM_LIMIT_ON_MAP = 100;            //Max number of items allowed on a map.
+    public static final int ITEM_LIMIT_ON_MAP = 150;            //Max number of items allowed on a map.
     public static final int ITEM_LOOT_DELAY = 0 * 1000;
     
     //Some Gameplay Enhancing Configurations
