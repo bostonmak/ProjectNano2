@@ -5256,6 +5256,9 @@ public void saveInventory() throws SQLException {
     public boolean isGM() {
         return gmLevel > 1;
     }
+    public boolean isAdmin(){
+        return gmLevel > 1 && gmLevel <6;
+    }
 
     public boolean isHidden() {
         return hidden;
