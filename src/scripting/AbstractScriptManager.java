@@ -35,6 +35,8 @@ import javax.script.ScriptException;
 import constants.ServerConstants;
 import tools.FilePrinter;
 
+import static constants.ServerConstants.JAVA_8_JAVASCRIPT_ENGINE;
+
 /**
  *
  * @author Matze
@@ -59,7 +61,7 @@ public abstract class AbstractScriptManager {
             if (!scriptFile.exists()) {
                 return null;
             }
-            engine = sem.getEngineByName("javascript");
+            engine = sem.getEngineByName(JAVA_8_JAVASCRIPT_ENGINE);
             if (c != null) {
                 c.setScriptEngine(path, engine);
             }

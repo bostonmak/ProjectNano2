@@ -38,6 +38,8 @@ import javax.script.ScriptException;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 
+import static constants.ServerConstants.JAVA_8_JAVASCRIPT_ENGINE;
+
 public class ItemScriptManager {
 
     private static ItemScriptManager instance = new ItemScriptManager();
@@ -46,7 +48,7 @@ public class ItemScriptManager {
 
     private ItemScriptManager() {
         ScriptEngineManager sem = new ScriptEngineManager();
-        sef = sem.getEngineByName("javascript").getFactory();
+        sef = sem.getEngineByName(JAVA_8_JAVASCRIPT_ENGINE).getFactory();
     }
 
     public static ItemScriptManager getInstance() {

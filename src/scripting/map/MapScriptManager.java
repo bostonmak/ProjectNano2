@@ -37,6 +37,8 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import tools.FilePrinter;
 
+import static constants.ServerConstants.JAVA_8_JAVASCRIPT_ENGINE;
+
 public class MapScriptManager {
 
     private static MapScriptManager instance = new MapScriptManager();
@@ -45,7 +47,7 @@ public class MapScriptManager {
 
     private MapScriptManager() {
         ScriptEngineManager sem = new ScriptEngineManager();
-        sef = sem.getEngineByName("javascript").getFactory();
+        sef = sem.getEngineByName(JAVA_8_JAVASCRIPT_ENGINE).getFactory();
     }
 
     public static MapScriptManager getInstance() {

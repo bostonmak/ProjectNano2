@@ -40,8 +40,10 @@ public class ServerConstants {
     //Other Configuration
     public static boolean JAVA_8;
     public static boolean SHUTDOWNHOOK;
+    public static final String JAVA_7_JAVASCRIPT_ENGINE = "javascript";
+    public static final String JAVA_8_JAVASCRIPT_ENGINE = "nashorn"; // We will now use this instead of "javascript"
     public static final boolean REBIRTH_FEATURE = false;
-    
+
     //Server Flags
     public static final boolean USE_CUSTOM_KEYSET = false;           //Enables auto-setup of the HeavenMS's custom keybindings when creating characters.
     public static final boolean USE_MAXRANGE_ECHO_OF_HERO = true;
