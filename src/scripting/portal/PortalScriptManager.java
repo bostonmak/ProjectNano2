@@ -37,8 +37,6 @@ import javax.script.ScriptException;
 import server.MaplePortal;
 import tools.FilePrinter;
 
-import static constants.ServerConstants.JAVA_8_JAVASCRIPT_ENGINE;
-
 public class PortalScriptManager {
 
     private static PortalScriptManager instance = new PortalScriptManager();
@@ -47,7 +45,7 @@ public class PortalScriptManager {
 
     private PortalScriptManager() {
         ScriptEngineManager sem = new ScriptEngineManager();
-        sef = sem.getEngineByName(JAVA_8_JAVASCRIPT_ENGINE).getFactory();
+        sef = sem.getEngineByName("javascript").getFactory();
     }
 
     public static PortalScriptManager getInstance() {
