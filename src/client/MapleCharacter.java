@@ -48,8 +48,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Comparator;
 
+import constants.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import repository.RebirthpathRepository;
 import tools.locks.MonitoredReentrantLock;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.ScheduledFuture;
@@ -124,10 +126,6 @@ import client.inventory.MapleWeaponType;
 import client.inventory.ModifyInventory;
 import client.inventory.PetDataFactory;
 import client.newyear.NewYearCardRecord;
-import constants.ExpTable;
-import constants.GameConstants;
-import constants.ItemConstants;
-import constants.ServerConstants;
 import constants.skills.Aran;
 import constants.skills.Beginner;
 import constants.skills.Bishop;
@@ -325,6 +323,9 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     private long banishTime = 0;
     private boolean isDead = false;
     private int rebirths = 0;
+    private RebirthPath rebirthPath = RebirthPath.NONE;
+    private int apGain = 5;
+
     private static Logger MapleLogger = LoggerFactory.getLogger(MapleCharacter.class);
 
 
@@ -355,29 +356,55 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     
     private static MapleJob getJobStyleInternal(int jobid, byte opt) {
         int jobtype = jobid / 100;
-        
+
         if(jobtype == MapleJob.WARRIOR.getId() / 100 || jobtype == MapleJob.DAWNWARRIOR1.getId() / 100 || jobtype == MapleJob.ARAN1.getId() / 100) {
             return(MapleJob.WARRIOR);
         }
-        
+
         else if(jobtype == MapleJob.MAGICIAN.getId() / 100 || jobtype == MapleJob.BLAZEWIZARD1.getId() / 100 || jobtype == MapleJob.EVAN1.getId() / 100) {
             return(MapleJob.MAGICIAN);
         }
-        
+
         else if(jobtype == MapleJob.BOWMAN.getId() / 100 || jobtype == MapleJob.WINDARCHER1.getId() / 100) {
             if(jobid / 10 == MapleJob.CROSSBOWMAN.getId() / 10) return(MapleJob.CROSSBOWMAN);
             else return(MapleJob.BOWMAN);
         }
-        
+
         else if(jobtype == MapleJob.THIEF.getId() / 100 || jobtype == MapleJob.NIGHTWALKER1.getId() / 100) {
             return(MapleJob.THIEF);
         }
-        
+
         else if(jobtype == MapleJob.PIRATE.getId() / 100 || jobtype == MapleJob.THUNDERBREAKER1.getId() / 100) {
             if(opt == (byte) 0x80) return(MapleJob.BRAWLER);
             else return(MapleJob.GUNSLINGER);
         }
-        
+
+        return(MapleJob.BEGINNER);
+    }
+
+    private static MapleJob getJobStyleInternal(int jobid) {
+        int jobtype = jobid / 100;
+
+        if(jobtype == MapleJob.WARRIOR.getId() / 100 || jobtype == MapleJob.DAWNWARRIOR1.getId() / 100 || jobtype == MapleJob.ARAN1.getId() / 100) {
+            return(MapleJob.WARRIOR);
+        }
+
+        else if(jobtype == MapleJob.MAGICIAN.getId() / 100 || jobtype == MapleJob.BLAZEWIZARD1.getId() / 100 || jobtype == MapleJob.EVAN1.getId() / 100) {
+            return(MapleJob.MAGICIAN);
+        }
+
+        else if(jobtype == MapleJob.BOWMAN.getId() / 100 || jobtype == MapleJob.WINDARCHER1.getId() / 100) {
+            return(MapleJob.BOWMAN);
+        }
+
+        else if(jobtype == MapleJob.THIEF.getId() / 100 || jobtype == MapleJob.NIGHTWALKER1.getId() / 100) {
+            return(MapleJob.THIEF);
+        }
+
+        else if(jobtype == MapleJob.PIRATE.getId() / 100 || jobtype == MapleJob.THUNDERBREAKER1.getId() / 100) {
+            return(MapleJob.PIRATE);
+        }
+
         return(MapleJob.BEGINNER);
     }
     
@@ -387,6 +414,10 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     
     public MapleJob getJobStyle() {
         return getJobStyle((byte) ((this.getStr() > this.getDex()) ? 0x80 : 0x40));
+    }
+
+    public MapleJob getClassOfJob() {
+        return getJobStyleInternal(this.getJob().getId());
     }
 
     public static MapleCharacter getDefault(MapleClient c) {
@@ -2313,38 +2344,6 @@ public void saveInventory() throws SQLException {
     public void setRebirths(int value) {
         this.rebirths = value;
     }
-
-    private void rebirth(MapleJob jobToRebirthInto) {
-        this.setLevel(1);
-        this.setExp(0);
-        this.setJob(jobToRebirthInto);
-
-        List<Pair<MapleStat, Integer>> rebirthStats = new ArrayList<>();
-        rebirthStats.add(new Pair<>(MapleStat.LEVEL, 1));
-        rebirthStats.add(new Pair<>(MapleStat.EXP, 0));
-        rebirthStats.add(new Pair<>(MapleStat.JOB, jobToRebirthInto.getId()));
-        this.announce(MaplePacketCreator.updatePlayerStats(rebirthStats, this));
-
-        MapleInventoryManipulator.removeById(
-            this.client,
-            ItemConstants.getInventoryType(GameConstants.getItemIdUsedForRebirth()),
-            GameConstants.getItemIdUsedForRebirth(),
-            this.getNumberOfItemsRequiredToRebirth(),
-            false,
-            false
-        );
-        this.setRebirths(this.getRebirths() + 1);
-
-        final String REBIRTH_NOTICE_MESSAGE = "[Notice] " + this.getName() + " has just rebirthed! They have rebirthed " + this.getRebirths() + " time(s)!";
-        Server.getInstance().broadcastMessage(
-                this.getWorld(),
-                MaplePacketCreator.serverNotice(6, REBIRTH_NOTICE_MESSAGE)
-        );
-    }
-
-    public void rebirthToBeginner() { this.rebirth(MapleJob.BEGINNER); }
-    public void rebirthToNoblesse() { this.rebirth(MapleJob.NOBLESSE); }
-    public void rebirthToLegend() { this.rebirth(MapleJob.LEGEND); }
 
     public int getNumberOfItemsRequiredToRebirth() {
         return this.getRebirths() + 1;
@@ -5310,7 +5309,9 @@ public void saveInventory() throws SQLException {
         int improvingMaxMPLevel = 0;
 
         if (isBeginnerJob() && getLevel() < 11) {
-            remainingAp = 0;
+            if (!this.hasRebirthed()) {
+                remainingAp = 0;
+            }
             if (getLevel() < 6) {
                 str += 5;
             } else {
@@ -5318,8 +5319,8 @@ public void saveInventory() throws SQLException {
                 dex += 1;
             }
         } else {
-            remainingAp += 5;
-            if (isCygnus() && level < 70) {
+            remainingAp += apGain;
+            if (isCygnus() && level < 70 && !this.hasRebirthed()) {
                 remainingAp++;
             }
         }
@@ -6217,6 +6218,9 @@ public void saveInventory() throws SQLException {
             MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Load Mounts", ret.getName(), "IN PROGRESS", System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
+
+            ret.setRebirthPath(RebirthpathRepository.getRebirthPath(charid));
+            ret.setApGain(ret.getRebirthPath().getApGain());
             
             con.close();
 
@@ -7351,6 +7355,8 @@ public void saveInventory() throws SQLException {
             ps.setInt(2, client.getAccID());
             ps.executeUpdate();
             ps.close();
+
+            RebirthpathRepository.persistRebirthPath(this);
 
             //ret.rewardpoints = rs.getInt("rewardpoints");
             taskSuccess = true;
@@ -9010,5 +9016,25 @@ public void saveInventory() throws SQLException {
             return true;
         }
         return false;
+    }
+
+    public RebirthPath getRebirthPath() {
+        return rebirthPath;
+    }
+
+    public void setRebirthPath(RebirthPath rebirthPath) {
+        this.rebirthPath = rebirthPath;
+    }
+
+    public int getApGain() {
+        return apGain;
+    }
+
+    public void setApGain(int apGain) {
+        this.apGain = apGain;
+    }
+
+    public boolean hasRebirthed() {
+        return rebirths > 0 ? true : false;
     }
 }
