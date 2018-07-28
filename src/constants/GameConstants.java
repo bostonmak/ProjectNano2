@@ -30,6 +30,25 @@ public class GameConstants {
 
     public static final int DAILY_BOSS_LIMIT_RESET_VALUE = 2;
 
+    // Maple Job Names
+    public static final class Job {
+        public static final String WARRIOR = "Warrior";
+        public static final String DAWNWARRIOR1 = "Dawn Warrior";
+        public static final String ARAN1 = "Aran 1";
+
+        public static final String MAGICIAN = "Magician";
+        public static final String BLAZEWIZARD1 = "Blaze Wizard";
+
+        public static final String BOWMAN = "Bowman";
+        public static final String WINDARCHER1 = "Wind Archer";
+
+        public static final String THIEF = "Thief";
+        public static final String NIGHTWALKER1 = "Nightwalker";
+
+        public static final String PIRATE = "Pirate";
+        public static final String THUNDERBREAKER1 = "Thunderbreaker";
+    }
+
     public static final int[] OWL_DATA = new int[]{1082002, 2070005, 2070006, 1022047, 1102041, 2044705, 2340000, 2040017, 1092030, 2040804};
     
     // Ronan's rates upgrade system
