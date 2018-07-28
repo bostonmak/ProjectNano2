@@ -27,6 +27,7 @@ import net.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import repository.BossentriesRepository;
+import repository.RebirthpathRepository;
 import server.MapleItemInformationProvider;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
@@ -150,5 +151,12 @@ public final class CreateCharHandler extends AbstractMaplePacketHandler {
             Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.sendYellowTip("[NEW CHAR]: Could not create new entry in bossentries table for " + newchar.getName()));
             logger.error(e.getMessage());
         }
+
+        try {
+			RebirthpathRepository.CreateNewEntryForCharacterId(newchar.getId());
+		} catch (UpdatedRowCountMismatchException e) {
+			Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.sendYellowTip("[NEW CHAR]: Could not create new entry in rebirthpath table for " + newchar.getName()));
+			logger.error(e.getMessage());
+		}
 	}
 }

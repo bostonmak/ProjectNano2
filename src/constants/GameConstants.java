@@ -49,6 +49,8 @@ public class GameConstants {
         public static final String THUNDERBREAKER1 = "Thunderbreaker";
     }
 
+    public static final int STARTING_MAX_HP = 50;
+
     public static final int[] OWL_DATA = new int[]{1082002, 2070005, 2070006, 1022047, 1102041, 2044705, 2340000, 2040017, 1092030, 2040804};
     
     // Ronan's rates upgrade system

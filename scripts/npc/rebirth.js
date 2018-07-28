@@ -5,7 +5,9 @@
 
 importPackage(Packages.constants);
 importPackage(Packages.client);
+importPackage(Packages.controller);
 
+var RebirthController = RebirthController.getInstance();
 var JOB_BEGINNER_NAME = "Beginner";
 var JOB_NOBLESSE_NAME = "Noblesse";
 var JOB_LEGEND_NAME = "Legend";
@@ -101,17 +103,6 @@ function action(mode, type, selection) {
                     }
                     cm.sendSimple(sendStr);
                 } else if (selection === 1) {
-                    // Check for correct items
-                    // if (
-                    //     !(cm.getPlayer().haveItemWithId(GameConstants.getItemIdUsedForRebirth(), false)) ||
-                    //     !(cm.getPlayer().getItemQuantity(GameConstants.getItemIdUsedForRebirth(), false) >= cm.getPlayer().getNumberOfItemsRequiredToRebirth())
-                    // ) {
-                    //     cm.sendOk("You cannot rebirth. You are missing " + cm.getPlayer().getNumberOfItemsRequiredToRebirth() + " " + GameConstants.getItemNameUsedForRebirth() + ".")
-                    //     cm.dispose();
-                    // } else {
-                    //     // pathOfEnforcementFunction
-                    //     cm.dispose();
-                    // }
                     var sendStr = "Which job will you rebirth into? \r\n\r\n#b";
 
                     // Default to selectionIndex to 3 since the above already has 0-2
@@ -123,24 +114,24 @@ function action(mode, type, selection) {
                     // Pirate 12-13
                     var selectionIndex = 3;
                     var jobArray = [];
-                    if (MapleJob.WARRIOR == cm.getPlayer().getJobStyle()) {
+                    if (MapleJob.WARRIOR == cm.getPlayer().getClassOfJob()) {
                         jobArray = WARRIOR_JOBS;
                         selectionIndex = 3;
-                    } else if (MapleJob.MAGICIAN == cm.getPlayer().getJobStyle()) {
+                    } else if (MapleJob.MAGICIAN == cm.getPlayer().getClassOfJob()) {
                         jobArray = MAGICIAN_JOBS;
                         selectionIndex = 6;
-                    } else if (MapleJob.BOWMAN == cm.getPlayer().getJobStyle()) {
+                    } else if (MapleJob.BOWMAN == cm.getPlayer().getClassOfJob()) {
                         jobArray = BOWMAN_JOBS;
                         selectionIndex = 8;
-                    } else if (MapleJob.THIEF == cm.getPlayer().getJobStyle()) {
+                    } else if (MapleJob.THIEF == cm.getPlayer().getClassOfJob()) {
                         jobArray = THIEF_JOBS;
                         selectionIndex = 10;
-                    } else if (MapleJob.PIRATE == cm.getPlayer().getJobStyle()) {
+                    } else if (MapleJob.PIRATE == cm.getPlayer().getClassOfJob()) {
                         jobArray = PIRATE_JOBS;
                         selectionIndex = 12;
                     }
                     for (var i = 0; i < jobArray.length; i++) {
-                        sendStr += "#L" + i+3 + "#" + jobArray[i] + "#l\r\n";
+                        sendStr += "#L" + i + selectionIndex + "#" + jobArray[i] + "#l\r\n";
                     }
                     cm.sendSimple(sendStr);
                 }
@@ -157,19 +148,42 @@ function action(mode, type, selection) {
                 cm.sendOk("You cannot rebirth. You are missing " + cm.getPlayer().getNumberOfItemsRequiredToRebirth() + " " + GameConstants.getItemNameUsedForRebirth() + ".")
                 cm.dispose();
             } else {
+                var job;
                 if (selection === 0) {
-                    cm.getPlayer().rebirthToBeginner();
-                    cm.dispose();
+                    job = MapleJob.BEGINNER;
                 } else if (selection === 1) {
-                    cm.getPlayer().rebirthToNoblesse();
+                    job = MapleJob.NOBLESSE;
                     cm.warp(130030000, 0);
-                    cm.dispose();
                 } else if (selection === 2) {
-                    cm.getPlayer().rebirthToLegend();
-                    cm.dispose();
+                    job = MapleJob.LEGEND;
+                } else if (selection === 3) {
+                    job = MapleJob.WARRIOR;
+                } else if (selection === 4) {
+                    job = MapleJob.DAWNWARRIOR1;
+                } else if (selection === 5) {
+                    job = MapleJob.ARAN1;
+                } else if (selection === 6) {
+                    job = MapleJob.MAGICIAN
+                } else if (selection === 7) {
+                    job = MapleJob.BLAZEWIZARD1;
+                } else if (selection === 8) {
+                    job = MapleJob.BOWMAN;
+                } else if (selection === 9) {
+                    job = MapleJob.WINDARCHER1;
+                } else if (selection === 10) {
+                    job = MapleJob.THIEF;
+                } else if (selection === 11) {
+                    job = MapleJob.NIGHTWALKER1;
+                } else if (selection === 12) {
+                    job = MapleJob.PIRATE;
+                } else if (selection === 13) {
+                    job = MapleJob.THUNDERBREAKER1;
                 } else {
                     cm.dispose();
                 }
+
+                RebirthController.rebirth(cm.getPlayer(), job);
+                cm.dispose();
             }
         } else {
             cm.dispose();
