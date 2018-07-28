@@ -19,7 +19,7 @@ function action(mode, type, selection) {
 		if(cm.getPlayer().getSkillLevel(21100002) == 0)
 		cm.teachSkill(21100002,0,0); // Final Charge
  // Body Pressure
- if(cm.getPlayer().getSkillLevel(2110004) == 0)
+ if(cm.getPlayer().getSkillLevel(21100004) == 0)
 		cm.teachSkill(21100004,0,0);  //Combo Smash
 		if(cm.getPlayer().getSkillLevel(21100005) == 0)
 		cm.teachSkill(21100005,0,0); // Combo Drain
