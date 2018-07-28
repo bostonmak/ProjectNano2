@@ -41,6 +41,10 @@ public class RebirthController {
     private int setExpTo;
     private int setRemainingAPTo;
     private int setMaxHPTo;
+    private int setStrTo;
+    private int setDexTo;
+    private int setIntTo;
+    private int setLukTo;
     private RebirthPath chosenPath;
 
     public void rebirth(MapleCharacter mapleCharacter, MapleJob mapleJob) {
@@ -55,6 +59,10 @@ public class RebirthController {
                 this.setExpTo = 0;
                 this.chosenPath = RebirthPath.ENLIGHTENMENT;
                 this.setRemainingAPTo = getApRefund(mapleCharacter);
+                this.setStrTo = 4;
+                this.setDexTo = 4;
+                this.setIntTo = 4;
+                this.setLukTo = 4;
                 break;
             }
             case WARRIOR:
@@ -81,18 +89,26 @@ public class RebirthController {
                     this.giveHP = GameConstants.STARTING_MAX_HP + STARTING_HP_FOR_LEVEL_10 + 1250 * (mapleCharacter.getRebirths() + 1);
                 }
                 this.setMaxHPTo = giveHP;
+                this.setStrTo = mapleCharacter.getStr();
+                this.setDexTo = mapleCharacter.getDex();
+                this.setIntTo = mapleCharacter.getInt();
+                this.setLukTo = mapleCharacter.getLuk();
                 break;
             }
         }
 
         mapleCharacter.setLevel(this.setPlayerLevelTo);
-        mapleCharacter.setExp(setExpTo);
+        mapleCharacter.setExp(this.setExpTo);
         mapleCharacter.setJob(mapleJob);
         mapleCharacter.setRemainingAp(this.setRemainingAPTo);
         mapleCharacter.setApGain(this.setApGainTo);
         mapleCharacter.setMaxHp(this.setMaxHPTo);
         mapleCharacter.setApGain(this.setApGainTo);
         mapleCharacter.setRebirthPath(chosenPath);
+        mapleCharacter.setStr(this.setStrTo);
+        mapleCharacter.setDex(this.setDexTo);
+        mapleCharacter.setInt(this.setIntTo);
+        mapleCharacter.setLuk(this.setLukTo);
 
         List<Pair<MapleStat, Integer>> rebirthStats = new ArrayList<>();
         rebirthStats.add(new Pair<>(MapleStat.LEVEL, this.setPlayerLevelTo));
@@ -100,6 +116,10 @@ public class RebirthController {
         rebirthStats.add(new Pair<>(MapleStat.JOB, mapleJob.getId()));
         rebirthStats.add(new Pair<>(MapleStat.AVAILABLEAP, this.setRemainingAPTo));
         rebirthStats.add(new Pair<>(MapleStat.MAXHP, this.setMaxHPTo));
+        rebirthStats.add(new Pair<>(MapleStat.STR, this.setStrTo));
+        rebirthStats.add(new Pair<>(MapleStat.DEX, this.setDexTo));
+        rebirthStats.add(new Pair<>(MapleStat.INT, this.setIntTo));
+        rebirthStats.add(new Pair<>(MapleStat.LUK, this.setLukTo));
         mapleCharacter.announce(MaplePacketCreator.updatePlayerStats(rebirthStats, mapleCharacter));
 
         MapleInventoryManipulator.removeById(
