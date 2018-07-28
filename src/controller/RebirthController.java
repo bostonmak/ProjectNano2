@@ -21,7 +21,13 @@ import java.util.List;
  * Handles rebirth of Maple Character on the server
  */
 public class RebirthController {
-    public RebirthController instance = null;
+    public static RebirthController instance = new RebirthController();
+
+    private RebirthController() { }
+
+    public static RebirthController getInstance() {
+        return instance;
+    }
 
     private static final String PATH_OF_ENLIGHTENMENT = "Path of Enlightenment";
     private static final String PATH_OF_ENFORCEMENT = "Path of Enforcement";
@@ -37,15 +43,6 @@ public class RebirthController {
     private int setMaxHPTo;
     private RebirthPath chosenPath;
 
-    private RebirthController() { }
-
-    public RebirthController getInstance() {
-        if (this.instance == null) {
-            this.instance = new RebirthController();
-        }
-        return this.instance;
-    }
-
     public void rebirth(MapleCharacter mapleCharacter, MapleJob mapleJob) {
         switch (mapleJob) {
             case BEGINNER:
@@ -53,7 +50,7 @@ public class RebirthController {
             case LEGEND: {
                 this.setPlayerLevelTo = 1;
                 this.setApGainTo = 1;
-                this.giveHP = 250;
+                this.giveHP = 250 * (mapleCharacter.getRebirths() + 1);
                 this.setMaxHPTo = GameConstants.STARTING_MAX_HP + giveHP;
                 this.setExpTo = 0;
                 this.chosenPath = RebirthPath.ENLIGHTENMENT;
@@ -61,33 +58,38 @@ public class RebirthController {
                 break;
             }
             case WARRIOR:
+            case DAWNWARRIOR1:
+            case ARAN1:
             case MAGICIAN:
+            case BLAZEWIZARD1:
             case BOWMAN:
+            case WINDARCHER1:
             case THIEF:
-            case PIRATE: {
+            case NIGHTWALKER1:
+            case PIRATE:
+            case THUNDERBREAKER1: {
                 this.setPlayerLevelTo = 10;
+                this.setExpTo = 0;
                 this.setApGainTo = 3;
-                this.giveHP = GameConstants.STARTING_MAX_HP + STARTING_HP_FOR_LEVEL_10 + 1000;
+                this.giveHP = GameConstants.STARTING_MAX_HP + STARTING_HP_FOR_LEVEL_10 + 1000 * (mapleCharacter.getRebirths() + 1);
                 this.chosenPath = RebirthPath.ENFORCEMENT;
                 this.setRemainingAPTo = mapleCharacter.getRemainingAp();
                 if (mapleJob == MapleJob.MAGICIAN) {
                     this.setPlayerLevelTo = 8;
-                    this.giveHP = GameConstants.STARTING_MAX_HP + STARTING_HP_FOR_LEVEL_8 + 500;
+                    this.giveHP = GameConstants.STARTING_MAX_HP + STARTING_HP_FOR_LEVEL_8 + 500 * (mapleCharacter.getRebirths() + 1);
                 } else if (mapleJob == MapleJob.WARRIOR) {
-                    this.giveHP = GameConstants.STARTING_MAX_HP + STARTING_HP_FOR_LEVEL_10 + 1250;
+                    this.giveHP = GameConstants.STARTING_MAX_HP + STARTING_HP_FOR_LEVEL_10 + 1250 * (mapleCharacter.getRebirths() + 1);
                 }
                 this.setMaxHPTo = giveHP;
-                this.setExpTo = ExpTable.getExpNeededForLevel(this.setPlayerLevelTo);
                 break;
             }
         }
 
         mapleCharacter.setLevel(this.setPlayerLevelTo);
-        mapleCharacter.setExp(this.setExpTo);
+        mapleCharacter.setExp(setExpTo);
         mapleCharacter.setJob(mapleJob);
         mapleCharacter.setRemainingAp(this.setRemainingAPTo);
         mapleCharacter.setApGain(this.setApGainTo);
-        mapleCharacter.setRebirths(mapleCharacter.getRebirths() + 1);
         mapleCharacter.setMaxHp(this.setMaxHPTo);
         mapleCharacter.setApGain(this.setApGainTo);
         mapleCharacter.setRebirthPath(chosenPath);
@@ -108,6 +110,8 @@ public class RebirthController {
                 false,
                 false
         );
+
+        mapleCharacter.setRebirths(mapleCharacter.getRebirths() + 1);
 
         final String chosenPathName = this.chosenPath == RebirthPath.ENLIGHTENMENT ? PATH_OF_ENLIGHTENMENT : PATH_OF_ENFORCEMENT;
         final String REBIRTH_NOTICE_MESSAGE = "[Notice] " + mapleCharacter.getName() + " has rebirthed to the " + chosenPathName + "! They have rebirthed " + mapleCharacter.getRebirths() + " time(s)!";

@@ -56,7 +56,7 @@ public class RebirthpathRepository {
         Connection connection = null;
         PreparedStatement updateRebirthPath = null;
 
-        int rowCount = 0;
+        int rowCount = 1;
         int rowsUpdated = 0;
 
         try {
@@ -84,7 +84,7 @@ public class RebirthpathRepository {
         }
 
         if (rowCount != rowsUpdated) {
-            throw new UpdatedRowCountMismatchException("Error when trying to persist rebirth path in `bossentries` table for " + mapleCharacter.getName());
+            throw new UpdatedRowCountMismatchException("Error when trying to persist rebirth path in `rebirthpath` table for " + mapleCharacter.getName());
         }
     }
 

@@ -5,9 +5,8 @@
 
 importPackage(Packages.constants);
 importPackage(Packages.client);
-importPackage(Packages.controller);
 
-var RebirthController = RebirthController.getInstance();
+var RebirthController = Packages.controller.RebirthController.getInstance();
 var JOB_BEGINNER_NAME = "Beginner";
 var JOB_NOBLESSE_NAME = "Noblesse";
 var JOB_LEGEND_NAME = "Legend";
@@ -79,7 +78,7 @@ function action(mode, type, selection) {
                 // Player has selected The Path of Enlightenment
                 var sendStr = "\"That is a good choice, my child. Are you prepared?\"\r\n\r\n";
                 sendStr += "#eThe Path of Enlightenment\r\n";
-                sendStr += "#nYou may rebirth into any job. Your AP is refunded. You gain 1 AP per level.\r\n";
+                sendStr += "#nYou may rebirth into any job. Your AP is refunded. You gain 1 AP per level. You gain +250 HP\r\n";
 
                 sendStr += "#L0##bGo down this path#l\r\n";
 
@@ -88,7 +87,7 @@ function action(mode, type, selection) {
                 // Player has selected The Path of Enforcement
                 var sendStr = "\"That is a good choice, my child. Are you prepared?\"\r\n\r\n";
                 sendStr += "#eThe Path of Enforcement\r\n";
-                sendStr += "#nRebirth into the same job tree (e.g. Dark Knight must rebirth into another Warrior job). AP is NOT refunded. You gain 3 AP per level.\r\n";
+                sendStr += "#nRebirth into the same job tree (e.g. Dark Knight must rebirth into another Warrior job). AP is NOT refunded. You gain 3 AP per level. You gain HP (+500 Wizards, +1250 Warriors, +1000 all other classes)\r\n";
 
                 sendStr += "#L1##bGo down this path#l\r\n";
 
@@ -131,7 +130,8 @@ function action(mode, type, selection) {
                         selectionIndex = 12;
                     }
                     for (var i = 0; i < jobArray.length; i++) {
-                        sendStr += "#L" + i + selectionIndex + "#" + jobArray[i] + "#l\r\n";
+                        var index = i + selectionIndex;
+                        sendStr += "#L" + index + "#" + jobArray[i] + "#l\r\n";
                     }
                     cm.sendSimple(sendStr);
                 }

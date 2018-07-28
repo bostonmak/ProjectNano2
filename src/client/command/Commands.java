@@ -391,7 +391,7 @@ public class Commands {
 				player.yellowMessage("ProjectNano Server Time: " + dateFormat.format(new Date()));
 				break;
 			case "rebirth":
-				c.getAbstractPlayerInteraction().openNpc(9201143, "rebirth");
+				c.getAbstractPlayerInteraction().openNpc(1061005, "rebirth");
 				break;
 			case "aranmastery":
 				c.getAbstractPlayerInteraction().openNpc(9201143, "aran");

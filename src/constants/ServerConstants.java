@@ -41,7 +41,7 @@ public class ServerConstants {
     //Other Configuration
     public static boolean JAVA_8;
     public static boolean SHUTDOWNHOOK;
-    public static final boolean REBIRTH_FEATURE = false;
+    public static final boolean REBIRTH_FEATURE = true;
     
     //Server Flags
     public static final boolean USE_CUSTOM_KEYSET = false;           //Enables auto-setup of the HeavenMS's custom keybindings when creating characters.

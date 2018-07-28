@@ -9030,7 +9030,7 @@ public void saveInventory() throws SQLException {
         return apGain;
     }
 
-    public int setApGain(int apGain) {
+    public void setApGain(int apGain) {
         this.apGain = apGain;
     }
 
