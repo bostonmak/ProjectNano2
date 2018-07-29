@@ -625,7 +625,7 @@ public class Commands {
 				Connection con = null;
 				try {
 					con = DatabaseConnection.getConnection();
-					ps = con.prepareStatement("SELECT `characters`.`name`, `characters`.`level` FROM `characters` LEFT JOIN accounts ON accounts.id = characters.accountid WHERE `characters`.`gm` = '0' AND `accounts`.`banned` = '0' ORDER BY level DESC, exp DESC LIMIT 50");
+					ps = con.prepareStatement("SELECT `characters`.`name`, `characters`.`level` FROM `characters` LEFT JOIN accounts ON accounts.id = characters.accountid WHERE `characters`.`gm` = '0' AND `accounts`.`banned` = '0' ORDER BY reborns DESC, level DESC, exp DESC LIMIT 50");
 					rs = ps.executeQuery();
 
 					player.announce(MaplePacketCreator.showPlayerRanks(9010000, rs));
