@@ -312,7 +312,7 @@ public class Commands {
 		gotomaps.put("nlc", 600000000);
 		gotomaps.put("gpq", 101030104);
 		gotomaps.put("pianus", 230040420);
-		gotomaps.put("horntail", 240060200);
+		gotomaps.put("horntail", 240040700);
 		gotomaps.put("mushmom", 100000005);
 		gotomaps.put("griffey", 240020101);
 		gotomaps.put("manon", 240020401);
