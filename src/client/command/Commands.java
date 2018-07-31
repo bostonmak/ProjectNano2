@@ -3199,7 +3199,7 @@ public class Commands {
 					}
 				}
 
-
+				Server.getInstance().closeServer();
 				TimerManager.getInstance().schedule(Server.getInstance().shutdown(false), time);
 				break;
 

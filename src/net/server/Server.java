@@ -1023,7 +1023,7 @@ public class Server {
         }
     }
 
-    private void closeServer() {
+    public void closeServer() {
         this.acceptor.unbind();
         logger.info("Server closed. No longer accepting connections.");
     }
