@@ -38,6 +38,9 @@ public class ServerConstants {
     public static String HOST;
     public static final Integer PORT = 8484;
 
+    // Connection Configuration
+    public static final boolean CLOSE_CONNECTIONS_ON_SHUTDOWN = false; //Forces all clients to disconnect when IoSession has been unbound
+
     //Other Configuration
     public static boolean JAVA_8;
     public static boolean SHUTDOWNHOOK;
