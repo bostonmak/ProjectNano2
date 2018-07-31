@@ -39,6 +39,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.mina.core.filterchain.IoFilter;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -56,7 +57,6 @@ import net.server.world.World;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.buffer.SimpleBufferAllocator;
-import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
@@ -80,6 +80,7 @@ import server.quest.MapleQuest;
 import tools.locks.MonitoredLockType;
 import tools.AutoJCE;
 
+import static constants.ServerConstants.CLOSE_CONNECTIONS_ON_SHUTDOWN;
 import static constants.ServerConstants.PORT;
 
 public class Server {
@@ -280,7 +281,7 @@ public class Server {
             System.exit(0);
         }
 
-        System.out.println("HeavenMS v" + ServerConstants.VERSION + " starting up.\r\n");
+        System.out.println("ProjectNano v" + ServerConstants.VERSION + " starting up.\r\n");
 
 
         if(ServerConstants.SHUTDOWNHOOK)
@@ -305,9 +306,6 @@ public class Server {
         }
         IoBuffer.setUseDirectBuffer(false);
         IoBuffer.setAllocator(new SimpleBufferAllocator());
-        acceptor = new NioSocketAcceptor();
-        acceptor.getFilterChain().addLast("codec", (IoFilter) new ProtocolCodecFilter(new MapleCodecFactory()));
-        
         TimerManager tMan = TimerManager.getInstance();
         tMan.start();
         tMan.register(tMan.purge(), ServerConstants.PURGING_INTERVAL);//Purging ftw...
@@ -366,13 +364,8 @@ public class Server {
             System.exit(0);
         }
 
-        acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 30);
-        acceptor.setHandler(new MapleServerHandler());
-        try {
-            acceptor.bind(new InetSocketAddress(PORT));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        setupAcceptor();
+        openServer();
 
         logger.info("Scheduling Batch Jobs...");
 
@@ -392,8 +385,6 @@ public class Server {
         } catch (SchedulerException e) {
             logger.error("Error starting batch scheduler. Daily boss limits will not be reset automatically.", e);
         }
-
-        System.out.println("Listening on port " + PORT + "\r\n\r\n");
 
         System.out.println("ProjectNano is now online.\r\n");
         online = true;
@@ -940,6 +931,7 @@ public class Server {
                 
                 try {
                     System.out.println((restart ? "Restarting" : "Shutting down") + " the server!\r\n");
+                    closeServer();
                     if (getWorlds() == null) return;//already shutdown
                     for (World w : getWorlds()) {
                         w.shutdown();
@@ -986,8 +978,6 @@ public class Server {
                     worldRecommendedList = null;
 
                     System.out.println("Worlds + Channels are offline.");
-                    acceptor.unbind();
-                    acceptor = null;
                     if (!restart) {
                         System.out.println("Server has gracefully shutdown.");
                         System.out.println("This window may now be closed.");
@@ -1008,5 +998,33 @@ public class Server {
                 }
             }
         };
+    }
+
+    private void setupAcceptor() {
+        this.acceptor = new NioSocketAcceptor();
+        this.acceptor.getFilterChain().addLast("codec", (IoFilter) new ProtocolCodecFilter(new MapleCodecFactory()));
+        this.acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 30);
+        this.acceptor.setHandler(new MapleServerHandler());
+        this.acceptor.setCloseOnDeactivation(CLOSE_CONNECTIONS_ON_SHUTDOWN);
+    }
+
+    private void openServer() {
+        boolean taskSuccess = false;
+        logger.info("Task: {}, Status: {}", "Opening Server", "BEGIN");
+        try {
+            this.acceptor.bind(new InetSocketAddress(PORT));
+            logger.info("Server opened on port " + PORT);
+            taskSuccess = true;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            logger.error("ERROR: Attempt to open server failed.", ex);
+        } finally {
+            logger.info("Task: {}, Status: {}", "Opening Server", taskSuccess ? "SUCCESS" : "FAILED");
+        }
+    }
+
+    private void closeServer() {
+        this.acceptor.unbind();
+        logger.info("Server closed. No longer accepting connections.");
     }
 }
