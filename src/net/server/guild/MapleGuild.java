@@ -59,7 +59,6 @@ public class MapleGuild {
     private String name, notice;
     private int id, gp, logo, logoColor, leader, capacity, logoBG, logoBGColor, signature, allianceId;
     private int world;
-    private Map<Integer, List<Integer>> notifications = new LinkedHashMap<>();
     private boolean bDirty = true;
 
     public MapleGuild(int guildid, int world) {
@@ -114,7 +113,7 @@ public class MapleGuild {
         }
     }
 
-    public void buildNotifications() {
+    public void buildNotifications(Map<Integer, List<Integer>> notifications) {
         if (!bDirty) {
             return;
         }
@@ -281,26 +280,25 @@ public class MapleGuild {
     }
 
     public void broadcast(final byte[] packet, int exceptionId, BCOp bcop) {
-        synchronized (notifications) {
-            if (bDirty) {
-                buildNotifications();
-            }
-            try {
-                for (Integer b : Server.getInstance().getChannelServer(world)) {
-                    if (notifications.get(b).size() > 0) {
-                        if (bcop == BCOp.DISBAND) {
-                            Server.getInstance().getWorld(world).setGuildAndRank(notifications.get(b), 0, 5, exceptionId);
-                        } else if (bcop == BCOp.EMBLEMCHANGE) {
-                            Server.getInstance().getWorld(world).changeEmblem(this.id, notifications.get(b), new MapleGuildSummary(this));
-                        } else {
-                            Server.getInstance().getWorld(world).sendPacket(notifications.get(b), packet, exceptionId);
-                        }
+        Map<Integer, List<Integer>> notifications = new LinkedHashMap<>();
+        if (bDirty) {
+            buildNotifications(notifications);
+        }
+        try {
+            for (Integer b : Server.getInstance().getChannelServer(world)) {
+                if (notifications.get(b).size() > 0) {
+                    if (bcop == BCOp.DISBAND) {
+                        Server.getInstance().getWorld(world).setGuildAndRank(notifications.get(b), 0, 5, exceptionId);
+                    } else if (bcop == BCOp.EMBLEMCHANGE) {
+                        Server.getInstance().getWorld(world).changeEmblem(this.id, notifications.get(b), new MapleGuildSummary(this));
+                    } else {
+                        Server.getInstance().getWorld(world).sendPacket(notifications.get(b), packet, exceptionId);
                     }
                 }
-            } catch (Exception re) {
-                re.printStackTrace();
-                System.out.println("Failed to contact channel(s) for broadcast.");//fu?
             }
+        } catch (Exception re) {
+            re.printStackTrace();
+            System.out.println("Failed to contact channel(s) for broadcast.");//fu?
         }
     }
 
