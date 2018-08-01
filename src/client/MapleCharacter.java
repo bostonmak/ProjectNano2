@@ -1653,7 +1653,7 @@ public void saveInventory() throws SQLException {
         return false;
     }
     
-    private void changeMapInternal(final MapleMap to, final Point pos, final byte[] warpPacket) {
+    private synchronized void changeMapInternal(final MapleMap to, final Point pos, final byte[] warpPacket) {
         if(!canWarpMap) return;
         
         this.mapTransitioning.set(true);
@@ -1669,17 +1669,17 @@ public void saveInventory() throws SQLException {
             map = to;
             setPosition(pos);
             map.addPlayer(this);
-            
-            prtLock.lock();
-            try {
-                if (party != null) {
+
+            if (this.party != null) {
+                prtLock.lock();
+                try {
                     mpc.setMapId(to.getId());
                     silentPartyUpdateInternal();
                     client.announce(MaplePacketCreator.updateParty(client.getChannel(), party, PartyOperation.SILENT_UPDATE, null));
                     updatePartyMemberHPInternal();
+                } finally {
+                    prtLock.unlock();
                 }
-            } finally {
-                prtLock.unlock();
             }
             
             if (getMap().getHPDec() > 0) resetHpDecreaseTask();
@@ -3493,17 +3493,17 @@ public void saveInventory() throws SQLException {
                     destroyDoor.getTownDoor().sendDestroyData(chr.getClient());
                 }
 
-                prtLock.lock();
-                try {
-                    if (party != null) {
+                if (this.party != null) {
+                    prtLock.lock();
+                    try {
                         for (MaplePartyCharacter partyMembers : party.getMembers()) {
                             partyMembers.getPlayer().removeDoor(this.getId());
                             partyMembers.removeDoor(this.getId());
                         }
                         silentPartyUpdateInternal();
+                    } finally {
+                        prtLock.unlock();
                     }
-                } finally {
-                    prtLock.unlock();
                 }
             }
         } else if (effect.isMapChair()) {
@@ -8058,18 +8058,18 @@ public void saveInventory() throws SQLException {
     }
 
     public void silentPartyUpdate() {
-        prtLock.lock();
-        try {
-            silentPartyUpdateInternal();
-        } finally {
-            prtLock.unlock();
+        if (this.party != null) {
+            prtLock.lock();
+            try {
+                silentPartyUpdateInternal();
+            } finally {
+                prtLock.unlock();
+            }
         }
     }
     
     private void silentPartyUpdateInternal() {
-        if (party != null) {
-            Server.getInstance().getWorld(world).updateParty(party.getId(), PartyOperation.SILENT_UPDATE, getMPC());
-        }
+        Server.getInstance().getWorld(world).updateParty(party.getId(), PartyOperation.SILENT_UPDATE, getMPC());
     }
 
     public static class SkillEntry {
