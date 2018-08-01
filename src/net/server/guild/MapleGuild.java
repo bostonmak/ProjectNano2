@@ -281,26 +281,31 @@ public class MapleGuild {
     }
 
     public void broadcast(final byte[] packet, int exceptionId, BCOp bcop) {
-        synchronized (notifications) {
-            if (bDirty) {
-                buildNotifications();
-            }
-            try {
-                for (Integer b : Server.getInstance().getChannelServer(world)) {
-                    if (notifications.get(b).size() > 0) {
-                        if (bcop == BCOp.DISBAND) {
-                            Server.getInstance().getWorld(world).setGuildAndRank(notifications.get(b), 0, 5, exceptionId);
-                        } else if (bcop == BCOp.EMBLEMCHANGE) {
-                            Server.getInstance().getWorld(world).changeEmblem(this.id, notifications.get(b), new MapleGuildSummary(this));
-                        } else {
-                            Server.getInstance().getWorld(world).sendPacket(notifications.get(b), packet, exceptionId);
+        membersLock.lock();
+        try {
+            synchronized (notifications) {
+                if (bDirty) {
+                    buildNotifications();
+                }
+                try {
+                    for (Integer b : Server.getInstance().getChannelServer(world)) {
+                        if (notifications.get(b).size() > 0) {
+                            if (bcop == BCOp.DISBAND) {
+                                Server.getInstance().getWorld(world).setGuildAndRank(notifications.get(b), 0, 5, exceptionId);
+                            } else if (bcop == BCOp.EMBLEMCHANGE) {
+                                Server.getInstance().getWorld(world).changeEmblem(this.id, notifications.get(b), new MapleGuildSummary(this));
+                            } else {
+                                Server.getInstance().getWorld(world).sendPacket(notifications.get(b), packet, exceptionId);
+                            }
                         }
                     }
+                } catch (Exception re) {
+                    re.printStackTrace();
+                    System.out.println("Failed to contact channel(s) for broadcast.");//fu?
                 }
-            } catch (Exception re) {
-                re.printStackTrace();
-                System.out.println("Failed to contact channel(s) for broadcast.");//fu?
             }
+        } finally {
+            membersLock.unlock();
         }
     }
 
