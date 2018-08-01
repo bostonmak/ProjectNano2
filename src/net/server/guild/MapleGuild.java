@@ -59,7 +59,7 @@ public class MapleGuild {
     private String name, notice;
     private int id, gp, logo, logoColor, leader, capacity, logoBG, logoBGColor, signature, allianceId;
     private int world;
-    private Map<Integer, List<Integer>> notifications = new LinkedHashMap<>();
+    private final Map<Integer, List<Integer>> notifications = new LinkedHashMap<>();
     private boolean bDirty = true;
 
     public MapleGuild(int guildid, int world) {
@@ -114,7 +114,7 @@ public class MapleGuild {
         }
     }
 
-    public void buildNotifications() {
+    private void buildNotifications() {
         if (!bDirty) {
             return;
         }
@@ -147,7 +147,7 @@ public class MapleGuild {
         bDirty = false;
     }
 
-    public void writeToDB(boolean bDisband) {
+    private void writeToDB(boolean bDisband) {
         try {
             Connection con = DatabaseConnection.getConnection();
             
@@ -272,7 +272,7 @@ public class MapleGuild {
         return signature;
     }
 
-    public void broadcast(final byte[] packet) {
+    private void broadcast(final byte[] packet) {
         broadcast(packet, -1, BCOp.NONE);
     }
 
@@ -517,7 +517,7 @@ public class MapleGuild {
         }
     }
     
-    public void changeRank(MapleGuildCharacter mgc, int newRank) {
+    private void changeRank(MapleGuildCharacter mgc, int newRank) {
         try {
             if (mgc.isOnline()) {
                 Server.getInstance().getWorld(mgc.getWorld()).setGuildAndRank(mgc.getId(), this.id, newRank);
