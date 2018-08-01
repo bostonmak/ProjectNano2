@@ -77,42 +77,47 @@ import tools.locks.MonitoredLockType;
  */
 public class World {
 
-    private int id, flag, exprate, droprate, mesorate, questrate;
-    private String eventmsg;
-    private List<Channel> channels = new ArrayList<>();
-    private Map<Integer, MapleMessenger> messengers = new HashMap<>();
-    private AtomicInteger runningMessengerId = new AtomicInteger();
-    private Map<Integer, MapleFamily> families = new LinkedHashMap<>();
-    private Map<Integer, MapleGuildSummary> gsStore = new HashMap<>();
-    private PlayerStorage players = new PlayerStorage();
+    private final int id;
+    private int flag;
+    private int exprate;
+    private int droprate;
+    private int mesorate;
+    private int questrate;
+    private final String eventmsg;
+    private final List<Channel> channels = new ArrayList<>();
+    private final Map<Integer, MapleMessenger> messengers = new HashMap<>();
+    private final AtomicInteger runningMessengerId = new AtomicInteger();
+    private final Map<Integer, MapleFamily> families = new LinkedHashMap<>();
+    private final Map<Integer, MapleGuildSummary> gsStore = new HashMap<>();
+    private final PlayerStorage players = new PlayerStorage();
     
-    private Set<Integer> queuedGuilds = new HashSet<>();
+    private final Set<Integer> queuedGuilds = new HashSet<>();
     
-    private Map<Integer, MapleParty> parties = new HashMap<>();
-    private AtomicInteger runningPartyId = new AtomicInteger();
-    private Lock partyLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_PARTY, true);
+    private final Map<Integer, MapleParty> parties = new HashMap<>();
+    private final AtomicInteger runningPartyId = new AtomicInteger();
+    private final Lock partyLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_PARTY, true);
     
-    private Map<Integer, Integer> owlSearched = new LinkedHashMap<>();
-    private Lock owlLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_OWL);
+    private final Map<Integer, Integer> owlSearched = new LinkedHashMap<>();
+    private final Lock owlLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_OWL);
     
-    private Lock activePetsLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_PETS, true);
-    private Map<Integer, Byte> activePets = new LinkedHashMap<>();
+    private final Lock activePetsLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_PETS, true);
+    private final Map<Integer, Byte> activePets = new LinkedHashMap<>();
     private ScheduledFuture<?> petsSchedule;
     private long petUpdate;
     
-    private Lock activeMountsLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_MOUNTS, true);
-    private Map<Integer, Byte> activeMounts = new LinkedHashMap<>();
+    private final Lock activeMountsLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_MOUNTS, true);
+    private final Map<Integer, Byte> activeMounts = new LinkedHashMap<>();
     private ScheduledFuture<?> mountsSchedule;
     private long mountUpdate;
     
-    private Lock activePlayerShopsLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_PSHOPS, true);
-    private Map<Integer, MaplePlayerShop> activePlayerShops = new LinkedHashMap<>();
+    private final Lock activePlayerShopsLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_PSHOPS, true);
+    private final Map<Integer, MaplePlayerShop> activePlayerShops = new LinkedHashMap<>();
     
-    private Lock activeMerchantsLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_MERCHS, true);
-    private Map<Integer, Pair<MapleHiredMerchant, Byte>> activeMerchants = new LinkedHashMap<>();
+    private final Lock activeMerchantsLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_MERCHS, true);
+    private final Map<Integer, Pair<MapleHiredMerchant, Byte>> activeMerchants = new LinkedHashMap<>();
     private long merchantUpdate;
     
-    private ScheduledFuture<?> charactersSchedule;
+    private final ScheduledFuture<?> charactersSchedule;
     
     public World(int world, int flag, String eventmsg, int exprate, int droprate, int mesorate, int questrate) {
         this.id = world;
@@ -296,7 +301,7 @@ public class World {
         }
     }
 
-    public void updateGuildSummary(int gid, MapleGuildSummary mgs) {
+    private void updateGuildSummary(int gid, MapleGuildSummary mgs) {
         gsStore.put(gid, mgs);
     }
 
@@ -414,16 +419,16 @@ public class World {
         }
     }
 
-    public MapleParty disbandParty(int partyid) {
+    private void disbandParty(int partyid) {
         partyLock.lock();
         try {
-            return parties.remove(partyid);
+            parties.remove(partyid);
         } finally {
             partyLock.unlock();
         }
     }
 
-    public void updateParty(MapleParty party, PartyOperation operation, MaplePartyCharacter target) {
+    private void updateParty(MapleParty party, PartyOperation operation, MaplePartyCharacter target) {
         for (MaplePartyCharacter partychar : party.getMembers()) {
             MapleCharacter chr = getPlayerStorage().getCharacterByName(partychar.getName());
             if (chr != null) {
@@ -580,7 +585,7 @@ public class World {
         }
     }
 
-    public void addMessengerPlayer(MapleMessenger messenger, String namefrom, int fromchannel, int position) {
+    private void addMessengerPlayer(MapleMessenger messenger, String namefrom, int fromchannel, int position) {
     	for (MapleMessengerCharacter messengerchar : messenger.getMembers()) {
     		MapleCharacter chr = getPlayerStorage().getCharacterByName(messengerchar.getName());
     		if(chr == null){
@@ -596,7 +601,7 @@ public class World {
     	}
     }
 
-    public void removeMessengerPlayer(MapleMessenger messenger, int position) {
+    private void removeMessengerPlayer(MapleMessenger messenger, int position) {
         for (MapleMessengerCharacter messengerchar : messenger.getMembers()) {
             MapleCharacter chr = getPlayerStorage().getCharacterByName(messengerchar.getName());
             if (chr != null) {
@@ -935,13 +940,11 @@ public class World {
         }
     }
     
-    public List<MaplePlayerShop> getActivePlayerShops() {
+    private List<MaplePlayerShop> getActivePlayerShops() {
         List<MaplePlayerShop> psList = new ArrayList<>();
         activePlayerShopsLock.lock();
         try {
-            for(MaplePlayerShop mps : activePlayerShops.values()) {
-                psList.add(mps);
-            }
+            psList.addAll(activePlayerShops.values());
             
             return psList;
         } finally {
@@ -1005,7 +1008,7 @@ public class World {
         }
     }
     
-    public List<MapleHiredMerchant> getActiveMerchants() {
+    private List<MapleHiredMerchant> getActiveMerchants() {
         List<MapleHiredMerchant> hmList = new ArrayList<>();
         activeMerchantsLock.lock();
         try {
