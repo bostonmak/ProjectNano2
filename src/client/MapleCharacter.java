@@ -1653,7 +1653,7 @@ public void saveInventory() throws SQLException {
         return false;
     }
     
-    private void changeMapInternal(final MapleMap to, final Point pos, final byte[] warpPacket) {
+    private synchronized void changeMapInternal(final MapleMap to, final Point pos, final byte[] warpPacket) {
         if(!canWarpMap) return;
         
         this.mapTransitioning.set(true);
