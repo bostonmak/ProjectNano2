@@ -1269,10 +1269,10 @@ public class MapleClient {
                         player.setTargetHpBarTime(timeNow);
                 }
 	}
-        
-        public synchronized void announce(final byte[] packet) {//MINA CORE IS A FUCKING BITCH AND I HATE IT <3
-                session.write(packet);
-	}
+
+    public void announce(final byte[] packet) {
+        session.write(packet);
+    }
 
         public void announceHint(String msg, int length) {
                 announce(MaplePacketCreator.sendHint(msg, length, 10));
