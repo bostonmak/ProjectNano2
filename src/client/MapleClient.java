@@ -1271,7 +1271,11 @@ public class MapleClient {
 	}
 
     public void announce(final byte[] packet) {
-        session.write(packet);
+		if(!session.isClosing()) {
+			synchronized(session) {
+				session.write(packet);
+			}
+		}
     }
 
         public void announceHint(String msg, int length) {
