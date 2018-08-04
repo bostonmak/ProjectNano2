@@ -41,6 +41,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 
 import tools.*;
@@ -104,7 +105,7 @@ public class MapleClient {
 	private String hwid = null;
 	private int picattempt = 0;
 	private byte gender = -1;
-	private boolean disconnecting = false;
+	private AtomicBoolean disconnecting = new AtomicBoolean(false);
 	private final Lock lock = new MonitoredReentrantLock(MonitoredLockType.CLIENT, true);
         private final Lock encoderLock = new MonitoredReentrantLock(MonitoredLockType.CLIENT, true);
         private static final Lock loginLock = new MonitoredReentrantLock(MonitoredLockType.CLIENT, true);
@@ -814,11 +815,11 @@ public class MapleClient {
 		}
 	}
 
-	public final synchronized void disconnect(boolean shutdown, boolean cashshop) {//once per MapleClient instance
-                if (disconnecting) {
+	public final void disconnect(boolean shutdown, boolean cashshop) {//once per MapleClient instance
+		if (disconnecting.get()) {
 			return;
 		}
-		disconnecting = true;
+		disconnecting.compareAndSet(false, true);
 		if (player != null && player.isLoggedin() && player.getClient() != null) {
                         MapleMap map = player.getMap();
 			final MapleParty party = player.getParty();
@@ -831,20 +832,20 @@ public class MapleClient {
 			final MapleGuildCharacter chrg = player.getMGC();
 			final MapleGuild guild = player.getGuild();
                         
-                        player.cancelMagicDoor();
+			player.cancelMagicDoor();
 
 			if (channel == -1 || shutdown) {
-                                if(chrg != null) chrg.setCharacter(null);
-                            
-                                removePlayer();
-                                player.saveCooldowns();
-                                player.saveToDB(true);
+				if(chrg != null) chrg.setCharacter(null);
+
+				removePlayer();
+				player.saveCooldowns();
+				player.saveToDB(true);
                             
 				player = null;
 				return;
 			}
                         
-                        removePlayer();
+			removePlayer();
 			
 			final World worlda = getWorldServer();
 			try {
@@ -916,23 +917,23 @@ public class MapleClient {
 			} catch (final Exception e) {
 				FilePrinter.printError(FilePrinter.ACCOUNT_STUCK, e);
 			} finally {
-                                if (!this.serverTransition) {
+				if (!this.serverTransition) {
 					worlda.removePlayer(player);
-                                        //getChannelServer().removePlayer(player); already being done
+					//getChannelServer().removePlayer(player); already being done
                                         
-                                        player.saveCooldowns();
-                                        player.saveToDB(true);
+					player.saveCooldowns();
+					player.saveToDB(true);
 					if (player != null) {//no idea, occur :(
 						player.empty(false);
 					}
 					player.logOff();
 				} else {
-                                        getChannelServer().removePlayer(player);
+					getChannelServer().removePlayer(player);
 
-                                        player.saveCooldowns();
-                                        player.saveToDB();
-                                }
-                                player = null;
+					player.saveCooldowns();
+					player.saveToDB();
+				}
+				player = null;
 			}
 		}
 		if (!serverTransition && isLoggedIn()) {
