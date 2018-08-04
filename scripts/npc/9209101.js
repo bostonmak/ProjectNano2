@@ -48,8 +48,13 @@ function action (m,t,s) {
     } else if (status == 2) {
         if (sel == 100) {
             if (cm.getrewardpoints() >= 6) {
+                if(!cm.getPlayer().getInventory(Packages.client.inventory.MapleInventoryType.EQUIP).isFull(2)){
                 cm.gainrewardpoints(-6);
                 cm.gainItem(2340000, 5);
+                }
+                else{
+                    cm.sendOK("Please make sure you have enough space to hold these items!");
+                }
             } else {
                 cm.sendOk(" You don't have 6 vote points. ");
             }

@@ -90,7 +90,7 @@ function action(mode, type, selection) {
         if (status == 0) {
             cm.sendNext(" #i3991013##i3991023##i3991006##i3991000##i3991002##i3991007##i3991000##i3991015##i3991014##i3991013# \r\nHello #h #,\r\n\r\nWant to try your luck at the #r#eNX Weapon Gachapon?#n#k You can earn assorted up to date NX Weapons Remember that it will cost you #r#e10,000,000 mesos#n#k a spin! #b#eGood Luck!");
         } else if (status == 1) {
-            if (cm.getMeso() >= 500000) {
+            if (cm.getMeso() >= 10000000) {
                 //cm.gainMeso([-1]);
                 cm.sendNext(" #eFeatured NX Items in July#e \r\n\r\n #i1702453# #i1702714#  #i1702713# #i1702211# #i1702419# #i1702364# #i1702372#\r\n ------------------------------------------------------------------------------ \r\n#i1702694# #i1702654# #i1702715# #i1702521# #i1702629# #i1702625# #i1702688# \r\n ------------------------------------------------------------------------------ \r\n #i1702716# #i1702538# #i1702534# #i1702722# #i1702711# #i1702433# #i1702423# \r\n ------------------------------------------------------------------------------ \r\n \t\t\t\t\t\#e#rGood Luck Adventurer!");
                 
@@ -101,22 +101,26 @@ function action(mode, type, selection) {
         } else if (status == 2) {
         //           cm.setDailyReward('DailyGift');
                      
-
+            if(!cm.getPlayer().getInventory(Packages.client.inventory.MapleInventoryType.EQUIP).isFull(0)){
             if (chance > 0 && chance <= 1) {
             cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(icommon, 1) + "##k #v" + icommon + "#"); 
-            cm.gainMeso([-500000]);
+            cm.gainMeso([-10000000]);
             } else if (chance >= 2 && chance <= 3) {
             cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(inormal, 1) + "##k #v" + inormal + "#");
-            cm.gainMeso([-500000]);
+            cm.gainMeso([-10000000]);
             } else if (chance >=4 && chance <=5) {
             cm.sendOk("#b#eCongratulations!#n#k You have obtained a #d#t" + cm.gainItem(irare, 1) + "##k #v" + irare + "#");
-            cm.gainMeso([-500000]);
+            cm.gainMeso([-10000000]);
             } else if (chance >= 6 && chance <= 7) {
             cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare1, 1) + "##k #v" + irare1 + "#");
-            cm.gainMeso([-500000]);
+            cm.gainMeso([-10000000]);
             } else if (chance >= 8 && chance <= 9) {
             cm.sendOk("#b#eCongratulations!#n#k You have obtained a #b#t" + cm.gainItem(irare2, 1) + "##k #v" + irare2 + "#");
-            cm.gainMeso([-500000]);
+            cm.gainMeso([-10000000]);
+            }
+        }
+            else{
+                 cm.sendOk("Please make sure you have enough space to hold these items!");
             }
             cm.dispose();
         }

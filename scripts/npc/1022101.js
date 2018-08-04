@@ -7,6 +7,8 @@ function action(mode, type, selection) {
  // Double Swing
  if(cm.getPlayer().getSkillLevel(2221003) == 0)
 		cm.teachSkill(2221003,0, 10); // Combat Ability
+		if(cm.getPlayer().getSkillLevel(21000000) == 0)
+		cm.teachSkill(21000000,0,10);
  // Combat Step
  if(cm.getPlayer().getSkillLevel(21001003) == 0)
 		cm.teachSkill(21001003,0, 0); // Pole Arm Booster
@@ -17,7 +19,7 @@ function action(mode, type, selection) {
 		if(cm.getPlayer().getSkillLevel(21100002) == 0)
 		cm.teachSkill(21100002,0,0); // Final Charge
  // Body Pressure
- if(cm.getPlayer().getSkillLevel(2110004) == 0)
+ if(cm.getPlayer().getSkillLevel(21100004) == 0)
 		cm.teachSkill(21100004,0,0);  //Combo Smash
 		if(cm.getPlayer().getSkillLevel(21100005) == 0)
 		cm.teachSkill(21100005,0,0); // Combo Drain
