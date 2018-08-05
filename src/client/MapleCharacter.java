@@ -827,7 +827,7 @@ public void saveInventory() throws SQLException {
                 if (databaseKeybinds.containsKey(currentKeybind.getKey())) {
                     updateKeymapQuery.setInt(1, currentKeybind.getValue().getType());
                     updateKeymapQuery.setInt(2, currentKeybind.getValue().getAction());
-                    updateKeymapQuery.setInt(3, databaseKeybinds.get(this.id));
+                    updateKeymapQuery.setInt(3, this.id);
                     updateKeymapQuery.addBatch();
                 }
                 else {
