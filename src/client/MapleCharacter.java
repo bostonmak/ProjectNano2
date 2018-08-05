@@ -848,6 +848,7 @@ public void saveInventory() throws SQLException {
             updateKeymapQuery.executeBatch();
             deleteKeymapQuery.executeBatch();
 
+            con.commit();
             taskSuccess = true;
         } catch (SQLException ex) {
             MapleLogger.error("ERROR: Exception caught while saving keybindings for character: " + this.name, ex);
