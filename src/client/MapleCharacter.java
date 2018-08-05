@@ -7165,15 +7165,17 @@ public void saveInventory() throws SQLException {
                 }
                 keys.put(keybinding.getKey(), 1);
             }
-            String query = "DELETE FROM keymap WHERE characterid = ? and `key` NOT IN (";
+            StringBuilder query = new StringBuilder().append("DELETE FROM keymap WHERE characterid = ? and `key` NOT IN (");
             Iterator it = keys.entrySet().iterator();
             while (it.hasNext()) {
                 String keystr = ((Map.Entry)it.next()).getKey().toString();
-                query += keystr + ",";
+                query.append(keystr);
+                if(it.hasNext()) {
+                    query.append(",");
+                }
             }
-            query = query.substring(0, query.length() - 1);
-            query += ")";
-            deleteWhereCharacterId(con, query);
+            query.append(")");
+            deleteWhereCharacterId(con, query.toString());
             ps.executeBatch();
             upd.executeBatch();
             
