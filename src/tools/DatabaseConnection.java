@@ -88,7 +88,7 @@ public class DatabaseConnection {
             config.setMaximumPoolSize(poolSize);
             
             config.addDataSourceProperty("cachePrepStmts", true);
-            config.addDataSourceProperty("prepStmtCacheSize", 25);
+            config.addDataSourceProperty("prepStmtCacheSize", 250);
             config.addDataSourceProperty("prepStmtCacheSqlLimit", 2048);
             config.addDataSourceProperty("useServerPrepStmts", true);
             config.addDataSourceProperty("useLocalSessionState", true);
