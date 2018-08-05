@@ -325,6 +325,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     private int rebirths = 0;
     private RebirthPath rebirthPath = RebirthPath.NONE;
     private int apGain = 5;
+    private List<Integer> keybindingsToRemove = new ArrayList<>();
 
     private static Logger MapleLogger = LoggerFactory.getLogger(MapleCharacter.class);
 
@@ -792,6 +793,76 @@ public void saveInventory() throws SQLException {
             if (inventoryItemsTableGeneratedKeysResult != null) inventoryItemsTableGeneratedKeysResult.close();
         }
 }
+
+    private void saveKeybindings() throws SQLException {
+        boolean taskSuccess = false;
+        long saveKeybindingsTaskTime = System.currentTimeMillis();
+
+        Connection con = null;
+        PreparedStatement selectKeymapQuery = null;
+        ResultSet keymapResult = null;
+        PreparedStatement insertKeymapQuery = null;
+        PreparedStatement updateKeymapQuery = null;
+        PreparedStatement deleteKeymapQuery = null;
+
+        try {
+            con = DatabaseConnection.getConnection();
+            con.setAutoCommit(false);
+
+            selectKeymapQuery = con.prepareStatement("SELECT * FROM keymap WHERE characterid=?", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            selectKeymapQuery.setInt(1, this.id);
+            keymapResult = selectKeymapQuery.executeQuery();
+            HashMap<Integer, Integer> databaseKeybinds = new HashMap<>();
+            while (keymapResult.next()) {
+                Integer key = keymapResult.getInt("key");
+                Integer id = keymapResult.getInt("id");
+                databaseKeybinds.put(key, id);
+            }
+            insertKeymapQuery = con.prepareStatement("INSERT INTO keymap (characterid, `key`, `type`, `action`) VALUES (?, ?, ?, ?)");
+            updateKeymapQuery = con.prepareStatement("UPDATE keymap SET `type`=?, `action`=? WHERE characterid=?");
+            insertKeymapQuery.setInt(1, id);
+
+            Set<Entry<Integer, MapleKeyBinding>> currentKeybinds = Collections.unmodifiableSet(keymap.entrySet());
+            for (Entry<Integer, MapleKeyBinding> currentKeybind : currentKeybinds) {
+                if (databaseKeybinds.containsKey(currentKeybind.getKey())) {
+                    updateKeymapQuery.setInt(1, currentKeybind.getValue().getType());
+                    updateKeymapQuery.setInt(2, currentKeybind.getValue().getAction());
+                    updateKeymapQuery.setInt(3, databaseKeybinds.get(this.id));
+                    updateKeymapQuery.addBatch();
+                }
+                else {
+                    insertKeymapQuery.setInt(2, currentKeybind.getKey());
+                    insertKeymapQuery.setInt(3, currentKeybind.getValue().getType());
+                    insertKeymapQuery.setInt(4, currentKeybind.getValue().getAction());
+                    insertKeymapQuery.addBatch();
+                }
+            }
+            deleteKeymapQuery = con.prepareStatement("DELETE FROM keymap WHERE characterid = ? AND key = ?");
+            for(Integer keybindingToRemove : keybindingsToRemove) {
+                deleteKeymapQuery.setInt(1, this.id);
+                deleteKeymapQuery.setInt(2, keybindingToRemove.intValue());
+                deleteKeymapQuery.addBatch();
+            }
+
+            insertKeymapQuery.executeBatch();
+            updateKeymapQuery.executeBatch();
+            deleteKeymapQuery.executeBatch();
+
+            taskSuccess = true;
+        } catch (SQLException ex) {
+            MapleLogger.error("ERROR: Exception caught while saving keybindings for character: " + this.name, ex);
+        } finally {
+            String taskStatus = taskSuccess ? TASK_SUCCESSFUL : TASK_FAILED;
+            MapleLogger.debug("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
+                    "Save Keybindings", this.getName(), taskStatus, System.currentTimeMillis() - saveKeybindingsTaskTime);
+            if(con != null) con.close();
+            if(selectKeymapQuery != null) selectKeymapQuery.close();
+            if(keymapResult != null) keymapResult.close();
+            if(insertKeymapQuery != null) insertKeymapQuery.close();
+            if(updateKeymapQuery != null) updateKeymapQuery.close();
+            if(deleteKeymapQuery != null) deleteKeymapQuery.close();
+        }
+    }
 
     public void addCrushRing(MapleRing r) {
         crushRings.add(r);
@@ -1437,10 +1508,15 @@ public void saveInventory() throws SQLException {
     }
 
     public void changeKeybinding(int key, MapleKeyBinding keybinding) {
+        Integer keyInteger = Integer.valueOf(key);
         if (keybinding.getType() != 0) {
-            keymap.put(Integer.valueOf(key), keybinding);
+            keymap.put(keyInteger, keybinding);
+            if(keybindingsToRemove.contains(keyInteger)) {
+                keybindingsToRemove.remove(keyInteger);
+            }
         } else {
-            keymap.remove(Integer.valueOf(key));
+            keymap.remove(keyInteger);
+            keybindingsToRemove.add(keyInteger);
         }
     }
     
@@ -7131,54 +7207,11 @@ public void saveInventory() throws SQLException {
 
             MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
                     "Save Pets", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
+
+            this.saveKeybindings();
+
             lastTaskTime = System.currentTimeMillis();
 
-
-
-            PreparedStatement p = con.prepareStatement("SELECT * FROM keymap WHERE characterid=?", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            p.setInt(1, this.id);
-            ResultSet r = p.executeQuery();
-            HashMap<Integer, Integer> updates = new HashMap();
-            while (r.next()) {
-                Integer key = r.getInt("key");
-                Integer id = r.getInt("id");
-                updates.put(key, id);
-            }
-            ps = con.prepareStatement("INSERT INTO keymap (characterid, `key`, `type`, `action`) VALUES (?, ?, ?, ?)");
-            PreparedStatement upd = con.prepareStatement("UPDATE keymap SET `type`=?, `action`=? WHERE id=?");
-            ps.setInt(1, id);
-            
-            Set<Entry<Integer, MapleKeyBinding>> keybindingItems = Collections.unmodifiableSet(keymap.entrySet());
-            HashMap<Integer, Integer> keys = new HashMap();
-            for (Entry<Integer, MapleKeyBinding> keybinding : keybindingItems) {
-                if (updates.containsKey(keybinding.getKey())) {
-                    upd.setInt(1, keybinding.getValue().getType());
-                    upd.setInt(2, keybinding.getValue().getAction());
-                    upd.setInt(3, updates.get(keybinding.getKey()));
-                    upd.addBatch();
-                }
-                else {
-                    ps.setInt(2, keybinding.getKey());
-                    ps.setInt(3, keybinding.getValue().getType());
-                    ps.setInt(4, keybinding.getValue().getAction());
-                    ps.addBatch();
-                }
-                keys.put(keybinding.getKey(), 1);
-            }
-            StringBuilder query = new StringBuilder().append("DELETE FROM keymap WHERE characterid = ? and `key` NOT IN (");
-            Iterator it = keys.entrySet().iterator();
-            while (it.hasNext()) {
-                String keystr = ((Map.Entry)it.next()).getKey().toString();
-                query.append(keystr);
-                if(it.hasNext()) {
-                    query.append(",");
-                }
-            }
-            query.append(")");
-            deleteWhereCharacterId(con, query.toString());
-            ps.executeBatch();
-            upd.executeBatch();
-            
             deleteWhereCharacterId(con, "DELETE FROM skillmacros WHERE characterid = ?");
             ps = con.prepareStatement("INSERT INTO skillmacros (characterid, skill1, skill2, skill3, name, shout, position) VALUES (?, ?, ?, ?, ?, ?, ?)");
             ps.setInt(1, getId());
@@ -7197,7 +7230,7 @@ public void saveInventory() throws SQLException {
             ps.executeBatch();
 
             MapleLogger.info("Task: {}, Character: {}, Status: {}, ExecutionTime: {}ms",
-                    "Save Key Bindings and Macros", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
+                    "Save Macros", this.getName(), TASK_IN_PROGRESS, System.currentTimeMillis() - lastTaskTime);
             lastTaskTime = System.currentTimeMillis();
             
             /*
