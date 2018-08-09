@@ -3,7 +3,7 @@ Exchanges votepoints for white scrolls dragon weapons and reverse weapons.
 @@author shadowzzz*/
 
 var status = 0;
-var points = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 1, 1, 1, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5];
+var points = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 1, 1, 1, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 var items = [1022082, 
 /*Starts at 1, all the ITCG Equips */          1082223, 1082230, 1032048, 1002675, 1002676, 1072344, 1402045, 1472064, 1422028, 2070016, 1102165, 1092052, 1102145, 1442057, 2070018, 1002553,
 /*Starts at 16, all the dragon weapons */      1302086, 1312038, 1322061, 1332075, 1332076, 1372045, 1382059, 1402047, 1412034, 1422038, 1432049, 1442067, 1452059, 1462051, 1472071, 1482024, 1492025, 
@@ -18,10 +18,11 @@ var items = [1022082,
 /*Starts at 63, Thief Empress Gear */          1003175, 1102278, 1052317, 1072488, 1082298,
 /*Starts at 68, Pirate Empress Gear*/          1003176, 1102279, 1052318, 1072489, 1082299,
 /*Starts at 73, Mage Empress Gear*/            1003173, 1102276, 1052315, 1072486, 1082296,
-/*Starts at 78, VIP Weapoons */                1302147, 1312062, 1322090, 1332120, 1332125, 1372078, 1382099, 1402090, 1412062, 1422063, 1432081, 1442111, 1452106, 1462091, 1472117, 1482079, 1492079];
+/*Starts at 78, VIP Weapoons */                1302147, 1312062, 1322090, 1332120, 1332125, 1372078, 1382099, 1402090, 1412062, 1422063, 1432081, 1442111, 1452106, 1462091, 1472117, 1482079, 1492079,
+/*Starts at 95, 60% Scrolls */                 2040914, 2040919, 2044301, 2044401, 2044501, 2044601, 2044701, 2044801, 2044901, 2044201, 2044101, 2044001, 2043001, 2043101, 2043201, 2043801, 2043701, 2043301];
 
 function start() {
-    cm.sendSimple("Welcome to the vote point exchange npc you have.#r" +cm.getrewardpoints() +"#k votepoints Go to the website and vote to gain votepoints. What would u like to buy with your votepoints? #b\r\n#L0# Buy some scrolls 1 for 1 votepoint #b\r\n#L1# Buy ITCG Equips 3 votepoints #b\r\n#L2# Buy VIP Weapons for 5 votepoints");
+    cm.sendSimple("Welcome to the vote point exchange npc you have.#r" +cm.getrewardpoints() +"#k votepoints Go to the website and vote to gain votepoints. What would u like to buy with your votepoints? #b\r\n#L0# Buy some scrolls 1 for 1 votepoint #b\r\n#L1# Buy ITCG Equips 3 votepoints #b\r\n#L2# Buy VIP Weapons for 15 votepoints");
 }
 
 function action (m,t,s) {
@@ -34,7 +35,7 @@ function action (m,t,s) {
     if (status == 1) {
     sel = s;
         if (s == 0) {
-            cm.sendSimple("Fun Fact: Mitochondria is not actually the powerhouse of the cell #b\r\n\#L34# #v2049100# Chaos Scroll #b\r\n\#L35# #v2340000#White Scroll #b\r\n\#L36# #v2049003#Clean Slate 20%");
+            cm.sendSimple("Fun Fact: Mitochondria is not actually the powerhouse of the cell #b\r\n\#L34# #v2049100# Chaos Scroll #b\r\n\#L35# #v2340000#White Scroll #b\r\n\#L36# #v2049003#Clean Slate 20% #b\r\n\#L95# #v2040914#Shield for W.Att #b\r\n\#L96# #v2040919#Shield for M.Att #b\r\n\#L97# #v2044301#Spear Att x3 #b\r\n\#L98# #v2044401#Polearm Att x3#b\r\n\#L99# #v2044501#Bow Att x3 #b\r\n\#L100# #v2044701#Xbow Att x3 #b\r\n\#L101# #v2044701#Claw Att x3 #b\r\n\#L102# #v2044801#Knuckle Att x3 #b\r\n\#L103# #v2044901#Gun Att x3 #b\r\n\#L104# #v2044201#2H BW Att x3 #b\r\n\#L105# #v2044101#2H Axe Att x3 #b\r\n\#L106# #v2044001#2H Sword Att x3 #b\r\n\#L107# #v2043001#1H Sword Att x3 #b\r\n\#L108# #v2043101#1H Axe Att x3 #b\r\n\#L109# #v2043201# 1H BW Att x3 #b\r\n\#L110# #v2043801#Staff M.Att x3 #b\r\n\#L111# #v2043701#Wand M.Att x3 #b\r\n\#L112# #v2043301#Dagger Att x3  ");
         } else if (s == 1){
                         cm.sendSimple("Fun Fact: Munz Likes Bunz #b\r\n\#L1# #v1082223#Stormcaster Gloves#b\r\n\#L2# #v1082230#Glitter Gloves#b\r\n\#L3# #v1032048#Crystal Leaf Earrings#b\r\n\#L4# #v1002675#Antellion Mitter#b\r\n\#L5# #v1002676#Infinity Circlet #b\r\n\#L6# #v1072344#Facestompers#b\r\n\#L7# #v1402045#Winkel #b\r\n\#L8# #v1472064#Tiger's Fang #b\r\n\#L9# #v1422028#Neva #b\r\n\#L10# #v2070016#Crystal Ilbis #b\r\n\#L11# #v1102165#Taru Spirit Cape #b\r\n\#L12# #v1092052#Black Phoenix Shield #b\r\n\#L13# #v1102145#Sirius Cloak #b\r\n\#L14# #v1442057#Purple Surfboard #b\r\n\#L15# #v2070018#Balanced Fury #b\r\n\#L16# #v1002553#Genesis Bandana");
         } else if (s == 2){
@@ -60,13 +61,22 @@ function action (m,t,s) {
             }
         } else {
             if (cm.getrewardpoints() >= points[s]) {
-                cm.gainrewardpoints(-points[s]);
-                if (items[s] == 2049100 || items[s] == 2340000 || items[s] == 2049003) {
-                    cm.gainItem(items[s], 1);
+                if(!cm.getPlayer().getInventory(Packages.client.inventory.MapleInventoryType.EQUIP).isFull(2)) {
+                    cm.gainrewardpoints(-points[s]);
+                    if (items[s] == 2049100 || items[s] == 2340000 || items[s] == 2049003) {
+                        cm.gainItem(items[s], 1);
+                    }
+                    else if(items[s] == 2044301 || items[s] == 2044401 || items[s] == 2044501 || items[s] == 2044601 || items[s] == 2044701 || items[s] == 2044801 || items[s] == 2044901 || items[s] == 2044201 || items[s] == 2044101 || items[s] == 2044001 || items[s] == 2043001 || items[s] == 2043101 || items[s] == 2043201 || items[s] == 2043801 || items[s] == 2043701 || items[s] == 2043301){
+                        cm.gainItem(items[s], 3);
+                    }
+                    else if(items[s] != 2049100 || items[s] != 2340000 || items[s] != 249003){
+                        cm.gainItem(items[s], 1);
+                    }
                 }
-                else if(items[s] != 2049100 || items[s] != 2340000 || items[s] != 249003){
-                    cm.gainItem(items[s], 1);
+                else{
+                    cm.sendOK("Please make sure you have enough space to hold these items!");
                 }
+
                     
                 
             
