@@ -1008,7 +1008,7 @@ public class Server {
         this.acceptor.setCloseOnDeactivation(CLOSE_CONNECTIONS_ON_SHUTDOWN);
     }
 
-    private void openServer() {
+    public void openServer() {
         boolean taskSuccess = false;
         logger.info("Task: {}, Status: {}", "Opening Server", "BEGIN");
         try {
@@ -1026,5 +1026,11 @@ public class Server {
     public void closeServer() {
         this.acceptor.unbind();
         logger.info("Server closed. No longer accepting connections.");
+    }
+
+    public boolean isAcceptingConnections() {
+        boolean isAcceptingConnections = this.acceptor.isActive();
+        logger.info("Server is {}", isAcceptingConnections ? "closed. Not accepting connections" : "open. Accepting connections");
+        return isAcceptingConnections;
     }
 }

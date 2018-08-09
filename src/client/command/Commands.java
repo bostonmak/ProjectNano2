@@ -3060,7 +3060,32 @@ public class Commands {
 				player.dropMessage(successMessage.toString());
 				break;
 			}
-
+			case "closeserver": {
+				Server.getInstance().closeServer();
+				player.dropMessage("Server has been successfully closed. No longer accepting new connections.");
+				break;
+			}
+			case "openserver": {
+				if (Server.getInstance().isAcceptingConnections()) {
+					player.dropMessage("Server is already open and accepting connections.");
+				} else {
+					Server.getInstance().openServer();
+					if (Server.getInstance().isAcceptingConnections()) {
+						player.dropMessage("Server has been opened. Now accepting connections.");
+					} else {
+						player.dropMessage("ERROR: Server could not be opened.");
+					}
+				}
+				break;
+			}
+			case "constatus": {
+				if (Server.getInstance().isAcceptingConnections()) {
+					player.dropMessage("Server is open and accepting connections.");
+				} else {
+					player.dropMessage("Server is closed and not accepting connections.");
+				}
+				break;
+			}
 			default:
 				return false;
 		}
