@@ -319,17 +319,9 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
     private void distributeExperienceToParty(int pid, float exp, int killer, Set<MapleCharacter> underleveled, int minThresholdLevel) {
         List<MapleCharacter> members = new LinkedList<>();
-        if (pid != 1) {
-            MapleCharacter pchar = getMap().getAnyCharacterFromParty(pid);
-            if (pchar != null) {
-                for (MapleCharacter chr : pchar.getPartyMembersOnSameMap()) {
-                    members.add(chr);
-                }
-            } else {
-                MapleCharacter chr = getMap().getCharacterById(killer);
-                if (chr == null) {
-                    return;
-                }
+        MapleCharacter pchar = getMap().getAnyCharacterFromParty(pid);
+        if (pchar != null) {
+            for (MapleCharacter chr : pchar.getPartyMembersOnSameMap()) {
                 members.add(chr);
             }
         } else {

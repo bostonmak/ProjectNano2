@@ -2843,9 +2843,8 @@ public void saveInventory() throws SQLException {
         if(gain < 0) gain = Integer.MAX_VALUE;   // integer overflow, heh.
         if(party < 0) party = Integer.MAX_VALUE;   // integer overflow, heh.
         int equip = (int) Math.min((long)(gain / 10) * pendantExp, Integer.MAX_VALUE);
-        
-        long total = (long) gain + equip + party;
-        gainExpInternal(total, equip, party, show, inChat, white);
+
+        gainExpInternal((long)gain, equip, party, show, inChat, white);
     }
     
     public void loseExp(int loss, boolean show, boolean inChat) {
@@ -2857,7 +2856,7 @@ public void saveInventory() throws SQLException {
     }
     
     private void gainExpInternal(long gain, int equip, int party, boolean show, boolean inChat, boolean white) {
-        long total = Math.max(gain, -exp.get());
+        long total = Math.max(gain + equip + party, -exp.get());
         
         if (level < getMaxLevel()) {
             long leftover = 0;
