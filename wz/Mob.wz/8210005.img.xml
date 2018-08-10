@@ -14,7 +14,7 @@
         <int name="eva" value="169"/>
         <int name="pushed" value="3800"/>
         <float name="fs" value="10.0"/>
-        <int name="exp" value="58285"/>
+        <int name="exp" value="119879"/>
         <string name="elemAttr" value="F2I2L2S1"/>
     </imgdir>
     <imgdir name="stand">

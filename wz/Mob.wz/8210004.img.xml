@@ -15,7 +15,7 @@
         <int name="eva" value="225"/>
         <int name="pushed" value="3600"/>
         <float name="fs" value="10.0"/>
-        <int name="exp" value="54642"/>
+        <int name="exp" value="114171"/>
         <string name="elemAttr" value="F3I2"/>
         <int name="partyBonusMob" value="1"/>
     </imgdir>
