@@ -34,7 +34,6 @@ var em;
 var exped = MapleExpeditionType.HORNTAIL;
 var expedName = "Horntail";
 var expedBoss = "mighty Horntail";
-var eye = 4001017;
 
 var list = "What would you like to do?#b\r\n\r\n#L1#View current Expedition members#l\r\n#L2#Start the fight!#l\r\n#L3#Stop the expedition.#l";
 
@@ -165,7 +164,6 @@ function action(mode, type, selection) {
                 }
 
                 cm.sendOk("Good luck! All of Leafre is counting on you.");
-                cm.dispose();
                 status = 4;
                 return;
             } else if (selection == 3) {
