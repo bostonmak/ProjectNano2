@@ -22,6 +22,7 @@
 package net.server;
 
 import batch.ResetDailyBossLimitJob;
+import web.WebServer;
 import net.server.worker.CouponWorker;
 import net.server.worker.RankingWorker;
 import java.io.FileInputStream;
@@ -84,6 +85,7 @@ import static constants.ServerConstants.CLOSE_CONNECTIONS_ON_SHUTDOWN;
 import static constants.ServerConstants.PORT;
 
 public class Server {
+    private WebServer webServer;
     private static final Set<Integer> activeFly = new HashSet<>();
     private static final Map<Integer, Integer> couponRates = new HashMap<>(30);
     private static final List<Integer> activeCoupons = new LinkedList<>();
@@ -332,10 +334,10 @@ public class Server {
         NewYearCardRecord.startPendingNewYearCardRequests();
         
         if(ServerConstants.USE_THREAD_TRACKER) ThreadTracker.getInstance().registerThreadTrackerTask();
-        
+
         try {
             Integer worldCount = Math.min(ServerConstants.WORLD_NAMES.length, Integer.parseInt(p.getProperty("worlds")));
-            
+
             for (int i = 0; i < worldCount; i++) {
                 System.out.println("Starting world " + i);
                 World world = new World(i,
@@ -388,6 +390,9 @@ public class Server {
 
         System.out.println("ProjectNano is now online.\r\n");
         online = true;
+
+        webServer = new WebServer();
+        webServer.start();
     }
 
     public void shutdown() {

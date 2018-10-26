@@ -32,6 +32,7 @@ dependencies {
     runtime 'mysql:mysql-connector-java:5.1.37'
     compile 'org.quartz-scheduler:quartz:2.2.1'
     compile 'org.quartz-scheduler:quartz-jobs:2.2.1'
+    compile'org.apache.httpcomponents:httpcore:4.4.10'
 }
 
 sourceSets {
