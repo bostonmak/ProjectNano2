@@ -1,5 +1,8 @@
 package constants;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileInputStream;
 import java.util.Properties;
 
@@ -178,30 +181,5 @@ public class ServerConstants {
 
     public static boolean isRebirthEnabled() {
         return REBIRTH_FEATURE;
-    }
-	
-    //Properties
-    static {
-        Properties p = new Properties();
-        try {
-            p.load(new FileInputStream("configuration.ini"));
-
-            //Server Host
-            ServerConstants.HOST = p.getProperty("HOST");
-
-            //Sql Database
-            ServerConstants.DB_URL = p.getProperty("URL");
-            ServerConstants.DB_USER = p.getProperty("DB_USER");
-            ServerConstants.DB_PASS = p.getProperty("DB_PASS");
-
-            //java8 And Shutdownhook
-            ServerConstants.JAVA_8 = p.getProperty("JAVA8").equalsIgnoreCase("TRUE");
-            ServerConstants.SHUTDOWNHOOK = p.getProperty("SHUTDOWNHOOK").equalsIgnoreCase("true");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Failed to load configuration.ini.");
-            System.exit(0);
-        }
     }
 }
