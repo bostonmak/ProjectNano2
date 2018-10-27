@@ -22,9 +22,9 @@
 package net.server;
 
 import batch.ResetDailyBossLimitJob;
+import config.ConfigLoader;
 import net.server.worker.CouponWorker;
 import net.server.worker.RankingWorker;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.sql.*;
@@ -84,6 +84,11 @@ import static constants.ServerConstants.CLOSE_CONNECTIONS_ON_SHUTDOWN;
 import static constants.ServerConstants.PORT;
 
 public class Server {
+    // Load configurations based on environment
+    private String environment = "test";
+
+    private final static ConfigLoader ConfigLoader = new ConfigLoader();
+
     private static final Set<Integer> activeFly = new HashSet<>();
     private static final Map<Integer, Integer> couponRates = new HashMap<>(30);
     private static final List<Integer> activeCoupons = new LinkedList<>();
@@ -272,14 +277,10 @@ public class Server {
     }
 
     public void init() {
-        Properties p = new Properties();
-        try {
-            p.load(new FileInputStream("world.ini"));
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Please start create_server.bat");
-            System.exit(0);
-        }
+        environment = System.getProperty("env", "test");
+        logger.info("Environment: " + environment);
+
+        ConfigLoader.LoadServerConstantsConfig();
 
         System.out.println("ProjectNano v" + ServerConstants.VERSION + " starting up.\r\n");
 
@@ -332,37 +333,7 @@ public class Server {
         NewYearCardRecord.startPendingNewYearCardRequests();
         
         if(ServerConstants.USE_THREAD_TRACKER) ThreadTracker.getInstance().registerThreadTrackerTask();
-        
-        try {
-            Integer worldCount = Math.min(ServerConstants.WORLD_NAMES.length, Integer.parseInt(p.getProperty("worlds")));
-            
-            for (int i = 0; i < worldCount; i++) {
-                System.out.println("Starting world " + i);
-                World world = new World(i,
-                        Integer.parseInt(p.getProperty("flag" + i)),
-                        p.getProperty("eventmessage" + i),
-                        ServerConstants.EXP_RATE,
-                        ServerConstants.DROP_RATE,
-                        ServerConstants.MESO_RATE,
-                        ServerConstants.QUEST_RATE);
-
-                worldRecommendedList.add(new Pair<>(i, p.getProperty("whyamirecommended" + i)));
-                worlds.add(world);
-                channels.add(new HashMap<Integer, String>());
-                for (int j = 0; j < Integer.parseInt(p.getProperty("channels" + i)); j++) {
-                    int channelid = j + 1;
-                    Channel channel = new Channel(i, channelid);
-                    world.addChannel(channel);
-                    channels.get(i).put(channelid, channel.getIP());
-                }
-                world.setServerMessage(p.getProperty("servermessage" + i));
-                System.out.println("Finished loading world " + i + "\r\n");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();//For those who get errors
-            System.out.println("Error in moople.ini, start CreateINI.bat to re-make the file.");
-            System.exit(0);
-        }
+        ConfigLoader.LoadWorldConfig();
 
         setupAcceptor();
         openServer();
@@ -1032,5 +1003,21 @@ public class Server {
         boolean isAcceptingConnections = this.acceptor.isActive();
         logger.info("Server is {}", isAcceptingConnections ? "closed. Not accepting connections" : "open. Accepting connections");
         return isAcceptingConnections;
+    }
+
+    public String getEnvironment() {
+        return environment;
+    }
+
+    public void setWorlds(List<World> worlds) {
+        this.worlds = worlds;
+    }
+
+    public void setChannels(List<Map<Integer, String>> channels) {
+        this.channels = channels;
+    }
+
+    public void setWorldRecommendedList(List<Pair<Integer, String>> worldRecommendedList) {
+        this.worldRecommendedList = worldRecommendedList;
     }
 }
