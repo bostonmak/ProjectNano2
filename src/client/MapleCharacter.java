@@ -164,6 +164,8 @@ import scripting.item.ItemScriptManager;
 import server.maps.MapleMapItem;
 import tools.locks.MonitoredLockType;
 
+import static constants.GameConstants.NO_PARTY;
+
 public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     private static NumberFormat nf = new DecimalFormat("#,###,###,###");
     private static MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
@@ -237,7 +239,6 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     private MapleMessenger messenger = null;
     private MapleMiniGame miniGame;
     private MapleMount maplemount;
-    private MapleParty party;
     private MaplePet[] pets = new MaplePet[3];
     private MaplePlayerShop playerShop = null;
     private MapleShop shop = null;
@@ -325,6 +326,7 @@ public class MapleCharacter extends AbstractAnimatedMapleMapObject {
     private int rebirths = 0;
     private RebirthPath rebirthPath = RebirthPath.NONE;
     private int apGain = 5;
+    private int partyId = NO_PARTY;
 
     private static Logger MapleLogger = LoggerFactory.getLogger(MapleCharacter.class);
 
@@ -1670,12 +1672,12 @@ public void saveInventory() throws SQLException {
             setPosition(pos);
             map.addPlayer(this);
 
-            if (this.party != null) {
+            if (this.partyId != NO_PARTY) {
                 prtLock.lock();
                 try {
                     mpc.setMapId(to.getId());
                     silentPartyUpdateInternal();
-                    client.announce(MaplePacketCreator.updateParty(client.getChannel(), party, PartyOperation.SILENT_UPDATE, null));
+                    client.announce(MaplePacketCreator.updateParty(client.getChannel(), this.getParty(), PartyOperation.SILENT_UPDATE, null));
                     updatePartyMemberHPInternal();
                 } finally {
                     prtLock.unlock();
@@ -1903,18 +1905,18 @@ public void saveInventory() throws SQLException {
                     if (mapitem.getMeso() > 0) {
                         prtLock.lock();
                         try {
-                            if (this.party != null) {
+                            if (this.partyId != NO_PARTY) {
                                 int mesosamm = mapitem.getMeso();
                                 if (mesosamm > 50000 * this.getMesoRate()) {
                                     return;
                                 }
                                 int partynum = 0;
-                                for (MaplePartyCharacter partymem : this.party.getMembers()) {
+                                for (MaplePartyCharacter partymem : this.getParty().getMembers()) {
                                     if (partymem.isOnline() && partymem.getMapId() == this.getMap().getId() && partymem.getChannel() == client.getChannel()) {
                                         partynum++;
                                     }
                                 }
-                                for (MaplePartyCharacter partymem : this.party.getMembers()) {
+                                for (MaplePartyCharacter partymem : this.getParty().getMembers()) {
                                     if (partymem.isOnline() && partymem.getMapId() == this.getMap().getId()) {
                                         MapleCharacter somecharacter = client.getChannelServer().getPlayerStorage().getCharacterById(partymem.getId());
                                         if (somecharacter != null) {
@@ -3492,10 +3494,10 @@ public void saveInventory() throws SQLException {
                     destroyDoor.getTownDoor().sendDestroyData(chr.getClient());
                 }
 
-                if (this.party != null) {
+                if (this.partyId != NO_PARTY) {
                     prtLock.lock();
                     try {
-                        for (MaplePartyCharacter partyMembers : party.getMembers()) {
+                        for (MaplePartyCharacter partyMembers : this.getParty().getMembers()) {
                             partyMembers.getPlayer().removeDoor(this.getId());
                             partyMembers.removeDoor(this.getId());
                         }
@@ -4465,7 +4467,7 @@ public void saveInventory() throws SQLException {
         if(doorSlot == -1) {
             prtLock.lock();
             try {
-                doorSlot = (party == null) ? 0 : party.getPartyDoor(this.getId());
+                doorSlot = (partyId == NO_PARTY) ? 0 : this.getParty().getPartyDoor(this.getId());
             } finally {
                 prtLock.unlock();
             }
@@ -4558,21 +4560,12 @@ public void saveInventory() throws SQLException {
     }
 
     public MapleParty getParty() {
-        prtLock.lock();
-        try {
-            return party;
-        } finally {
-            prtLock.unlock();
-        }
+        World world = client.getWorldServer();
+        return world.getParty(this.partyId);
     }
 
     public int getPartyId() {
-        prtLock.lock();
-        try {
-            return (party != null ? party.getId() : -1);
-        } finally {
-            prtLock.unlock();
-        }
+        return partyId;
     }
     
     public List<MapleCharacter> getPartyMembers() {
@@ -4580,8 +4573,8 @@ public void saveInventory() throws SQLException {
         
         prtLock.lock();
         try {
-            if(party != null) {
-                for(MaplePartyCharacter partyMembers: party.getMembers()) {
+            if(partyId != NO_PARTY) {
+                for(MaplePartyCharacter partyMembers: this.getParty().getMembers()) {
                     list.add(partyMembers.getPlayer());
                 }
             }
@@ -4598,8 +4591,8 @@ public void saveInventory() throws SQLException {
         
         prtLock.lock();
         try {
-            if(party != null) {
-                for(MaplePartyCharacter partyMembers: party.getMembers()) {
+            if(partyId != NO_PARTY) {
+                for(MaplePartyCharacter partyMembers: this.getParty().getMembers()) {
                     MapleCharacter chr = partyMembers.getPlayer();
                     if(chr.getMap().hashCode() == thisMapHash && chr.isLoggedinWorld()) list.add(chr);
                 }
@@ -5282,7 +5275,7 @@ public void saveInventory() throws SQLException {
     public boolean isPartyLeader() {
         prtLock.lock();
         try {
-            return party.getLeaderId() == getId();
+            return this.getParty().getLeaderId() == getId();
         } finally {
             prtLock.unlock();
         }
@@ -5412,9 +5405,9 @@ public void saveInventory() throws SQLException {
         setMPC(new MaplePartyCharacter(this));
         silentPartyUpdate();
         
-        if(level == 10 && party != null) {
-            if(this.isPartyLeader()) party.assignNewLeader(client);
-            PartyOperationHandler.leaveParty(party, mpc, client);
+        if(level == 10 && partyId != NO_PARTY) {
+            if(this.isPartyLeader()) this.getParty().assignNewLeader(client);
+            PartyOperationHandler.leaveParty(this.getParty(), mpc, client);
             
             showHint("You have reached #blevel 10#k, therefore you must leave your #rstarter party#k.");
         }
@@ -5919,7 +5912,7 @@ public void saveInventory() throws SQLException {
                     ret.mpc = party.getMemberById(ret.id);
                     if (ret.mpc != null) {
                         ret.mpc = new MaplePartyCharacter(ret);
-                        ret.party = party;
+                        ret.partyId = partyid;
                     }
                 }
                 int messengerid = rs.getInt("messengerid");
@@ -6589,11 +6582,11 @@ public void saveInventory() throws SQLException {
     public void receivePartyMemberHP() {
         prtLock.lock();
         try {
-            if (party != null) {
+            if (this.partyId != NO_PARTY) {
                 int channel = client.getChannel();
                 int mapId = getMapId();
                 
-                for (MaplePartyCharacter partychar : party.getMembers()) {
+                for (MaplePartyCharacter partychar : this.getParty().getMembers()) {
                     if (partychar.getMapId() == mapId && partychar.getChannel() == channel) {
                         MapleCharacter other = Server.getInstance().getWorld(world).getChannel(channel).getPlayerStorage().getCharacterByName(partychar.getName());
                         if (other != null) {
@@ -7042,11 +7035,7 @@ public void saveInventory() throws SQLException {
             
             prtLock.lock();
             try {
-                if (party != null) {
-                    ps.setInt(25, party.getId());
-                } else {
-                    ps.setInt(25, -1);
-                }
+                ps.setInt(25, this.partyId);
             } finally {
                 prtLock.unlock();
             }
@@ -7822,23 +7811,6 @@ public void saveInventory() throws SQLException {
         }
     }
 
-    public void setParty(MapleParty p) {
-        prtLock.lock();
-        try {
-            if (p == null) {
-                this.mpc = null;
-                doorSlot = -1;
-
-                party = null;
-                //cancelMagicDoor();  // cancel magic doors if kicked out / quitted from party.
-            } else {
-                party = p;
-            }
-        } finally {
-            prtLock.unlock();
-        }
-    }
-
     public void setPlayerShop(MaplePlayerShop playerShop) {
         this.playerShop = playerShop;
     }
@@ -8062,7 +8034,7 @@ public void saveInventory() throws SQLException {
     }
 
     public void silentPartyUpdate() {
-        if (this.party != null) {
+        if (this.partyId != NO_PARTY) {
             prtLock.lock();
             try {
                 silentPartyUpdateInternal();
@@ -8073,7 +8045,7 @@ public void saveInventory() throws SQLException {
     }
     
     private void silentPartyUpdateInternal() {
-        Server.getInstance().getWorld(world).updateParty(party.getId(), PartyOperation.SILENT_UPDATE, getMPC());
+        Server.getInstance().getWorld(world).updateParty(this.getPartyId(), PartyOperation.SILENT_UPDATE, getMPC());
     }
 
     public static class SkillEntry {
@@ -8212,11 +8184,11 @@ public void saveInventory() throws SQLException {
     }
     
     private void updatePartyMemberHPInternal() {
-        if (party != null) {
+        if (this.partyId != NO_PARTY) {
             int channel = client.getChannel();
             int mapId = getMapId();
             
-            for (MaplePartyCharacter partychar : party.getMembers()) {
+            for (MaplePartyCharacter partychar : this.getParty().getMembers()) {
                 if (partychar.getMapId() == mapId && partychar.getChannel() == channel) {
                     MapleCharacter other = Server.getInstance().getWorld(world).getChannel(channel).getPlayerStorage().getCharacterByName(partychar.getName());
                     if (other != null) {
@@ -8914,7 +8886,7 @@ public void saveInventory() throws SQLException {
             mpc = null;
             mgc = null;
             events = null;
-            party = null;
+            partyId = NO_PARTY;
             family = null;
             client = null;
             map = null;
@@ -9040,5 +9012,9 @@ public void saveInventory() throws SQLException {
 
     public boolean hasRebirthed() {
         return rebirths > 0 ? true : false;
+    }
+
+    public void setPartyId(int partyId) {
+        this.partyId = partyId;
     }
 }
