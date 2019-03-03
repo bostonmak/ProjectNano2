@@ -12,6 +12,8 @@ Create a variable called `JDK7_HOME` and set it to your JDK7 path
 
 For example: `JDK7_HOME=C:\Program Files\Java\jdk1.7.0_79`
 
+---
+
 ### Building the JAR with Gradle (New Method)
 
 To construct the jar, run:
@@ -23,6 +25,39 @@ The jar is now created at `build/dist`
 To construct the jar and copy it to the `dist/` directory:
 
 Run `./gradlew buildAndCopy`
+
+---
+
+### Configuration
+
+Config files are located under `config/` and the ConfigLoader looks for them there
+
+The launch scripts now take the value passed from `env` to setup the server differently.
+
+Variables are passed to the server by providing the -D flag
+The variable name immediately follow and then the value
+
+`-Dname=value`
+
+The launch script looks like the following
+
+`java -server -Xms4g -Xmx4g -Denv=local -Dwzpath=wz\ net.server.Server`
+
+Configs are loaded based on the values `prod`, `test`, and anything else that aren't those values
+
+#### When env is `prod`
+
+`configuration.ini` and `world.ini` are loaded
+
+#### When env is `test`
+
+`testconfiguration.ini` and `world.ini` are loaded
+
+#### When env is anything else
+
+`localconfiguration.ini` (create yourself) and `world.ini` are loaded
+
+---
 
 ### Running the Server
 
