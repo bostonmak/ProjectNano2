@@ -34,6 +34,8 @@ import constants.ServerConstants;
 import scripting.event.EventInstanceManager;
 import server.maps.MapleMap;
 
+import static constants.GameConstants.NO_PARTY;
+
 public final class PartyOperationHandler extends AbstractMaplePacketHandler {
     
     public static void leaveParty(MapleParty party, MaplePartyCharacter partyplayer, MapleClient c) {
@@ -57,7 +59,7 @@ public final class PartyOperationHandler extends AbstractMaplePacketHandler {
                 }
             }
 
-            player.setParty(null);
+            player.setPartyId(NO_PARTY);
         }
     }
     
@@ -77,7 +79,7 @@ public final class PartyOperationHandler extends AbstractMaplePacketHandler {
                 if (player.getParty() == null) {
                     partyplayer = new MaplePartyCharacter(player);
                     party = world.createParty(partyplayer);
-                    player.setParty(party);
+                    player.setPartyId(party.getId());
                     player.setMPC(partyplayer);
                     player.getMap().addPartyMember(player);
                     player.silentPartyUpdate();
@@ -136,7 +138,7 @@ public final class PartyOperationHandler extends AbstractMaplePacketHandler {
                             
                             partyplayer = new MaplePartyCharacter(player);
                             party = world.createParty(partyplayer);
-                            player.setParty(party);
+                            player.setPartyId(party.getId());
                             player.setMPC(partyplayer);
                             player.getMap().addPartyMember(player);
                             c.announce(MaplePacketCreator.partyCreated(partyplayer));
@@ -169,7 +171,7 @@ public final class PartyOperationHandler extends AbstractMaplePacketHandler {
                                 eim.leftParty(emc);
                             }
                             
-                            emc.setParty(null);
+                            emc.setPartyId(NO_PARTY);
                         }
                         
                         world.updateParty(party.getId(), PartyOperation.EXPEL, expelled);

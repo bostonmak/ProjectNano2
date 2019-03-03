@@ -305,4 +305,6 @@ public class GameConstants {
     public static String getItemNameUsedForRebirth() {
         return ITEM_NAME_USED_FOR_REBIRTH;
     }
+
+    public static int NO_PARTY = -1;
 }

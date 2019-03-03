@@ -91,6 +91,8 @@ import tools.Pair;
 import tools.Randomizer;
 import tools.locks.MonitoredLockType;
 
+import static constants.GameConstants.NO_PARTY;
+
 public class MapleMap {
     private static final List<MapleMapObjectType> rangedMapobjectTypes = Arrays.asList(MapleMapObjectType.SHOP, MapleMapObjectType.ITEM, MapleMapObjectType.NPC, MapleMapObjectType.MONSTER, MapleMapObjectType.DOOR, MapleMapObjectType.SUMMON, MapleMapObjectType.REACTOR);
     private static final Map<Integer, Pair<Integer, Integer>> dropBoundsCache = new HashMap<>(100);
@@ -350,7 +352,7 @@ public class MapleMap {
 
     public int getCurrentPartyId() {
         for (MapleCharacter chr : this.getCharacters()) {
-            if (chr.getPartyId() != -1) {
+            if (chr.getPartyId() != NO_PARTY) {
                 return chr.getPartyId();
             }
         }
