@@ -202,38 +202,49 @@ public class MapleMapFactory {
                 map.addMapleArea(new Rectangle(x1, y1, (x2 - x1), (y2 - y1)));
             }
         }
+
+        Connection con = null;
         try {
-                    Connection con = DatabaseConnection.getConnection();
-                    PreparedStatement ps = con.prepareStatement("SELECT * FROM spawns WHERE mid = ?");
-                    ps.setInt(1, omapid);
-                    ResultSet rs = ps.executeQuery();
-                    while (rs.next()) {
-                        int id = rs.getInt("idd");
-                        int f = rs.getInt("f");
-                        boolean hide = false;
-                        String type = rs.getString("type");
-                        int fh = rs.getInt("fh");
-                        int cy = rs.getInt("cy");
-                        int rx0 = rs.getInt("rx0");
-                        int rx1 = rs.getInt("rx1");
-                        int x = rs.getInt("x");
-                        int y = rs.getInt("y");
-                        int mobTime = rs.getInt("mobtime");
+            con = DatabaseConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM spawns WHERE mid = ?");
+            ps.setInt(1, omapid);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("idd");
+                int f = rs.getInt("f");
+                boolean hide = false;
+                String type = rs.getString("type");
+                int fh = rs.getInt("fh");
+                int cy = rs.getInt("cy");
+                int rx0 = rs.getInt("rx0");
+                int rx1 = rs.getInt("rx1");
+                int x = rs.getInt("x");
+                int y = rs.getInt("y");
+                int mobTime = rs.getInt("mobtime");
 
-                        AbstractLoadedMapleLife myLife = giveLife(id, f, hide, fh, cy, rx0, rx1, x, y, type);
+                AbstractLoadedMapleLife myLife = giveLife(id, f, hide, fh, cy, rx0, rx1, x, y, type);
 
-                        if (type.equals("n")) {
-                            map.addMapObject(myLife);
-                        } else if (type.equals("m")) {
-                            MapleMonster monster = (MapleMonster) myLife;
-                            map.addMonsterSpawn(monster, mobTime, 0);
-                        }
-                    }
-                } catch (SQLException e) {
-
+                if (type.equals("n")) {
+                    map.addMapObject(myLife);
+                } else if (type.equals("m")) {
+                    MapleMonster monster = (MapleMonster) myLife;
+                    map.addMonsterSpawn(monster, mobTime, 0);
                 }
+            }
+        } catch (SQLException e) {
+
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    System.out.println(e);
+                }
+            }
+        }
+
         try {
-            Connection con = DatabaseConnection.getConnection();
+            con = DatabaseConnection.getConnection();
             try (PreparedStatement ps = con.prepareStatement("SELECT * FROM playernpcs WHERE map = ?")) {
                 ps.setInt(1, omapid);
                 try (ResultSet rs = ps.executeQuery()) {
@@ -243,9 +254,16 @@ public class MapleMapFactory {
                 }
             }
 
-            con.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    System.out.println(e);
+                }
+            }
         }
 
         for (MapleData life : mapData.getChildByPath("life")) {
