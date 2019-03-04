@@ -14,7 +14,6 @@ public class ServerConstants {
     public static String DB_URL = "localhost";
     public static String DB_USER = "root";
     public static String DB_PASS = "";
-    public static final boolean DB_CONNECTION_POOL = true;      //Installs a connection pool to hub DB connections. Set false to default.
     //public static final boolean ALLOW_MASTER_PASSWORD = true;
     //public static String MASTER_PASSWORD = "m0untainview1757"; 
     
