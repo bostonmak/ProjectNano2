@@ -592,7 +592,7 @@ public class AbstractPlayerInteraction {
 		try {
 			return Server.getInstance().getGuild(getPlayer().getGuildId(), getPlayer().getWorld(), null);
 		} catch (Exception e) {
-                        e.printStackTrace();
+			e.printStackTrace();
 		}
 		return null;
 	}

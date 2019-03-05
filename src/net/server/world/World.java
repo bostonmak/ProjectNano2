@@ -96,7 +96,6 @@ public class World {
     
     private final Set<Integer> queuedGuilds = new HashSet<>();
     
-//    private final Map<Integer, MapleParty> parties = new HashMap<>();
     private final ConcurrentHashMap<Integer, MapleParty> parties = new ConcurrentHashMap<>();
     private final AtomicInteger runningPartyId = new AtomicInteger();
     private final Lock partyLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_PARTY, true);

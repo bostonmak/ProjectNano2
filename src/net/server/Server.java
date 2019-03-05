@@ -45,6 +45,8 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.locks.MonitoredReentrantLock;
+
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 
 import net.MapleServerHandler;
@@ -101,7 +103,7 @@ public class Server {
     private final Map<Integer, Set<Integer>> accountChars = new HashMap<>();
     private final Map<String, Integer> transitioningChars = new HashMap<>();
     private List<Pair<Integer, String>> worldRecommendedList = new LinkedList<>();
-    private final Map<Integer, MapleGuild> guilds = new HashMap<>(100);
+    private final ConcurrentHashMap<Integer, MapleGuild> guilds = new ConcurrentHashMap<>();
     private final Map<MapleClient, Long> inLoginState = new HashMap<>(100);
     private final Lock srvLock = new MonitoredReentrantLock(MonitoredLockType.SERVER);
     private final Lock lgnLock = new MonitoredReentrantLock(MonitoredLockType.SERVER);
@@ -405,7 +407,7 @@ public class Server {
             MapleAlliance alliance = alliances.get(id);
             if (alliance != null) {
                 for (Integer gid : alliance.getGuilds()) {
-                    guilds.get(gid).setAllianceId(0);
+                    this.getGuild(gid).setAllianceId(0);
                 }
                 alliances.remove(id);
             }
@@ -419,7 +421,7 @@ public class Server {
                 if (guildex == gid) {
                     continue;
                 }
-                MapleGuild guild = guilds.get(gid);
+                MapleGuild guild = this.getGuild(gid);
                 if (guild != null) {
                     guild.broadcast(packet, exception);
                 }
@@ -431,7 +433,7 @@ public class Server {
         MapleAlliance alliance = alliances.get(aId);
         if (alliance != null) {
             alliance.addGuild(guildId);
-            guilds.get(guildId).setAllianceId(aId);
+            this.getGuild(guildId).setAllianceId(aId);
             return true;
         }
         return false;
@@ -441,7 +443,7 @@ public class Server {
         MapleAlliance alliance = alliances.get(aId);
         if (alliance != null) {
             alliance.removeGuild(guildId);
-            guilds.get(guildId).setAllianceId(0);
+            this.getGuild(guildId).setAllianceId(0);
             return true;
         }
         return false;
@@ -494,25 +496,17 @@ public class Server {
     }
     
     public MapleGuild getGuildByName(String name) {
-        synchronized (guilds) {
-            for(MapleGuild mg: guilds.values()) {
-                if(mg.getName().equalsIgnoreCase(name)) {
-                    return mg;
-                }
+        for(MapleGuild mg: this.guilds.values()) {
+            if(mg.getName().equalsIgnoreCase(name)) {
+                return mg;
             }
-            
-            return null;
         }
+
+        return null;
     }
     
     public MapleGuild getGuild(int id) {
-        synchronized (guilds) {
-            if (guilds.get(id) != null) {
-                return guilds.get(id);
-            }
-            
-            return null;
-        }
+        return this.guilds.get(id);
     }
 
     public MapleGuild getGuild(int id, int world) {
@@ -520,33 +514,24 @@ public class Server {
     }
     
     public MapleGuild getGuild(int id, int world, MapleCharacter mc) {
-        synchronized (guilds) {
-            if (guilds.get(id) != null) {
-                return guilds.get(id);
-            }
-            MapleGuild g = new MapleGuild(id, world);
-            if (g.getId() == -1) {
-                return null;
-            }
-            
-            if(mc != null) {
-                mc.setMGC(g.getMGC(mc.getId()));
-                if(g.getMGC(mc.getId()) == null) System.out.println("null for " + mc.getName() + " when loading " + id);
-                g.getMGC(mc.getId()).setCharacter(mc);
-                g.setOnline(mc.getId(), true, mc.getClient().getChannel());
-            }
-            
-            guilds.put(id, g);
-            return g;
+        MapleGuild mapleGuild = this.getGuild(id);
+        if (mapleGuild != null) {
+            return mapleGuild;
         }
-    }
+        MapleGuild g = new MapleGuild(id, world);
+        if (g.getId() == -1) {
+            return null;
+        }
 
-    public void clearGuilds() {//remake
-        synchronized (guilds) {
-            guilds.clear();
+        if(mc != null) {
+            mc.setMGC(g.getMGC(mc.getId()));
+            if(g.getMGC(mc.getId()) == null) System.out.println("null for " + mc.getName() + " when loading " + id);
+            g.getMGC(mc.getId()).setCharacter(mc);
+            g.setOnline(mc.getId(), true, mc.getClient().getChannel());
         }
-        //for (List<Channel> world : worlds.values()) {
-        //reloadGuildCharacters();
+
+        this.guilds.put(id, g);
+        return g;
     }
 
     public void setGuildMemberOnline(MapleCharacter mc, boolean bOnline, int channel) {
@@ -555,7 +540,7 @@ public class Server {
     }
 
     public int addGuildMember(MapleGuildCharacter mgc, MapleCharacter chr) {
-        MapleGuild g = guilds.get(mgc.getGuildId());
+        MapleGuild g = this.getGuild(mgc.getGuildId());
         if (g != null) {
             return g.addGuildMember(mgc, chr);
         }
@@ -563,7 +548,7 @@ public class Server {
     }
 
     public boolean setGuildAllianceId(int gId, int aId) {
-        MapleGuild guild = guilds.get(gId);
+        MapleGuild guild = this.getGuild(gId);
         if (guild != null) {
             guild.setAllianceId(aId);
             return true;
@@ -572,75 +557,73 @@ public class Server {
     }
     
     public void resetAllianceGuildPlayersRank(int gId) {
-        guilds.get(gId).resetAllianceGuildPlayersRank();
+        this.getGuild(gId).resetAllianceGuildPlayersRank();
     }
 
     public void leaveGuild(MapleGuildCharacter mgc) {
-        MapleGuild g = guilds.get(mgc.getGuildId());
+        MapleGuild g = this.getGuild(mgc.getGuildId());
         if (g != null) {
             g.leaveGuild(mgc);
         }
     }
 
     public void guildChat(int gid, String name, int cid, String msg) {
-        MapleGuild g = guilds.get(gid);
+        MapleGuild g = this.getGuild(gid);
         if (g != null) {
             g.guildChat(name, cid, msg);
         }
     }
 
     public void changeRank(int gid, int cid, int newRank) {
-        MapleGuild g = guilds.get(gid);
+        MapleGuild g = this.getGuild(gid);
         if (g != null) {
             g.changeRank(cid, newRank);
         }
     }
 
     public void expelMember(MapleGuildCharacter initiator, String name, int cid) {
-        MapleGuild g = guilds.get(initiator.getGuildId());
+        MapleGuild g = this.getGuild(initiator.getGuildId());
         if (g != null) {
             g.expelMember(initiator, name, cid);
         }
     }
 
     public void setGuildNotice(int gid, String notice) {
-        MapleGuild g = guilds.get(gid);
+        MapleGuild g = this.getGuild(gid);
         if (g != null) {
             g.setGuildNotice(notice);
         }
     }
 
     public void memberLevelJobUpdate(MapleGuildCharacter mgc) {
-        MapleGuild g = guilds.get(mgc.getGuildId());
+        MapleGuild g = this.getGuild(mgc.getGuildId());
         if (g != null) {
             g.memberLevelJobUpdate(mgc);
         }
     }
 
     public void changeRankTitle(int gid, String[] ranks) {
-        MapleGuild g = guilds.get(gid);
+        MapleGuild g = this.getGuild(gid);
         if (g != null) {
             g.changeRankTitle(ranks);
         }
     }
 
     public void setGuildEmblem(int gid, short bg, byte bgcolor, short logo, byte logocolor) {
-        MapleGuild g = guilds.get(gid);
+        MapleGuild g = this.getGuild(gid);
         if (g != null) {
             g.setGuildEmblem(bg, bgcolor, logo, logocolor);
         }
     }
 
     public void disbandGuild(int gid) {
-        synchronized (guilds) {
-            MapleGuild g = guilds.get(gid);
-            g.disbandGuild();
-            guilds.remove(gid);
-        }
+        MapleGuild g = this.getGuild(gid);
+        g.disbandGuild();
+        this.guilds.remove(gid);
     }
 
     public boolean increaseGuildCapacity(int gid) {
-        MapleGuild g = guilds.get(gid);
+        MapleGuild g = this.getGuild(gid);
         if (g != null) {
             return g.increaseCapacity();
         }
@@ -648,7 +631,7 @@ public class Server {
     }
 
     public void gainGP(int gid, int amount) {
-        MapleGuild g = guilds.get(gid);
+        MapleGuild g = this.getGuild(gid);
         if (g != null) {
             g.gainGP(amount);
         }
@@ -659,7 +642,7 @@ public class Server {
     }
 	
     public void guildMessage(int gid, byte[] packet, int exception) {
-        MapleGuild g = guilds.get(gid);
+        MapleGuild g = this.getGuild(gid);
         if(g != null) {
             g.broadcast(packet, exception);
         }
